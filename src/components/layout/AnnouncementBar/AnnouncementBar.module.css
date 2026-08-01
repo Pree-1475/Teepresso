@@ -1,0 +1,18 @@
+.bar {
+  background-color: #2D1A13; /* Dark brown */
+  color: #FDF9F1; /* Warm beige */
+  text-align: center;
+  padding: 8px 16px;
+  width: 100%;
+  position: relative;
+  z-index: 60;
+}
+
+.text {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin: 0;
+}

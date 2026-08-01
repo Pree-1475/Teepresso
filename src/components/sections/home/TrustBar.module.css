@@ -1,0 +1,57 @@
+.trustBar {
+  background-color: #2D1A13; /* Dark brown to sharply divide the sections */
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  /* Thin, sleek height */
+  padding: 12px 0;
+  display: flex;
+  align-items: center;
+}
+
+.marquee {
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.marqueeContent {
+  display: inline-flex;
+  align-items: center;
+  /* Animate continuously to the left */
+  animation: scrollMarquee 30s linear infinite;
+}
+
+/* Pause the marquee if they hover over it */
+.marqueeContent:hover {
+  animation-play-state: paused;
+}
+
+.signalText {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  color: #C3B19E; /* Soft Tan */
+  white-space: nowrap;
+  padding: 0 16px;
+}
+
+.separator {
+  color: #8B7355; /* Slightly darker brown diamond */
+  font-size: 10px;
+  margin: 0 8px;
+}
+
+@keyframes scrollMarquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    /* Translate by exactly one full set of the items. 
+       Since we duplicated it 3 times, translating by -33.33% seamlessly loops it. */
+    transform: translateX(-33.3333%);
+  }
+}

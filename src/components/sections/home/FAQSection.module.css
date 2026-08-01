@@ -1,0 +1,61 @@
+.section {
+  padding: var(--spacing-24) 0;
+  background-color: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-12);
+}
+
+@media (min-width: 1024px) {
+  .wrapper {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+}
+
+.header {
+  flex: 1;
+}
+
+.title {
+  color: var(--color-primary-900);
+  margin-bottom: var(--spacing-4);
+}
+
+.description {
+  color: var(--color-text-secondary);
+  font-size: var(--text-lg);
+  margin-bottom: var(--spacing-8);
+}
+
+.contactCard {
+  background-color: var(--color-background);
+  padding: var(--spacing-6);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+}
+
+.contactCard h3 {
+  font-family: var(--font-body);
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: var(--spacing-2);
+}
+
+.contactCard p {
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  margin-bottom: var(--spacing-4);
+}
+
+.contactBtn {
+  width: 100%;
+}
+
+.accordionWrapper {
+  flex: 1.5;
+}

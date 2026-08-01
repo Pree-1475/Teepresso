@@ -1,0 +1,25 @@
+.layout {
+  padding: var(--spacing-16) 0 var(--spacing-24);
+  background-color: var(--color-background);
+  min-height: 100vh;
+}
+.grid {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--spacing-8);
+}
+@media (min-width: 1024px) {
+  .grid {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+  .mainContent { flex: 1; }
+  .sidebarColumn { width: 350px; position: sticky; top: var(--spacing-24); }
+}
+.stepContainer {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-8);
+  box-shadow: var(--shadow-sm);
+}

@@ -1,0 +1,34 @@
+.stepContainer { display: flex; flex-direction: column; gap: var(--spacing-6); animation: fadeIn var(--transition-fast) ease-out; }
+.title { font-size: var(--text-2xl); color: var(--color-primary-900); margin: 0; }
+.description { color: var(--color-text-secondary); margin: 0; }
+.actions { display: flex; justify-content: flex-end; gap: var(--spacing-4); margin-top: var(--spacing-8); padding-top: var(--spacing-6); border-top: 1px solid var(--color-border); }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-4);
+  margin-top: var(--spacing-4);
+}
+@media (min-width: 640px) {
+  .formGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.selectionGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-4);
+  margin-top: var(--spacing-4);
+}
+@media (min-width: 640px) {
+  .selectionGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (min-width: 1024px) {
+  .selectionGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

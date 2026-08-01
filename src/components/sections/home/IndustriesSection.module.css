@@ -1,0 +1,167 @@
+.section {
+  padding: 24px 0; /* Extremely tight padding */
+  background-color: #F8F5F2; /* Soft beige background */
+  overflow: hidden;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4); /* Just 16px between header and rope */
+}
+
+@media (min-width: 1024px) {
+  .container {
+    gap: var(--spacing-6); /* 24px on desktop */
+  }
+}
+
+.header {
+  flex: 1;
+  max-width: 700px;
+  margin: 0 auto;
+  text-align: center;
+  position: relative;
+  z-index: 10;
+}
+
+.subtitle {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #8B7355;
+  display: block;
+  margin-bottom: var(--spacing-2); /* Reduced to 8px */
+}
+
+.title {
+  font-family: var(--font-serif);
+  font-size: var(--text-3xl); /* Slightly smaller for tighter layout */
+  font-weight: 400;
+  color: #2D1A13; /* Dark brown */
+  line-height: 1.1;
+  margin-bottom: var(--spacing-2); /* Reduced to 8px */
+}
+
+.description {
+  font-size: var(--text-base); /* Smaller description */
+  color: #8B7355;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.ropeContainer {
+  flex: 1.5;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.mainRope {
+  position: absolute;
+  top: 10px;
+  left: -100px;
+  right: -100px;
+  height: 0;
+  border-bottom: 2px dashed #8B7355;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  z-index: 1;
+}
+
+.marqueeViewport {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.hangingItems {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 20px;
+  padding-top: 4px; /* Reduced */
+  padding-bottom: 8px; /* Greatly reduced */
+  position: relative;
+  z-index: 2;
+  width: max-content;
+  animation: scrollRope 40s linear infinite;
+}
+
+.marqueeViewport:hover .hangingItems {
+  animation-play-state: paused;
+}
+
+.hangingItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  transform-origin: top center;
+  animation: idleSwing 6s ease-in-out infinite alternate;
+}
+
+/* Add slight variation to idle swing per item */
+.hangingItem:nth-child(2n) { animation-duration: 7s; animation-delay: -1s; }
+.hangingItem:nth-child(3n) { animation-duration: 5s; animation-delay: -2s; }
+.hangingItem:nth-child(5n) { animation-duration: 6.5s; animation-delay: -3s; }
+
+.hangingItem:hover {
+  animation: activeSwing 1.5s ease-in-out infinite;
+  z-index: 10;
+}
+
+.hangingItem::before,
+.hangingItem::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  width: 1px;
+  height: 16px;
+  background-color: #8B7355;
+  z-index: 0;
+}
+
+.hangingItem::before {
+  left: 20%;
+}
+
+.hangingItem::after {
+  right: 20%;
+}
+
+.pill {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  color: #2D1A13;
+  padding: 10px 20px;
+  margin-top: 16px;
+  border-radius: 4px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 10px rgba(45, 26, 19, 0.05);
+  border: 1px solid rgba(45, 26, 19, 0.05);
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  cursor: default;
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes idleSwing {
+  0% { transform: rotate(-1.5deg); }
+  100% { transform: rotate(1.5deg); }
+}
+
+@keyframes activeSwing {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(4deg); }
+  50% { transform: rotate(-3deg); }
+  75% { transform: rotate(1deg); }
+  100% { transform: rotate(0deg); }
+}
+
+@keyframes scrollRope {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-33.3333%); }
+}
