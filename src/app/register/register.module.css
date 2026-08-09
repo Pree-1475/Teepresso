@@ -1,0 +1,53 @@
+/* src/app/register/register.module.css */
+
+.pageContainer {
+  padding: var(--spacing-16) 0 var(--spacing-24);
+  background-color: var(--color-background);
+  min-height: 100vh;
+}
+
+.registerCard {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-2xl);
+  padding: var(--spacing-10) var(--spacing-8);
+  max-width: 520px;
+  margin: 0 auto;
+  box-shadow: var(--shadow-md);
+}
+
+.headerText {
+  text-align: center;
+  margin-bottom: var(--spacing-8);
+}
+
+.title {
+  font-size: var(--text-3xl);
+  font-family: var(--font-heading);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-2);
+}
+
+.desc {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.footerLinks {
+  text-align: center;
+  margin-top: var(--spacing-6);
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+}
+
+.loginLink {
+  color: var(--color-primary-600);
+  font-weight: var(--font-weight-bold);
+  text-decoration: underline;
+}

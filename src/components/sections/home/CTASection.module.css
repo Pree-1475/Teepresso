@@ -1,7 +1,7 @@
 .section {
   padding: var(--spacing-24) 0;
-  background-color: var(--color-primary-900);
-  background-image: radial-gradient(circle at 50% 0%, var(--color-primary-800) 0%, var(--color-primary-900) 70%);
+  background-color: var(--color-accent-teal-dark);
+  background-image: radial-gradient(circle at 50% 0%, var(--color-accent-teal) 0%, var(--color-accent-teal-dark) 70%);
   color: var(--color-surface);
 }
 
@@ -26,7 +26,7 @@
 }
 
 .description {
-  color: var(--color-primary-200);
+  color: #E0E7FF;
   font-size: var(--text-lg);
   margin-bottom: var(--spacing-10);
   max-width: 600px;
@@ -55,4 +55,16 @@
 .outlineBtn:hover {
   background-color: rgba(255, 255, 255, 0.1);
   border-color: var(--color-surface);
+}
+
+.primaryBtn {
+  background-color: #FFFFFF !important;
+  color: var(--color-accent-teal-dark) !important;
+  border: none !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1) !important;
+}
+
+.primaryBtn:hover {
+  background-color: var(--color-accent-teal-light) !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15) !important;
 }

@@ -3,6 +3,7 @@ import { HeroSection } from '@/components/sections/home/HeroSection';
 import { TrustBar } from '@/components/sections/home/TrustBar';
 import { IndustriesSection } from '@/components/sections/home/IndustriesSection';
 import { HowItWorksSection } from '@/components/sections/home/HowItWorksSection';
+import { SeasonalKurtaSection } from '@/components/sections/home/SeasonalKurtaSection';
 import { FeaturedProducts } from '@/components/sections/home/FeaturedProducts';
 import { WhyChooseUsSection } from '@/components/sections/home/WhyChooseUsSection';
 import { TestimonialsSection } from '@/components/sections/home/TestimonialsSection';
@@ -17,6 +18,7 @@ export default function Home() {
       <TrustBar />
       <IndustriesSection />
       <HowItWorksSection />
+      <SeasonalKurtaSection />
       <FeaturedProducts />
       <WhyChooseUsSection />
       <TestimonialsSection />

@@ -81,6 +81,7 @@
   color: #FFFFFF;
 }
 
+
 .description {
   font-family: var(--font-body);
   /* Scaled down for mobile */
@@ -104,8 +105,9 @@
   align-items: center;
   justify-content: center;
   gap: var(--spacing-2);
-  background-color: #F8F5F2; 
-  color: #1A1A1A;
+  background-color: var(--color-accent-teal);
+  color: #FFFFFF;
+  border: none;
   font-family: var(--font-body);
   font-size: 14px;
   font-weight: 600;
@@ -114,12 +116,13 @@
   text-decoration: none;
   transition: all 0.3s ease;
   width: 100%; /* Full width on mobile */
+  box-shadow: 0 4px 14px rgba(13, 148, 136, 0.25);
 }
 
 .btnPrimary:hover {
-  background-color: #FFFFFF;
+  background-color: var(--color-accent-teal-dark);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  box-shadow: 0 6px 20px rgba(13, 148, 136, 0.4);
 }
 
 .btnOutline {

@@ -1,12 +1,124 @@
-.container { margin-bottom: var(--spacing-8); }
-.mobileText { font-size: var(--text-sm); font-weight: var(--font-weight-semibold); color: var(--color-primary-700); margin-bottom: var(--spacing-2); }
-.progressBar { height: 8px; background-color: var(--color-secondary-200); border-radius: var(--radius-full); overflow: hidden; margin-bottom: var(--spacing-4); }
-.progressFill { height: 100%; background-color: var(--color-primary-600); transition: width var(--transition-normal); }
-.desktopSteps { display: none; }
+/* src/components/sections/order-flow/StepProgress.module.css */
+
+.container {
+  margin-bottom: var(--spacing-8);
+}
+
+.mobileHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-2);
+}
+
+.mobileText {
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-primary-700);
+}
+
+.mobileStepTitle {
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+
+.progressBar {
+  height: 6px;
+  background-color: var(--color-secondary-200);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  margin-bottom: var(--spacing-6);
+}
+
+.progressFill {
+  height: 100%;
+  background-color: var(--color-primary-600);
+  transition: width var(--transition-normal);
+}
+
+.desktopSteps {
+  display: none;
+}
+
 @media (min-width: 768px) {
-  .mobileText { display: none; }
-  .desktopSteps { display: flex; justify-content: space-between; }
-  .stepIndicator { width: 32px; height: 32px; border-radius: var(--radius-full); background-color: var(--color-secondary-200); color: var(--color-text-tertiary); display: flex; align-items: center; justify-content: center; font-size: var(--text-sm); font-weight: var(--font-weight-bold); transition: all var(--transition-fast); }
-  .stepIndicator.completed { background-color: var(--color-primary-600); color: var(--color-surface); }
-  .stepIndicator.active { background-color: var(--color-primary-50); color: var(--color-primary-600); box-shadow: 0 0 0 2px var(--color-primary-600); }
+  .desktopSteps {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    padding: 0 var(--spacing-2);
+  }
+
+  .stepTrackLine {
+    position: absolute;
+    top: 16px;
+    left: 24px;
+    right: 24px;
+    height: 3px;
+    background-color: var(--color-secondary-200);
+    z-index: 1;
+  }
+
+  .stepTrackFill {
+    height: 100%;
+    background-color: var(--color-primary-600);
+    transition: width var(--transition-normal);
+  }
+
+  .stepNode {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-2);
+    cursor: pointer;
+    background: transparent;
+    border: none;
+  }
+
+  .stepBubble {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background-color: var(--color-surface);
+    border: 2px solid var(--color-border);
+    color: var(--color-text-tertiary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--text-xs);
+    font-weight: var(--font-weight-bold);
+    transition: all var(--transition-fast);
+  }
+
+  .stepNode.completed .stepBubble {
+    background-color: var(--color-primary-600);
+    border-color: var(--color-primary-600);
+    color: #ffffff;
+  }
+
+  .stepNode.active .stepBubble {
+    background-color: var(--color-primary-50);
+    border-color: var(--color-primary-600);
+    color: var(--color-primary-800);
+    box-shadow: 0 0 0 3px rgba(140, 91, 69, 0.2);
+    transform: scale(1.1);
+  }
+
+  .stepLabel {
+    font-size: 11px;
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-tertiary);
+    transition: color var(--transition-fast);
+  }
+
+  .stepNode.completed .stepLabel,
+  .stepNode.active .stepLabel {
+    color: var(--color-primary-900);
+    font-weight: var(--font-weight-bold);
+  }
 }

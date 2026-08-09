@@ -62,14 +62,15 @@
 
 .featureItem:hover {
   transform: translateY(-4px);
-  border-color: var(--color-primary-300);
+  border-color: var(--color-accent-teal);
+  box-shadow: 0 4px 14px rgba(13, 148, 136, 0.1);
 }
 
 .iconWrapper {
   width: 48px;
   height: 48px;
-  background-color: var(--color-primary-50);
-  color: var(--color-primary-600);
+  background-color: rgba(13, 148, 136, 0.1);
+  color: var(--color-accent-teal);
   border-radius: var(--radius-lg);
   display: flex;
   align-items: center;

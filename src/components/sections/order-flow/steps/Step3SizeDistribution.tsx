@@ -1,81 +1,88 @@
 'use client';
 
 import React from 'react';
-import { useOrderFlow } from '../OrderFlowContext';
+import { useOrderFlow, SizeQtyMap } from '../OrderFlowContext';
 import { Button } from '@/components/ui/Button/Button';
+import { Plus, Minus, ArrowRight, ArrowLeft, ShoppingBag, Sparkles } from 'lucide-react';
 import styles from './Step.module.css';
 
-const sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
+const SIZES_LIST: (keyof SizeQtyMap)[] = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
 
 export function Step3SizeDistribution() {
-  const { state, updateProductSizes, nextStep, prevStep } = useOrderFlow();
-
-  const handleSizeChange = (productId: string, size: string, value: string) => {
-    const num = parseInt(value) || 0;
-    const product = state.products.find(p => p.id === productId);
-    if (product) {
-      updateProductSizes(productId, { ...product.sizes, [size]: num });
-    }
-  };
-
-  const getProductTotal = (productId: string) => {
-    const product = state.products.find(p => p.id === productId);
-    if (!product) return 0;
-    return Object.values(product.sizes).reduce((sum, qty) => sum + (qty || 0), 0);
-  };
-
-  const isComplete = state.products.every(p => getProductTotal(p.id) > 0);
+  const { state, updateSizeQty, nextStep, prevStep, totalPieces } = useOrderFlow();
+  const { sizes } = state;
 
   return (
     <div className={styles.stepContainer}>
-      <h2 className={styles.title}>Quantities & Sizes</h2>
-      <p className={styles.description}>Enter the breakdown of sizes for each product in your order.</p>
-      
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-8)', marginTop: 'var(--spacing-6)' }}>
-        {state.products.map(product => (
-          <div key={product.id} style={{ border: '1px solid var(--color-border)', borderRadius: 'var(--radius-lg)', padding: 'var(--spacing-6)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--spacing-4)' }}>
-              <h3 style={{ margin: 0, fontSize: 'var(--text-lg)' }}>{product.name}</h3>
-              <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-semibold)' }}>
-                Total: {getProductTotal(product.id)}
+      <span className={styles.stepBadge}>STEP 3 OF 8 • SIZES & QUANTITIES</span>
+      <h2 className={styles.title}>How many pieces per size?</h2>
+      <p className={styles.description}>Specify the count for each size. You can adjust these numbers anytime before final production.</p>
+
+      {/* Dynamic Total Banner */}
+      <div className={styles.totalPiecesBox}>
+        <div className={styles.totalLeft}>
+          <ShoppingBag size={24} color="var(--color-primary-600)" />
+          <div>
+            <div className={styles.totalLabel}>Total Order Volume</div>
+            <div className={styles.totalCount}>{totalPieces} Pieces</div>
+          </div>
+        </div>
+
+        {totalPieces >= 150 ? (
+          <span className={styles.tierDiscountTag}>✨ 20% Volume Discount Applied!</span>
+        ) : totalPieces >= 75 ? (
+          <span className={styles.tierDiscountTag}>✨ 10% Volume Discount Applied!</span>
+        ) : (
+          <span className={styles.tierDiscountHint}>Add {75 - totalPieces} more for 10% off!</span>
+        )}
+      </div>
+
+      {/* Size Counters Grid */}
+      <div className={styles.sizeCountersGrid}>
+        {SIZES_LIST.map(sizeKey => {
+          const qty = sizes[sizeKey] || 0;
+          return (
+            <div key={sizeKey} className={styles.sizeCounterCard}>
+              <span className={styles.sizeLabel}>{sizeKey}</span>
+              <div className={styles.counterControls}>
+                <button
+                  className={styles.counterBtn}
+                  onClick={() => updateSizeQty(sizeKey, qty - 5)}
+                  disabled={qty <= 0}
+                >
+                  <Minus size={14} />
+                </button>
+
+                <input
+                  type="number"
+                  min={0}
+                  value={qty}
+                  onChange={(e) => updateSizeQty(sizeKey, parseInt(e.target.value) || 0)}
+                  className={styles.counterInput}
+                />
+
+                <button
+                  className={styles.counterBtn}
+                  onClick={() => updateSizeQty(sizeKey, qty + 5)}
+                >
+                  <Plus size={14} />
+                </button>
               </div>
             </div>
-            
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(60px, 1fr))', gap: 'var(--spacing-2)' }}>
-              {sizes.map(size => (
-                <div key={size} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-1)' }}>
-                  <label style={{ fontSize: 'var(--text-xs)', textAlign: 'center', color: 'var(--color-text-secondary)' }}>{size}</label>
-                  <input 
-                    type="number"
-                    min="0"
-                    value={product.sizes[size] || ''}
-                    onChange={(e) => handleSizeChange(product.id, size, e.target.value)}
-                    style={{ 
-                      width: '100%', 
-                      padding: 'var(--spacing-2)', 
-                      textAlign: 'center', 
-                      border: '1px solid var(--color-border)', 
-                      borderRadius: 'var(--radius-md)',
-                      backgroundColor: 'var(--color-background)'
-                    }}
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
-      
-      {!isComplete && (
-        <div style={{ marginTop: 'var(--spacing-4)', padding: 'var(--spacing-3)', backgroundColor: 'var(--color-warning-50)', color: 'var(--color-warning-text)', borderRadius: 'var(--radius-md)', fontSize: 'var(--text-sm)' }}>
-          Please enter at least one quantity for each selected product to continue.
-        </div>
-      )}
 
       <div className={styles.actions}>
-        <Button variant="outline" onClick={prevStep}>Back</Button>
-        <Button variant="primary" onClick={nextStep} disabled={!isComplete}>
-          Continue to Colors
+        <Button variant="outline" onClick={prevStep} leftIcon={<ArrowLeft size={16} />}>Back</Button>
+        <Button
+          variant="primary"
+          size="lg"
+          onClick={nextStep}
+          disabled={totalPieces <= 0}
+          rightIcon={<ArrowRight size={18} />}
+        >
+          Upload Artwork & Logo
         </Button>
       </div>
     </div>

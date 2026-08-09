@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter, Outfit, Playfair_Display } from 'next/font/google';
 import './globals.css';
+import { AuthProvider } from '@/context/AuthContext';
 import { Header } from '@/components/layout/Header/Header';
 import { Footer } from '@/components/layout/Footer/Footer';
 import { AnnouncementBar } from '@/components/layout/AnnouncementBar/AnnouncementBar';
@@ -24,8 +25,8 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: 'T Presso | Custom Bulk Apparel Printing for Professionals',
-  description: 'T Presso specializes in bulk custom apparel printing for universities, corporates, and events. Reliable, fast, and professional.',
+  title: 'Teepresso | Custom Bulk Apparel & Group Printing',
+  description: 'Teepresso specializes in bulk custom t-shirts, hoodies, polos, and seasonal kurtas for colleges, companies, colonies, and events.',
 };
 
 export default function RootLayout({
@@ -36,14 +37,16 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${outfit.variable} ${playfair.variable}`}>
       <body>
-        <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-          <AnnouncementBar />
-          <Header />
-          <main style={{ flex: '1' }}>
-            {children}
-          </main>
-          <Footer />
-        </div>
+        <AuthProvider>
+          <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+            <AnnouncementBar />
+            <Header />
+            <main style={{ flex: '1' }}>
+              {children}
+            </main>
+            <Footer />
+          </div>
+        </AuthProvider>
       </body>
     </html>
   );

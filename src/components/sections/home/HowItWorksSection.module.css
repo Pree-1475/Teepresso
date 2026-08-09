@@ -9,51 +9,43 @@
 }
 
 /* ============================================
-   PART 1: DARK PROCESS SECTION
+   COMBINED LAYOUT (GRID)
    ============================================ */
-.darkSection {
-  background-color: #2D1A13;
-  background-image:
-    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(90, 60, 40, 0.35) 0%, transparent 70%),
-    radial-gradient(ellipse 60% 50% at 80% 100%, rgba(70, 45, 30, 0.2) 0%, transparent 60%);
-  color: #FDF9F1;
-  padding: 100px 0 140px;
-  position: relative;
-  overflow: hidden;
+.gridContainer {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 60px;
+  padding: 60px 0;
 }
 
-/* Subtle grain overlay */
-.darkSection::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  opacity: 0.03;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-  background-size: 200px 200px;
-  pointer-events: none;
-  z-index: 0;
+@media (min-width: 1024px) {
+  .gridContainer {
+    grid-template-columns: 1.2fr 1fr;
+    gap: 80px;
+    padding: 80px 0;
+  }
 }
 
-.darkSection > * {
-  position: relative;
-  z-index: 1;
+/* ============================================
+   LEFT COLUMN: TIMELINE & STATS
+   ============================================ */
+.leftColumn {
+  display: flex;
+  flex-direction: column;
 }
 
-/* --- HEADER --- */
+/* Header */
 .header {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
-  max-width: 900px;
-  margin: 0 auto 72px;
+  margin-bottom: 40px;
 }
 
 .journeyPill {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  border: 1px solid rgba(212, 195, 163, 0.35);
+  border: 1px solid rgba(45, 26, 19, 0.15);
   border-radius: var(--radius-full);
   padding: 8px 22px;
   font-family: var(--font-body);
@@ -61,35 +53,32 @@
   font-weight: var(--font-weight-semibold);
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #D4C3A3;
-  margin-bottom: 28px;
-  background: rgba(212, 195, 163, 0.06);
+  color: #2D1A13;
+  margin-bottom: 16px;
+  align-self: flex-start;
+  background: rgba(45, 26, 19, 0.04);
 }
 
 .mainTitle {
   font-family: var(--font-serif);
-  font-size: var(--text-5xl);
+  font-size: var(--text-4xl);
   font-weight: var(--font-weight-regular);
-  color: #FDF9F1;
-  line-height: 1.08;
-  margin-bottom: 16px;
-  letter-spacing: -0.01em;
+  color: #2D1A13;
+  line-height: 1.1;
+  margin-bottom: 12px;
 }
 
 .mainSubtitle {
   font-family: var(--font-body);
   font-size: var(--text-lg);
-  color: rgba(253, 249, 241, 0.6);
-  line-height: 1.5;
-  margin-bottom: 36px;
+  color: rgba(45, 26, 19, 0.65);
+  margin-bottom: 24px;
 }
 
-/* Trust badges */
 .topBadgesRow {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
-  gap: 12px 36px;
+  gap: 12px 24px;
 }
 
 .topBadge {
@@ -99,240 +88,226 @@
   font-family: var(--font-body);
   font-size: 13px;
   font-weight: var(--font-weight-medium);
-  color: rgba(253, 249, 241, 0.85);
+  color: #2D1A13;
 }
 
 .topBadgeIcon {
-  color: #D4C3A3;
-  flex-shrink: 0;
+  color: var(--color-accent-teal);
 }
 
-/* --- PROCESS TIMELINE --- */
-.processContainer {
+/* Vertical Timeline */
+.verticalTimeline {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
   position: relative;
-  max-width: 1100px;
-  margin: 0 auto;
-  padding-top: 40px; /* Room for the top part of the thread and circles */
+  margin-bottom: 60px;
 }
 
-/* Dashed connector thread — runs edge-to-edge behind the cards */
-.threadLine {
+/* The vertical dashed line */
+.verticalTimeline::before {
+  content: '';
   position: absolute;
-  top: 30px; /* 30px + SVG line at y=30 = 60px perfectly aligns with step number centers */
-  left: 0;
-  right: 0;
-  height: 2px;
+  top: 20px;
+  bottom: 20px;
+  left: 19px; /* Center of the 40px node */
+  width: 2px;
+  background: repeating-linear-gradient(to bottom, rgba(45,26,19,0.15) 0, rgba(45,26,19,0.15) 6px, transparent 6px, transparent 12px);
+  z-index: 0;
+}
+
+.timelineStep {
+  display: flex;
+  position: relative;
   z-index: 1;
-  overflow: visible;
+  padding-left: 64px; /* Space for the node */
+  min-height: 100px;
 }
 
-.threadSvg {
+.timelineNode {
   position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  top: 0;
-}
-
-/* T-shirt decoration hanging off the thread */
-.threadShirt {
-  position: absolute;
-  left: -20px;
-  top: 96px;
-  z-index: 3;
-}
-
-.shirtIcon {
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
   width: 40px;
   height: 40px;
-  background: #FDF9F1;
+  background-color: #2D1A13;
+  color: #FFFFFF;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
-  transform: rotate(-15deg);
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-bold);
+  font-size: 14px;
+  flex-shrink: 0;
+  border: 4px solid var(--color-background);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  z-index: 5;
 }
 
-/* String from thread to shirt */
-.threadShirt::before {
+.timelineContent {
+  display: flex;
+  gap: 20px;
+  background-color: #FFFFFF;
+  border-radius: var(--radius-xl);
+  padding: 24px 24px 24px 36px;
+  flex: 1;
+  
+  /* Tag Shape: hole punch on left edge */
+  -webkit-mask-image: radial-gradient(circle at 0% 50%, transparent 22px, black 23px);
+  mask-image: radial-gradient(circle at 0% 50%, transparent 22px, black 23px);
+  
+  /* We use drop-shadow on the parent wrapper, or rely on filter here */
+  filter: drop-shadow(0 8px 16px rgba(0,0,0,0.04));
+  
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.4s ease;
+  border: 1px solid rgba(0,0,0,0.02);
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+  
+  /* Pull left to overlap the node */
+  margin-left: -32px; 
+}
+
+/* Massive watermark number */
+.timelineContent::before {
+  content: attr(data-step);
+  position: absolute;
+  right: -10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--font-heading);
+  font-size: 160px;
+  font-weight: 900;
+  color: rgba(13, 148, 136, 0.03); /* Faint teal */
+  z-index: -1;
+  line-height: 1;
+  pointer-events: none;
+  transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), color 0.6s ease;
+}
+
+.timelineContent:hover::before {
+  transform: translateY(-50%) scale(1.1) translateX(-10px);
+  color: rgba(13, 148, 136, 0.08);
+}
+
+.timelineContent:hover {
+  transform: translateY(-6px) scale(1.02);
+  filter: drop-shadow(0 16px 30px rgba(13, 148, 136, 0.12));
+}
+
+/* Sweeping shine effect */
+.timelineContent::after {
   content: '';
   position: absolute;
-  top: -6px;
-  left: 50%;
-  width: 1px;
-  height: 8px;
-  background: #D4C3A3;
-  transform: translateX(-50%);
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(to right, transparent, rgba(13, 148, 136, 0.08), transparent);
+  transform: skewX(-20deg);
+  z-index: -1;
+  transition: none;
 }
 
-/* Cards grid */
-.tagsWrapper {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 18px;
+.timelineContent:hover::after {
+  animation: shineSweep 0.8s ease-out forwards;
+}
+
+@keyframes shineSweep {
+  0% { left: -100%; }
+  100% { left: 200%; }
+}
+
+.timelineIconWrapper {
+  width: 70px;
+  height: 70px;
+  background: var(--color-background);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   position: relative;
   z-index: 2;
 }
 
-/* --- RECEIPT-STYLE CARD --- */
-.receiptTag {
-  position: relative;
+.timelineContent:hover .timelineIconWrapper {
+  background: var(--color-accent-teal);
+  transform: rotate(-8deg) scale(1.1);
+  box-shadow: 0 10px 20px rgba(13, 148, 136, 0.3);
+}
+
+/* Invert image color on hover so it pops against the solid teal background */
+.timelineContent:hover .timelineIconWrapper img {
+  filter: brightness(0) invert(1);
+}
+
+.timelineText {
   display: flex;
   flex-direction: column;
-  color: #2D1A13;
-  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-  padding-top: 20px; /* Space for the floating step number */
-}
-
-.receiptTag:hover {
-  transform: translateY(-6px);
-}
-
-.receiptTag:hover .tagBody {
-  box-shadow:
-    0 20px 50px rgba(0, 0, 0, 0.28),
-    0 4px 10px rgba(0, 0, 0, 0.12);
-}
-
-/* Step number circle — floated half on top of the card */
-.stepNumber {
-  position: absolute;
-  top: 0; /* Centered on the dashed thread line */
-  left: 50%;
-  transform: translateX(-50%);
-  width: 40px;
-  height: 40px;
-  background: #2D1A13;
-  color: #FDF9F1;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-body);
-  font-size: 14px;
-  font-weight: var(--font-weight-bold);
-  z-index: 5;
-}
-
-/* The actual card body (with zig-zag edges) */
-.tagBody {
-  position: relative;
-  background: #FDF9F1;
-  margin-top: 10px;
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  box-shadow:
-    0 8px 28px rgba(0, 0, 0, 0.2),
-    0 2px 6px rgba(0, 0, 0, 0.08);
-  /* Zig-zag top and bottom edges via clip-path */
-  clip-path: polygon(
-    0% 6px,
-    4% 0%, 8% 6px, 12% 0%, 16% 6px, 20% 0%, 24% 6px, 28% 0%, 32% 6px, 36% 0%, 40% 6px, 44% 0%, 48% 6px, 52% 0%, 56% 6px, 60% 0%, 64% 6px, 68% 0%, 72% 6px, 76% 0%, 80% 6px, 84% 0%, 88% 6px, 92% 0%, 96% 6px, 100% 0%,
-    100% calc(100% - 6px),
-    96% 100%, 92% calc(100% - 6px), 88% 100%, 84% calc(100% - 6px), 80% 100%, 76% calc(100% - 6px), 72% 100%, 68% calc(100% - 6px), 64% 100%, 60% calc(100% - 6px), 56% 100%, 52% calc(100% - 6px), 48% 100%, 44% calc(100% - 6px), 40% 100%, 36% calc(100% - 6px), 32% 100%, 28% calc(100% - 6px), 24% 100%, 20% calc(100% - 6px), 16% 100%, 12% calc(100% - 6px), 8% 100%, 4% calc(100% - 6px), 0% 100%
-  );
-}
-
-/* Card inner content */
-.tagContent {
-  padding: 36px 18px 28px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  flex: 1;
-}
-
-.tagIconWrapper {
-  width: 110px;
-  height: 110px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 16px;
-  border-radius: var(--radius-md);
-  overflow: hidden;
-}
-
-.step3Image {
-  transform: scale(1.6);
 }
 
 .stepTitle {
-  font-family: var(--font-heading);
-  font-size: 17px;
-  font-weight: var(--font-weight-semibold);
+  font-family: var(--font-serif);
+  font-size: var(--text-xl);
   color: #2D1A13;
-  margin-bottom: 10px;
-  line-height: 1.3;
+  margin-bottom: 6px;
 }
 
 .stepDesc {
   font-family: var(--font-body);
-  font-size: 12px;
-  line-height: 1.6;
+  font-size: var(--text-sm);
   color: rgba(45, 26, 19, 0.65);
-  flex: 1;
-  margin-bottom: 16px;
+  line-height: 1.5;
+  margin-bottom: 12px;
 }
 
-/* Time estimate pill */
 .timePill {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   background: rgba(45, 26, 19, 0.06);
   border-radius: var(--radius-full);
-  padding: 7px 14px;
+  padding: 6px 12px;
   font-family: var(--font-body);
   font-size: 11px;
   font-weight: var(--font-weight-semibold);
   color: #5C4033;
-  margin-top: auto;
+  align-self: flex-start;
 }
 
-.timePill svg {
-  flex-shrink: 0;
-}
-
-
-/* ============================================
-   FLOATING STATS BAR
-   ============================================ */
+/* Stats Bar */
 .statsBarContainer {
-  position: relative;
-  z-index: 10;
-  display: flex;
-  justify-content: center;
-  margin-top: -36px;
-  padding: 0 20px;
+  width: 100%;
 }
 
 .statsBar {
-  background: linear-gradient(135deg, #3C261C 0%, #4A2E22 100%);
-  border-radius: var(--radius-full);
-  padding: 18px 48px;
-  display: inline-flex;
-  align-items: center;
-  gap: 40px;
-  box-shadow:
-    0 12px 32px rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(212, 195, 163, 0.1);
-}
-
-.statItem {
+  background: linear-gradient(135deg, #2D1A13 0%, #4A2E22 100%);
+  border-radius: var(--radius-xl);
+  padding: 20px 32px;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 2px;
+  justify-content: space-between;
+  gap: 16px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+  flex-wrap: wrap;
 }
 
-.statItemRow {
+.statItem, .statItemRow {
   display: flex;
   align-items: center;
   gap: 12px;
+}
+
+.statItem {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
 }
 
 .statItemCol {
@@ -343,126 +318,95 @@
 .statValue {
   color: #FFFFFF;
   font-family: var(--font-heading);
-  font-size: 18px;
+  font-size: 20px;
   font-weight: var(--font-weight-bold);
-  white-space: nowrap;
 }
 
 .statLabel {
-  color: #C3B19E;
+  color: #D4C3A3;
   font-family: var(--font-body);
   font-size: 11px;
   letter-spacing: 0.03em;
-  white-space: nowrap;
 }
 
 .statDivider {
   width: 1px;
-  height: 28px;
-  background: rgba(253, 249, 241, 0.12);
-  flex-shrink: 0;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.15);
 }
 
 .ratingStars {
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: 4px;
 }
 
 .ratingStars .statValue {
   margin-left: 8px;
+  font-size: 16px;
 }
 
-
 /* ============================================
-   PART 2: LIGHT QUOTE CALCULATOR
+   RIGHT COLUMN: STICKY CALCULATOR
    ============================================ */
-.lightSection {
-  background-color: #F5EDE4;
-  background-image:
-    radial-gradient(ellipse 50% 40% at 20% 0%, rgba(212, 195, 163, 0.15) 0%, transparent 70%);
-  padding: 100px 0 56px;
+.rightColumn {
   position: relative;
 }
 
-.quoteGrid {
-  display: grid;
-  grid-template-columns: 280px 1fr;
-  gap: 48px;
-  align-items: start;
-}
-
-/* --- LEFT: COPY --- */
-.quoteLeft {
+.stickyCalculator {
+  position: sticky;
+  top: 100px;
   display: flex;
   flex-direction: column;
-  padding-top: 12px;
 }
 
-.nextStep {
-  font-family: var(--font-body);
-  font-size: 11px;
-  font-weight: var(--font-weight-bold);
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: rgba(45, 26, 19, 0.45);
-  margin-bottom: 8px;
+.quoteIntro {
+  margin-bottom: 24px;
 }
 
 .quoteTitle {
-  font-family: var(--font-serif);
+  font-family: var(--font-heading);
   font-size: var(--text-4xl);
-  font-weight: var(--font-weight-regular);
-  color: #2D1A13;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
   line-height: 1.1;
-  position: relative;
-  margin-bottom: 4px;
-}
-
-.squiggly {
-  display: block;
-  width: 100px;
-  height: 14px;
-  margin-top: 2px;
+  margin-bottom: 12px;
 }
 
 .quoteDesc {
   font-family: var(--font-body);
   font-size: var(--text-sm);
-  color: rgba(45, 26, 19, 0.6);
-  line-height: 1.6;
-  margin-top: 12px;
-  margin-bottom: 20px;
+  color: rgba(45, 26, 19, 0.65);
+  margin-bottom: 16px;
 }
 
 .quoteChecks {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
+  flex-wrap: wrap;
+  gap: 12px 24px;
 }
 
 .checkItem {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   font-family: var(--font-body);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: var(--font-weight-medium);
   color: #2D1A13;
 }
 
 .checkCircle {
-  width: 22px;
-  height: 22px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
-  background: #C9A96E;
+  background: var(--color-accent-teal);
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
 }
 
-/* --- RIGHT: CALCULATOR CARD --- */
+/* --- CALCULATOR CARD --- */
 .quoteCard {
   background: #FFFFFF;
   border-radius: var(--radius-xl);
@@ -472,97 +416,192 @@
     0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
-/* Form row */
-.formRow {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 14px;
-  margin-bottom: 20px;
-}
-
-.formGroup {
+/* Calculator Body */
+.calculatorBody {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 28px;
+  margin-bottom: 24px;
 }
 
-.formGroup label {
+.calcSection {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.calcLabelRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.calcLabel {
+  font-family: var(--font-heading);
+  font-size: 14px;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+
+.calcHint {
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: var(--color-primary-500);
+  font-weight: var(--font-weight-medium);
+}
+
+/* Product Chips */
+.productChips {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 4px; /* for focus ring */
+  scrollbar-width: none; /* Firefox */
+}
+.productChips::-webkit-scrollbar {
+  display: none; /* Chrome */
+}
+
+.productChip {
+  flex: 1;
+  min-width: 90px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 8px;
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  color: var(--color-text-secondary);
+}
+
+.productChip span {
   font-family: var(--font-body);
   font-size: 11px;
   font-weight: var(--font-weight-medium);
-  color: rgba(45, 26, 19, 0.5);
+  text-align: center;
 }
 
-/* Custom select wrappers */
-.selectWrap {
-  position: relative;
+.chipIcon {
+  color: var(--color-text-tertiary);
+  transition: color var(--transition-fast);
+}
+
+.productChip:hover {
+  border-color: var(--color-primary-300);
+  background: rgba(212, 195, 163, 0.05);
+}
+
+.productChip.activeChip {
+  background: var(--color-accent-teal);
+  border-color: var(--color-accent-teal);
+  color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.25);
+}
+
+.productChip.activeChip .chipIcon {
+  color: #FFFFFF;
+}
+
+/* Quantity Stepper */
+.qtyStepperWrapper {
   display: flex;
   align-items: center;
-  height: 46px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
+  height: 56px;
   background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
   transition: border-color var(--transition-fast);
-  cursor: pointer;
 }
 
-.selectWrap:hover,
-.selectWrap:focus-within {
-  border-color: var(--color-secondary-600);
+.qtyStepperWrapper:focus-within {
+  border-color: var(--color-primary-500);
 }
 
-.selectIcon {
+.stepperBtn {
+  width: 56px;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 38px;
-  flex-shrink: 0;
-  color: var(--color-text-tertiary);
-}
-
-.selectWrap select {
-  appearance: none;
   background: transparent;
   border: none;
-  width: 100%;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.stepperBtn:hover {
+  background: rgba(0, 0, 0, 0.03);
+  color: var(--color-text-primary);
+}
+
+.stepperInputWrap {
+  flex: 1;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  border-left: 1px solid var(--color-border);
+  border-right: 1px solid var(--color-border);
   height: 100%;
-  padding: 0 28px 0 0;
-  font-family: var(--font-body);
-  font-size: 13px;
-  font-weight: var(--font-weight-medium);
+  gap: 4px;
+}
+
+.stepperInput {
+  width: 60px;
+  text-align: right;
+  border: none;
+  background: transparent;
+  font-family: var(--font-heading);
+  font-size: 24px;
+  font-weight: var(--font-weight-bold);
   color: var(--color-text-primary);
   outline: none;
-  cursor: pointer;
+  -moz-appearance: textfield;
 }
 
-.selectChevron {
-  position: absolute;
-  right: 8px;
-  display: flex;
-  align-items: center;
-  color: var(--color-text-tertiary);
-  pointer-events: none;
+.stepperInput::-webkit-outer-spin-button,
+.stepperInput::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
-/* Color dots */
-.colorDots {
+.stepperSuffix {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+  padding-bottom: 4px;
+}
+
+.qtyShortcuts {
   display: flex;
-  align-items: center;
-  gap: 7px;
-  padding-left: 12px;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.shortcutBtn {
   flex: 1;
+  min-width: 48px;
+  padding: 6px 0;
+  background: rgba(212, 195, 163, 0.15);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary-700);
+  cursor: pointer;
+  transition: all var(--transition-fast);
 }
 
-.colorDot {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  flex-shrink: 0;
-  transition: transform var(--transition-fast);
-}
-
-.colorDot:hover {
-  transform: scale(1.15);
+.shortcutBtn:hover {
+  background: rgba(212, 195, 163, 0.3);
+  border-color: rgba(212, 195, 163, 0.5);
 }
 
 /* --- CARD FOOTER --- */
@@ -597,7 +636,7 @@
   flex-wrap: wrap;
 }
 
-.priceAmount {
+.totalPrice {
   font-family: var(--font-serif);
   font-size: 32px;
   font-weight: var(--font-weight-regular);
@@ -605,19 +644,20 @@
   line-height: 1;
 }
 
-.priceUnit {
+.perPiecePrice {
   font-family: var(--font-body);
   font-size: var(--text-sm);
   color: rgba(45, 26, 19, 0.55);
   margin-right: 8px;
+  margin-bottom: 2px;
 }
 
 .savingsBadge {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  background: var(--color-success-bg);
-  color: var(--color-success-text);
+  background: rgba(13, 148, 136, 0.1);
+  color: var(--color-accent-teal);
   font-family: var(--font-body);
   font-size: 11px;
   font-weight: var(--font-weight-semibold);
@@ -626,12 +666,17 @@
   white-space: nowrap;
 }
 
+.savingsBadge.maxBulk {
+  background: var(--color-accent-teal);
+  color: #FFFFFF;
+}
+
 .getQuoteBtn {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  background: #2D1A13;
-  color: #FDF9F1;
+  background-color: var(--color-accent-teal);
+  color: #FFFFFF;
   border: none;
   border-radius: var(--radius-full);
   padding: 14px 32px;
@@ -642,12 +687,13 @@
   text-decoration: none;
   transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
   white-space: nowrap;
+  box-shadow: 0 4px 14px rgba(13, 148, 136, 0.25);
 }
 
 .getQuoteBtn:hover {
-  background: #3C261C;
+  background-color: var(--color-accent-teal-dark);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(45, 26, 19, 0.3);
+  box-shadow: 0 6px 20px rgba(13, 148, 136, 0.4);
 }
 
 /* --- BOTTOM TRUST BAR --- */
@@ -683,38 +729,45 @@
    RESPONSIVE
    ============================================ */
 
-@media (max-width: 1080px) {
-  .tagsWrapper {
-    grid-template-columns: repeat(3, 1fr);
-    row-gap: 48px;
+@media (max-width: 1024px) {
+  .gridContainer {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    padding: 60px 0;
   }
-
-  .threadLine {
-    display: none;
-  }
-
-  .formRow {
-    grid-template-columns: repeat(3, 1fr);
+  
+  .stickyCalculator {
+    position: relative;
+    top: 0;
   }
 }
 
 @media (max-width: 768px) {
-  .darkSection {
-    padding: 72px 0 120px;
+  .wrapper {
+    padding: 48px 0;
   }
 
   .mainTitle {
-    font-size: var(--text-4xl);
+    font-size: var(--text-3xl);
   }
 
   .topBadgesRow {
-    gap: 8px 20px;
+    gap: 8px 16px;
   }
 
-  .tagsWrapper {
-    grid-template-columns: 1fr 1fr;
+  .timelineStep {
     gap: 16px;
-    row-gap: 32px;
+  }
+
+  .timelineIconWrapper {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .timelineContent {
+    padding: 16px;
+    flex-direction: column;
+    gap: 12px;
   }
 
   .statsBar {
@@ -722,8 +775,7 @@
     flex-wrap: wrap;
     justify-content: center;
     gap: 16px 32px;
-    padding: 20px 32px;
-    border-radius: var(--radius-2xl);
+    padding: 20px;
     width: 100%;
   }
 
@@ -731,17 +783,8 @@
     display: none;
   }
 
-  .quoteGrid {
-    grid-template-columns: 1fr;
-    gap: 40px;
-  }
-
   .quoteTitle {
     font-size: var(--text-3xl);
-  }
-
-  .formRow {
-    grid-template-columns: 1fr 1fr;
   }
 
   .cardFooter {
@@ -756,34 +799,18 @@
 }
 
 @media (max-width: 480px) {
-  .darkSection {
-    padding: 56px 0 100px;
-  }
-
   .mainTitle {
-    font-size: var(--text-3xl);
+    font-size: var(--text-2xl);
   }
 
-  .header {
-    margin-bottom: 48px;
+  .timelineNode {
+    width: 32px;
+    height: 32px;
+    font-size: 12px;
   }
-
-  .tagsWrapper {
-    grid-template-columns: 1fr;
-    gap: 24px;
-  }
-
-  .receiptTag {
-    max-width: 260px;
-    margin: 0 auto;
-  }
-
-  .formRow {
-    grid-template-columns: 1fr;
-  }
-
-  .lightSection {
-    padding: 80px 0 48px;
+  
+  .verticalTimeline::before {
+    left: 15px; /* Center of the 32px node (16px - 1px width) */
   }
 
   .bottomTrustBar {

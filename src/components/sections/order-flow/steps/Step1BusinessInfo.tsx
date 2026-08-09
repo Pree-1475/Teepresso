@@ -4,73 +4,53 @@ import React from 'react';
 import { useOrderFlow } from '../OrderFlowContext';
 import { Button } from '@/components/ui/Button/Button';
 import { Input } from '@/components/ui/Input/Input';
+import { User, Phone, ArrowRight } from 'lucide-react';
 import styles from './Step.module.css';
 
 export function Step1BusinessInfo() {
-  const { state, updateContactInfo, nextStep } = useOrderFlow();
-  const { contactInfo } = state;
+  const { state, updateCustomer, nextStep } = useOrderFlow();
+  const { customer } = state;
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    updateContactInfo({ [e.target.name]: e.target.value });
-  };
-
-  const isComplete = contactInfo.companyName && contactInfo.contactPerson && contactInfo.email && contactInfo.phone;
+  const isValid = customer.name.trim().length >= 2 && customer.phone.trim().length >= 10;
 
   return (
     <div className={styles.stepContainer}>
-      <h2 className={styles.title}>Business Information</h2>
-      <p className={styles.description}>Let&apos;s start with the basics. Who are we partnering with?</p>
-      
-      <div className={styles.formGrid}>
-        <Input 
-          label="Company / Institution Name *" 
-          name="companyName"
-          value={contactInfo.companyName}
-          onChange={handleChange}
-          placeholder="e.g. Acme Corp"
+      <span className={styles.stepBadge}>STEP 1 OF 8 • CUSTOMER DETAILS</span>
+      <h2 className={styles.title}>Who is this order for?</h2>
+      <p className={styles.description}>
+        We keep things simple! Just enter your name and WhatsApp/phone number so we can link your design mockup.
+      </p>
+
+      <div className={styles.formGridSingle}>
+        <Input
+          label="Your Full Name *"
+          name="name"
+          value={customer.name}
+          onChange={(e) => updateCustomer({ name: e.target.value })}
+          placeholder="e.g. Rahul Sharma"
+          leftIcon={<User size={18} color="var(--color-primary-600)" />}
         />
-        <Input 
-          label="Contact Person *" 
-          name="contactPerson"
-          value={contactInfo.contactPerson}
-          onChange={handleChange}
-          placeholder="e.g. Jane Doe"
-        />
-        <Input 
-          label="Email Address *" 
-          type="email"
-          name="email"
-          value={contactInfo.email}
-          onChange={handleChange}
-          placeholder="jane@acmecorp.com"
-        />
-        <Input 
-          label="Phone Number *" 
+
+        <Input
+          label="Phone / WhatsApp Number *"
           type="tel"
           name="phone"
-          value={contactInfo.phone}
-          onChange={handleChange}
-          placeholder="(555) 123-4567"
-        />
-        <Input 
-          label="Delivery Location / City *" 
-          name="deliveryLocation"
-          value={contactInfo.deliveryLocation}
-          onChange={handleChange}
-          placeholder="e.g. New York, NY"
-        />
-        <Input 
-          label="GST / Tax ID (Optional)" 
-          name="gst"
-          value={contactInfo.gst}
-          onChange={handleChange}
-          placeholder="For B2B invoicing"
+          value={customer.phone}
+          onChange={(e) => updateCustomer({ phone: e.target.value })}
+          placeholder="e.g. 98765 43210"
+          leftIcon={<Phone size={18} color="var(--color-primary-600)" />}
         />
       </div>
-      
+
       <div className={styles.actions}>
-        <Button variant="primary" onClick={nextStep} disabled={!isComplete}>
-          Continue to Products
+        <Button
+          variant="primary"
+          size="lg"
+          onClick={nextStep}
+          disabled={!isValid}
+          rightIcon={<ArrowRight size={18} />}
+        >
+          Select Apparel & Color
         </Button>
       </div>
     </div>

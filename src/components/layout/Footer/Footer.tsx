@@ -14,17 +14,14 @@ export function Footer() {
           {/* Company Info */}
           <div className={styles.companyInfo}>
             <Link href="/" className={styles.logo}>
-              T Presso
+              teepresso.
             </Link>
             <p className={styles.description}>
-              The trusted bulk custom apparel printing partner for professionals, universities, and businesses.
+              The trusted bulk custom apparel printing partner for colleges, colonies, businesses, and event groups.
             </p>
             <div className={styles.socials}>
               <a href="#" aria-label="Facebook">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
-              </a>
-              <a href="#" aria-label="Twitter">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path></svg>
               </a>
               <a href="#" aria-label="Instagram">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
@@ -35,25 +32,26 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Quick Links */}
+          {/* Catalog & Products */}
           <div className={styles.linkGroup}>
-            <h4 className={styles.linkTitle}>Company</h4>
+            <h4 className={styles.linkTitle}>Products & Services</h4>
             <ul className={styles.linkList}>
-              <li><Link href="/about">About Us</Link></li>
-              <li><Link href="/how-it-works">How It Works</Link></li>
-              <li><Link href="/industries">Industries We Serve</Link></li>
-              <li><Link href="/contact">Contact Us</Link></li>
+              <li><Link href="/products">Products Catalogue</Link></li>
+              <li><Link href="/custom-kurtas">✨ Custom Kurtas</Link></li>
+              <li><Link href="/bulk-orders">Bulk Order Configurator</Link></li>
+              <li><Link href="/products">T-Shirts & Oversized Tees</Link></li>
+              <li><Link href="/products">Polos & Corporate Merch</Link></li>
             </ul>
           </div>
 
           {/* Support */}
           <div className={styles.linkGroup}>
-            <h4 className={styles.linkTitle}>Support</h4>
+            <h4 className={styles.linkTitle}>Quick Navigation</h4>
             <ul className={styles.linkList}>
-              <li><Link href="/faq">FAQ</Link></li>
+              <li><Link href="/about">About Us</Link></li>
+              <li><Link href="/how-it-works">How It Works</Link></li>
+              <li><Link href="/faq">FAQ & Assistance</Link></li>
               <li><Link href="/track-order">Track Order</Link></li>
-              <li><Link href="/returns">Returns Policy</Link></li>
-              <li><Link href="/shipping">Shipping Info</Link></li>
             </ul>
           </div>
 
@@ -61,7 +59,7 @@ export function Footer() {
           <div className={styles.newsletter}>
             <h4 className={styles.linkTitle}>Stay Updated</h4>
             <p className={styles.newsletterDesc}>
-              Subscribe to get special offers and printing tips.
+              Subscribe to get group discounts and festive printing updates.
             </p>
             <form className={styles.form} onSubmit={(e) => e.preventDefault()}>
               <input 
@@ -77,7 +75,7 @@ export function Footer() {
 
         <div className={styles.bottom}>
           <p className={styles.copyright}>
-            &copy; {currentYear} T Presso. All rights reserved.
+            &copy; {currentYear} Teepresso. All rights reserved.
           </p>
           <div className={styles.legalLinks}>
             <Link href="/privacy">Privacy Policy</Link>

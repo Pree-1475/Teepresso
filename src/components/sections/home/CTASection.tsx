@@ -16,7 +16,7 @@ export function CTASection() {
           </p>
           <div className={styles.actions}>
             <Link href="/bulk-orders">
-              <Button variant="primary" size="lg" rightIcon={<ArrowRight size={20} />}>
+              <Button variant="primary" size="lg" rightIcon={<ArrowRight size={20} />} className={styles.primaryBtn}>
                 Start a Bulk Order
               </Button>
             </Link>

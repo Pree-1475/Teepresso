@@ -13,12 +13,12 @@
 }
 
 .item:hover {
-  border-color: var(--color-primary-300);
+  border-color: var(--color-accent-teal);
 }
 
 .item.open {
-  border-color: var(--color-primary-300);
-  box-shadow: var(--shadow-sm);
+  border-color: var(--color-accent-teal);
+  box-shadow: 0 4px 14px rgba(13, 148, 136, 0.08);
 }
 
 .header {
@@ -54,7 +54,7 @@
 
 .iconOpen {
   transform: rotate(180deg);
-  color: var(--color-primary-600);
+  color: var(--color-accent-teal);
 }
 
 .contentWrapper {

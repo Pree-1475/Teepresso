@@ -1,0 +1,108 @@
+.campaignSection {
+  padding: 60px 0;
+  background-color: var(--color-background);
+}
+
+.bannerWrapper {
+  position: relative;
+  display: block;
+  width: 100%;
+  border-radius: var(--radius-2xl);
+  overflow: hidden;
+  box-shadow: 0 12px 32px rgba(45, 26, 19, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  text-decoration: none;
+}
+
+.bannerWrapper:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(45, 26, 19, 0.12);
+}
+
+.bannerImage {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.buttonOverlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.solidButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background-color: #613C1C;
+  color: white;
+  padding: 14px 28px;
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(97, 60, 28, 0.4);
+  /* Continuous floating animation to draw attention */
+  animation: floatButton 3s ease-in-out infinite;
+}
+
+@keyframes floatButton {
+  0% {
+    transform: translateY(0);
+    box-shadow: 0 4px 12px rgba(97, 60, 28, 0.4);
+  }
+  50% {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 24px rgba(97, 60, 28, 0.3);
+  }
+  100% {
+    transform: translateY(0);
+    box-shadow: 0 4px 12px rgba(97, 60, 28, 0.4);
+  }
+}
+
+.ctaIcon {
+  transition: transform 0.3s ease;
+}
+
+.bannerWrapper:hover .solidButton {
+  background-color: #4A2E15;
+  /* Override the animation briefly when hovering so it feels grounded */
+  animation-play-state: paused;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(97, 60, 28, 0.5);
+}
+
+.bannerWrapper:hover .ctaIcon {
+  transform: translateX(4px);
+}
+
+@media (max-width: 1024px) {
+  .solidButton {
+    padding: 10px 18px;
+    font-size: 1.2vw; /* Use vw to shrink text proportionally with the banner */
+    border-radius: 6px;
+    gap: 6px;
+  }
+}
+
+@media (max-width: 600px) {
+  
+  .solidButton {
+    padding: 6px 12px;
+    font-size: 2vw;
+    border-radius: 4px;
+    gap: 4px;
+  }
+  
+  .ctaIcon {
+    width: 10px;
+    height: 10px;
+  }
+}

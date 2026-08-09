@@ -17,16 +17,17 @@
 
 /* Variants */
 .primary {
-  background-color: var(--color-primary-600);
-  color: var(--color-surface);
-  box-shadow: var(--shadow-sm);
+  background-color: var(--color-accent-teal);
+  color: #FFFFFF;
+  box-shadow: 0 2px 4px rgba(13, 148, 136, 0.2);
 }
 .primary:hover:not(.disabled) {
-  background-color: var(--color-primary-700);
-  box-shadow: var(--shadow-md);
+  background-color: var(--color-accent-teal-dark);
+  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3);
 }
 .primary:active:not(.disabled) {
-  background-color: var(--color-primary-800);
+  background-color: #0F766E;
+  transform: translateY(1px);
 }
 
 .secondary {

@@ -143,9 +143,15 @@
   border: 1px solid rgba(45, 26, 19, 0.05);
   transition: all 0.3s ease;
   white-space: nowrap;
-  cursor: default;
+  cursor: pointer;
   position: relative;
   z-index: 1;
+}
+
+.pill:hover {
+  border-color: var(--color-accent-teal);
+  color: var(--color-accent-teal);
+  box-shadow: 0 4px 14px rgba(13, 148, 136, 0.15);
 }
 
 @keyframes idleSwing {
