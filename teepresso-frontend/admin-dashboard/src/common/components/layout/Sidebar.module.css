@@ -1,0 +1,145 @@
+.sidebar {
+  width: 76px;
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(15px);
+  border-right: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  height: calc(100vh - 32px);
+  position: sticky;
+  top: 16px;
+  border-radius: var(--radius-xl);
+  padding: 24px 0;
+  box-shadow: var(--shadow-sm);
+  z-index: 100;
+}
+
+.brandHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Hourglass Logo Container */
+.logoBadge {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background-color: #0F0F11;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s;
+}
+
+.logoBadge:hover {
+  transform: rotate(180deg);
+}
+
+.brandTitle {
+  display: none; /* Hidden on narrow sidebar */
+}
+
+.brandSub {
+  font-size: 8px;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+.navSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.navGroupLabel {
+  display: none; /* Hidden */
+}
+
+.navItem {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.navItem:hover {
+  background-color: rgba(255, 255, 255, 0.5);
+  color: var(--color-text-title);
+}
+
+/* White active pill card container */
+.navItemActive {
+  background-color: #FFFFFF !important;
+  color: #0F0F11 !important;
+  box-shadow: var(--shadow-sm);
+}
+
+.navIcon {
+  flex-shrink: 0;
+}
+
+.navLabel {
+  display: none; /* Hide text label on narrow view */
+}
+
+.navCount {
+  display: none; /* Hide badge count */
+}
+
+.userProfileFooter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+
+/* Circular Avatar Image */
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #ECEF22;
+  color: #0F0F11;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid #FFFFFF;
+  box-shadow: var(--shadow-sm);
+}
+
+.userInfo {
+  display: none; /* Hidden */
+}
+
+.logoutBtn {
+  color: var(--color-text-muted);
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+
+.logoutBtn:hover {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #EF4444;
+}

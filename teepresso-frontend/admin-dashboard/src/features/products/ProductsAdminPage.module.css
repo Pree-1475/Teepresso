@@ -1,0 +1,141 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-6);
+}
+
+.title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-zinc-900);
+}
+
+.subtitle {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin-top: 2px;
+}
+
+.addBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: var(--radius-md);
+  background-color: var(--color-brand-primary);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.addBtn:hover {
+  background-color: var(--color-brand-hover);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--spacing-4);
+}
+
+.productCard {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  padding: 16px;
+  box-shadow: var(--shadow-xs);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cardTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.categoryBadge {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--color-zinc-700);
+  background-color: var(--color-zinc-100);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  text-transform: uppercase;
+}
+
+.productName {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-zinc-900);
+}
+
+.priceRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  background-color: var(--color-zinc-50);
+  padding: 6px 10px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-subtle);
+}
+
+.priceLabel {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+}
+
+.priceValue {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-zinc-900);
+}
+
+.metaRow {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.swatchRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+.cardFooter {
+  margin-top: 2px;
+  border-top: 1px solid var(--color-border);
+  padding-top: 10px;
+}
+
+.editBtn {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 6px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-surface);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-zinc-700);
+  transition: all 0.15s;
+}
+
+.editBtn:hover {
+  background-color: var(--color-zinc-100);
+  color: var(--color-zinc-900);
+}

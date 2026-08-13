@@ -1,0 +1,181 @@
+.loginContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: var(--color-canvas-bg);
+  padding: 24px;
+}
+
+.loginCard {
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(15px);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-lg);
+  border-radius: var(--radius-xl);
+  max-width: 480px;
+  width: 100%;
+  padding: 40px;
+}
+
+.brandHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 32px;
+}
+
+.logoBadge {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background-color: #0F0F11;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.brandTitle {
+  font-family: var(--font-heading);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--color-text-title);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.brandSub {
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  color: var(--color-text-muted);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.cardHeader {
+  margin-bottom: 24px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-text-title);
+  margin-bottom: 6px;
+}
+
+.subtitle {
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.roleGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.roleCard {
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: left;
+}
+
+.roleCard:hover {
+  background-color: rgba(255, 255, 255, 0.85);
+  border-color: var(--color-text-muted);
+}
+
+.roleCardActive {
+  border-color: #0F0F11;
+  background-color: #FFFFFF;
+  box-shadow: var(--shadow-sm);
+}
+
+.roleIcon {
+  color: var(--color-text-muted);
+}
+
+.roleCardActive .roleIcon {
+  color: #0F0F11;
+}
+
+.roleLabel {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-text-title);
+}
+
+.roleDescription {
+  background-color: rgba(255, 255, 255, 0.35);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-size: 11px;
+  color: var(--color-text-body);
+  border-left: 3px solid #0F0F11;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.input {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 8px 12px;
+  font-size: 13px;
+  color: var(--color-text-title);
+  background-color: #FFFFFF;
+  transition: border-color 0.15s;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #0F0F11;
+}
+
+.submitBtn {
+  background-color: #0F0F11;
+  color: #FFFFFF;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 10px;
+  border-radius: var(--radius-md);
+  transition: background-color 0.15s;
+  text-align: center;
+  margin-top: 8px;
+}
+
+.submitBtn:hover {
+  background-color: #1E1E24;
+}
+
+.footer {
+  text-align: center;
+  font-size: 10px;
+  color: var(--color-text-subtle);
+  margin-top: 24px;
+}

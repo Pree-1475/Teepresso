@@ -1,0 +1,72 @@
+.card {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  padding: 16px 20px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.topRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-zinc-500);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.iconBox {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-md);
+  background-color: var(--color-zinc-100);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border-subtle);
+}
+
+.bottomRow {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.value {
+  font-family: var(--font-heading);
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--color-zinc-900);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+/* Crisp Rectangular Badge (Ditching AI Pill) */
+.changeBadge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: var(--radius-md); /* 6px rectangle */
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.positive {
+  background-color: #ECFDF5;
+  color: #065F46;
+  border-color: #A7F3D0;
+}
+
+.negative {
+  background-color: #FFF1F2;
+  color: #9F1239;
+  border-color: #FECDD3;
+}

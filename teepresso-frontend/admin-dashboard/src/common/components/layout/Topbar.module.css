@@ -1,0 +1,75 @@
+.topbar {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  margin-bottom: 24px;
+}
+
+.pageHeading {
+  font-family: var(--font-heading);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--color-text-title);
+  letter-spacing: -0.03em;
+}
+
+.rightGroup {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Capsule buttons matching the image */
+.capsuleBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: rgba(255, 255, 255, 0.45);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  padding: 8px 16px;
+  height: 36px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.capsuleBtn:hover {
+  background-color: rgba(255, 255, 255, 0.7);
+  border-color: var(--color-text-subtle);
+}
+
+.capsuleIcon {
+  color: var(--color-text-muted);
+}
+
+.capsuleText {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-body);
+}
+
+.chevron {
+  color: var(--color-text-muted);
+}
+
+/* Icon pills on the right */
+.iconPill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 16px;
+  background-color: rgba(255, 255, 255, 0.45);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-body);
+  transition: all 0.15s ease;
+}
+
+.iconPill:hover {
+  background-color: rgba(255, 255, 255, 0.7);
+  border-color: var(--color-text-subtle);
+  color: var(--color-text-title);
+}

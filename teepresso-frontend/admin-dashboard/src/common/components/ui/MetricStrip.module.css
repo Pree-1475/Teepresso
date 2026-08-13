@@ -1,0 +1,76 @@
+/* Single seamless horizontal data strip separated by vertical dividers */
+.stripContainer {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background: var(--color-surface-white);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-xs);
+  overflow: hidden;
+  margin-bottom: var(--spacing-6);
+}
+
+.metricCell {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border-right: 1px solid var(--color-border);
+}
+
+.metricCell:last-child {
+  border-right: none;
+}
+
+.labelRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-text-subtle);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.valueRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.value {
+  font-family: var(--font-heading);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-text-title);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.subtext {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+
+.subtextAlert {
+  color: var(--color-brand-primary);
+  font-weight: 600;
+}
+
+@media (max-width: 900px) {
+  .stripContainer {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .metricCell:nth-child(2) {
+    border-right: none;
+  }
+  .metricCell:nth-child(1), .metricCell:nth-child(2) {
+    border-bottom: 1px solid var(--color-border);
+  }
+}
