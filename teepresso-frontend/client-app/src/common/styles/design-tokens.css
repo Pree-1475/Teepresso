@@ -35,9 +35,9 @@
   --color-border-hover: #d2cec9;
 
   /* Semantic & Accent Colors */
-  --color-accent-teal: #0D9488;
-  --color-accent-teal-dark: #0F766E;
-  --color-accent-teal-light: #CCFBF1;
+  --color-accent-teal: #B56C4A; /* Terracotta/Rust */
+  --color-accent-teal-dark: #8C5940;
+  --color-accent-teal-light: #F4E8E1;
   
   --color-success-bg: #eaf6ed;
   --color-success-text: #217336;
@@ -47,8 +47,9 @@
   --color-error-text: #b3261e; /* Soft Red */
 
   /* Typography */
-  --font-heading: 'Outfit', sans-serif;
+  --font-heading: 'Playfair Display', serif;
   --font-body: 'Inter', sans-serif;
+  --font-serif: 'Playfair Display', serif;
 
   /* Font Sizes */
   --text-xs: 0.75rem;     /* 12px */

@@ -822,3 +822,230 @@
     display: none;
   }
 }
+
+.kurtaHighlightChip {
+  position: relative;
+  border-color: #B56C4A !important; /* Warm terracotta highlight */
+  background: rgba(181, 108, 74, 0.05);
+}
+
+.kurtaHighlightChip:hover {
+  background: rgba(181, 108, 74, 0.1);
+}
+
+.kurtaHighlightChip.activeChip {
+  background: #B56C4A !important;
+  color: #2D1A13;
+  line-height: 1;
+}
+
+.perPiecePrice {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: rgba(45, 26, 19, 0.55);
+  margin-right: 8px;
+  margin-bottom: 2px;
+}
+
+.savingsBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(13, 148, 136, 0.1);
+  color: var(--color-accent-teal);
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: var(--font-weight-semibold);
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+}
+
+.savingsBadge.maxBulk {
+  background: var(--color-accent-teal);
+  color: #FFFFFF;
+}
+
+.getQuoteBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background-color: var(--color-accent-teal);
+  color: #FFFFFF;
+  border: none;
+  border-radius: var(--radius-full);
+  padding: 14px 32px;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  white-space: nowrap;
+  box-shadow: 0 4px 14px rgba(13, 148, 136, 0.25);
+}
+
+.getQuoteBtn:hover {
+  background-color: var(--color-accent-teal-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(13, 148, 136, 0.4);
+}
+
+/* --- BOTTOM TRUST BAR --- */
+.bottomTrustBar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 28px;
+  margin-top: 36px;
+  flex-wrap: wrap;
+}
+
+.bottomTrustItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: var(--font-weight-medium);
+  color: rgba(45, 26, 19, 0.5);
+}
+
+.trustDivider {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(45, 26, 19, 0.2);
+  flex-shrink: 0;
+}
+
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 1024px) {
+  .gridContainer {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    padding: 60px 0;
+  }
+  
+  .stickyCalculator {
+    position: relative;
+    top: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .wrapper {
+    padding: 48px 0;
+  }
+
+  .mainTitle {
+    font-size: var(--text-3xl);
+  }
+
+  .topBadgesRow {
+    gap: 8px 16px;
+  }
+
+  .timelineStep {
+    gap: 16px;
+  }
+
+  .timelineIconWrapper {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .timelineContent {
+    padding: 16px;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .statsBar {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px 32px;
+    padding: 20px;
+    width: 100%;
+  }
+
+  .statDivider {
+    display: none;
+  }
+
+  .quoteTitle {
+    font-size: var(--text-3xl);
+  }
+
+  .cardFooter {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+
+  .getQuoteBtn {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .mainTitle {
+    font-size: var(--text-2xl);
+  }
+
+  .timelineNode {
+    width: 32px;
+    height: 32px;
+    font-size: 12px;
+  }
+  
+  .verticalTimeline::before {
+    left: 15px; /* Center of the 32px node (16px - 1px width) */
+  }
+
+  .bottomTrustBar {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .trustDivider {
+    display: none;
+  }
+}
+
+.kurtaHighlightChip {
+  position: relative;
+  border-color: #B56C4A !important; /* Warm terracotta highlight */
+  background: rgba(181, 108, 74, 0.05);
+}
+
+.kurtaHighlightChip:hover {
+  background: rgba(181, 108, 74, 0.1);
+}
+
+.kurtaHighlightChip.activeChip {
+  background: #B56C4A !important;
+  border-color: #B56C4A !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 4px 12px rgba(181, 108, 74, 0.25);
+}
+
+.festiveBadge {
+  position: absolute;
+  top: -2px; /* Lowered from -8px */
+  right: -8px;
+  background-color: #D35400; /* Bright energetic saffron */
+  color: white;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 3px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.05em;
+  box-shadow: 0 2px 4px rgba(211, 84, 0, 0.3);
+  z-index: 10;
+}

@@ -9,16 +9,21 @@
   border-radius: var(--radius-lg);
   background-color: var(--color-surface);
   overflow: hidden;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
 .item:hover {
   border-color: var(--color-accent-teal);
+  background-color: #fdfaf7;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(45, 26, 19, 0.04);
 }
 
 .item.open {
   border-color: var(--color-accent-teal);
-  box-shadow: 0 4px 14px rgba(13, 148, 136, 0.08);
+  background-color: #ffffff;
+  box-shadow: 0 4px 20px rgba(181, 108, 74, 0.12);
+  transform: translateY(0);
 }
 
 .header {
@@ -59,7 +64,7 @@
 
 .contentWrapper {
   overflow: hidden;
-  transition: height var(--transition-normal) ease-in-out;
+  transition: height 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
 .content {

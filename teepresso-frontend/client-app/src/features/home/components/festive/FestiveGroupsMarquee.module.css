@@ -1,0 +1,69 @@
+.section {
+  background-color: #2D1A13; /* Dark brown brand color */
+  color: #FDFAF7;
+  padding: var(--spacing-6) 0;
+  overflow: hidden;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.marqueeContainer {
+  position: relative;
+  width: 100vw;
+  max-width: 100%;
+  display: flex;
+  overflow: hidden;
+}
+
+.marqueeTrack {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  animation: marquee 30s linear infinite;
+  will-change: transform;
+}
+
+/* Pause on hover if user prefers, though usually marques are fine */
+.marqueeContainer:hover .marqueeTrack {
+  animation-play-state: paused;
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.marqueeItem {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin: 0 var(--spacing-6);
+}
+
+@media (min-width: 768px) {
+  .marqueeItem {
+    font-size: 16px;
+    margin: 0 var(--spacing-10);
+  }
+}
+
+.separator {
+  color: #D35400; /* Terracotta/Saffron accent */
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+/* Accessibility: reduce motion */
+@media (prefers-reduced-motion: reduce) {
+  .marqueeTrack {
+    animation: none;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .marqueeContainer {
+    width: auto;
+  }
+}

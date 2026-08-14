@@ -1,8 +1,10 @@
 .section {
-  padding: var(--spacing-24) 0;
+  padding: var(--spacing-16) 0;
   background-color: var(--color-accent-teal-dark);
   background-image: radial-gradient(circle at 50% 0%, var(--color-accent-teal) 0%, var(--color-accent-teal-dark) 70%);
   color: var(--color-surface);
+  position: relative;
+  overflow: hidden;
 }
 
 .container {
@@ -67,4 +69,14 @@
 .primaryBtn:hover {
   background-color: var(--color-accent-teal-light) !important;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15) !important;
+}
+
+.threadWinding {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
 }

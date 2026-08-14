@@ -8,25 +8,34 @@ export const SeasonalKurtaSection = () => {
   return (
     <section className={styles.campaignSection}>
       <div className="container">
+        
+        <div className={styles.header}>
+          <div className={styles.headerText}>
+            <span className={styles.eyebrow}>Festive Collection</span>
+            <h2 className={styles.title}>Custom Kurtas.</h2>
+            <p className={styles.description}>
+              Custom printed ethnic wear for societies, fests, and celebrations.
+            </p>
+          </div>
+          <Link href="/custom-kurtas" className={styles.solidButton}>
+            Explore Collection <ArrowRight size={16} className={styles.ctaIcon} />
+          </Link>
+        </div>
+
         <Link href="/custom-kurtas" className={styles.bannerWrapper}>
-          <Image
-            src={`/images/kurtha-section-banner.png?v=${Date.now()}`}
-            alt="Custom Kurtas Campaign"
-            width={1200}
-            height={300}
-            className={styles.bannerImage}
-            unoptimized={true}
-          />
-          {/* Real interactive button positioned over the banner */}
-          <div 
-            className={styles.buttonOverlay}
-            style={{ position: 'absolute', bottom: '10%', left: '5%', zIndex: 10 }}
-          >
-            <span className={styles.solidButton}>
-              Explore Kurtas Collection <ArrowRight size={16} className={styles.ctaIcon} />
-            </span>
+          <div className={styles.imageContent}>
+            <Image
+              src={`/images/kurtha-section-banner.png?v=${Date.now()}`}
+              alt="Custom Kurtas Campaign"
+              width={1200}
+              height={300}
+              className={styles.bannerImage}
+              unoptimized={true}
+              style={{ objectFit: 'cover' }}
+            />
           </div>
         </Link>
+
       </div>
     </section>
   );

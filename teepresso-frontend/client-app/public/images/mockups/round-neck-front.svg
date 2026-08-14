@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 600" width="100%" height="100%">
+  <path d="M150,80 Q250,130 350,80 L440,170 L370,240 L360,560 L140,560 L130,240 L60,170 Z" fill="#f4ede6" stroke="#8c5b45" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M180,82 Q250,135 320,82 Q250,110 180,82 Z" fill="#8c5b45" opacity="0.15"/>
+  <path d="M180,82 Q250,135 320,82" fill="none" stroke="#8c5b45" stroke-width="3"/>
+  <line x1="140" y1="550" x2="360" y2="550" stroke="#8c5b45" stroke-width="2" stroke-dasharray="4,4"/>
+  <text x="250" y="320" font-family="sans-serif" font-size="18" font-weight="bold" fill="#8c5b45" text-anchor="middle" opacity="0.4">ROUND NECK (FRONT)</text>
+</svg>

@@ -1,0 +1,151 @@
+.section {
+  padding: var(--spacing-32) 0;
+  background-color: var(--color-background);
+  position: relative;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: var(--spacing-24);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.header.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.title {
+  font-family: var(--font-serif);
+  font-size: var(--text-5xl);
+  font-weight: 400;
+  color: #2D1A13;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-16);
+  position: relative;
+}
+
+@media (min-width: 1024px) {
+  .timeline {
+    flex-direction: row;
+    gap: 0;
+    justify-content: space-between;
+  }
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  flex: 1;
+  padding: 0 var(--spacing-6);
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.timelineVisible .step {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.iconWrapper {
+  width: 90px;
+  height: 90px;
+  background-color: #FDFAF7;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--spacing-8);
+  color: #D35400; 
+  position: relative;
+  z-index: 2;
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+  box-shadow: 0 10px 30px rgba(211, 84, 0, 0.05);
+  border: 1px solid rgba(211, 84, 0, 0.1);
+}
+
+.step:hover .iconWrapper {
+  transform: translateY(-5px) scale(1.05);
+}
+
+.iconGlow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(211, 84, 0, 0.2) 0%, rgba(211, 84, 0, 0) 70%);
+  transform: translate(-50%, -50%) scale(1.5);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.step:hover .iconGlow {
+  opacity: 1;
+}
+
+.stepTitle {
+  font-family: var(--font-body);
+  font-size: 20px;
+  font-weight: 600;
+  color: #2D1A13;
+  margin: 0 0 var(--spacing-3) 0;
+}
+
+.stepDesc {
+  font-family: var(--font-body);
+  font-size: 16px;
+  color: #5C4A3D;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* Connectors for Desktop */
+.connectorContainer {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .connectorContainer {
+    display: block;
+    position: absolute;
+    top: 45px; /* half of icon wrapper height */
+    left: 50%;
+    width: 100%;
+    height: 2px;
+    z-index: 1;
+  }
+  
+  .connectorBase {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent 0%, rgba(92, 74, 61, 0.1) 10%, rgba(92, 74, 61, 0.1) 90%, transparent 100%);
+  }
+
+  .connectorFill {
+    position: absolute;
+    top: 0; left: 0; height: 100%;
+    background: linear-gradient(90deg, transparent 0%, #D35400 50%, transparent 100%);
+    width: 0%;
+    transition: width 1s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+
+  .timelineVisible .connectorFill {
+    width: 100%;
+  }
+}

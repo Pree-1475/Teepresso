@@ -206,6 +206,7 @@ export function TrackOrderPage() {
                       className={`${styles.stageItem} ${isPassed ? styles.stageItemPassed : ''} ${
                         isActive ? styles.stageItemActive : ''
                       }`}
+                      style={{ animationDelay: `${idx * 0.1}s` }}
                     >
                       <div className={styles.stageDot}>
                         {isPassed ? <CheckCircle2 size={12} /> : null}

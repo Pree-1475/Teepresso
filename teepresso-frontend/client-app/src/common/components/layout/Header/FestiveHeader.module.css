@@ -1,0 +1,161 @@
+.header {
+  position: sticky; 
+  top: 0;
+  width: 100%;
+  background-color: transparent;
+  z-index: 100;
+  padding: 24px 0;
+  margin-bottom: -84px; /* Pulls the hero section up underneath */
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  will-change: padding, background-color, backdrop-filter, box-shadow;
+}
+
+.scrolled {
+  background: rgba(253, 250, 247, 0.85); /* FDFAF7 with opacity */
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  padding: 12px 0;
+  box-shadow: 0 8px 32px rgba(45, 26, 19, 0.08);
+  border-bottom: 1px solid rgba(45, 26, 19, 0.06);
+}
+
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Logo */
+.logoWrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logoIcon {
+  width: 24px;
+  height: 24px;
+  color: #5C3D2E;
+}
+
+.logoTextContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.logoTitle {
+  font-family: var(--font-heading);
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1;
+  color: #2D1A13;
+  letter-spacing: -0.02em;
+}
+
+.logoSubtitle {
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 500;
+  color: #5C3D2E;
+  margin-top: 2px;
+}
+
+/* Center Nav */
+.centerNav {
+  display: none;
+  align-items: center;
+  gap: 32px;
+}
+
+@media (min-width: 992px) {
+  .centerNav {
+    display: flex;
+  }
+}
+
+.navLink, .navLinkActive {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  color: #2D1A13;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: opacity 0.2s;
+}
+
+.navLink:hover {
+  opacity: 0.7;
+}
+
+.navLinkActive {
+  font-weight: 600;
+}
+
+.chevron {
+  font-size: 10px;
+  transform: scaleX(1.5);
+  display: inline-block;
+  margin-left: 2px;
+}
+
+.newBadge {
+  background-color: #A0522D; /* Rust color */
+  color: #FFF;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 10px;
+  margin-left: 4px;
+  text-transform: uppercase;
+}
+
+/* Right Nav */
+.rightNav {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.phoneBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: transparent;
+  color: #2D1A13;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid #D9CDBF;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.phoneBtn:hover {
+  background-color: #F0E6D8;
+}
+
+.whatsappIcon {
+  color: #4CAF50;
+  display: flex;
+  align-items: center;
+}
+
+.quoteBtn {
+  background-color: #2D1A13;
+  color: #FFF;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 10px 24px;
+  border-radius: 24px;
+  text-decoration: none;
+  transition: transform 0.2s;
+}
+
+.quoteBtn:hover {
+  transform: translateY(-1px);
+}

@@ -8,11 +8,21 @@
   z-index: 60;
 }
 
+.festiveBar {
+  background-color: #2D1A13;
+}
+
 .text {
   font-family: var(--font-body);
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
   margin: 0;
+  color: #FDF9F1;
+}
+
+.diamond {
+  color: #B56C4A; /* Terracotta/Rust color */
+  font-size: 14px;
+  margin: 0 4px;
 }

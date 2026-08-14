@@ -1,0 +1,134 @@
+.section {
+  padding: var(--spacing-32) 0;
+  background-color: var(--color-background);
+}
+
+.header {
+  text-align: center;
+  margin-bottom: var(--spacing-20);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.header.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.title {
+  font-family: var(--font-serif);
+  font-size: var(--text-5xl);
+  font-weight: 400;
+  color: #2D1A13;
+  margin: 0;
+}
+
+.masonryGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-4);
+  grid-auto-rows: 200px;
+}
+
+@media (min-width: 768px) {
+  .masonryGrid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--spacing-6);
+    grid-auto-rows: 250px;
+  }
+}
+
+.spanWide {
+  grid-column: span 2;
+  grid-row: span 1;
+}
+
+.spanTall {
+  grid-column: span 1;
+  grid-row: span 2;
+}
+
+.spanSquare {
+  grid-column: span 1;
+  grid-row: span 1;
+}
+
+.imageWrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 24px;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(40px) scale(0.95);
+  transition: opacity 0.6s ease-out, transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+  background-color: #EAE0D8;
+}
+
+.imageVisible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.imagePlaceholder {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  z-index: 1;
+}
+
+.shimmerEffect {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    transparent 100%
+  );
+  transform: translateX(-100%);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  100% { transform: translateX(100%); }
+}
+
+.image {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  z-index: 2;
+  transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.imageWrapper:hover .image {
+  transform: scale(1.05);
+}
+
+.overlay {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  padding: var(--spacing-6);
+  background: linear-gradient(to top, rgba(45, 26, 19, 0.8) 0%, transparent 100%);
+  z-index: 3;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  display: flex;
+  align-items: flex-end;
+}
+
+.imageWrapper:hover .overlay {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.overlayText {
+  color: #FFFFFF;
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}

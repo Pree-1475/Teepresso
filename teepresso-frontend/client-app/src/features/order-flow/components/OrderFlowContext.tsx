@@ -2,10 +2,11 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-// --- Types for Guided Order Flow ---
 export interface CustomerData {
   name: string;
   phone: string;
+  email: string;
+  organization: string;
 }
 
 export interface SelectedProduct {
@@ -28,22 +29,41 @@ export interface SizeQtyMap {
   XXXL: number;
 }
 
+export interface ColorVariant {
+  id: string;
+  color: string;
+  colorHex: string;
+  sizes: SizeQtyMap;
+}
+
+export interface PlacementArtworkData {
+  placementId: string;
+  file: File | null;
+  previewUrl: string;
+  x: number; // offset %
+  y: number; // offset %
+  scale: number;
+  rotation: number;
+}
+
 export interface ArtworkData {
   file: File | null;
   previewUrl: string;
   mode: 'has_design' | 'need_help';
   instructions: string;
+  placements: Record<string, PlacementArtworkData>;
 }
 
 export interface MockupTransform {
-  x: number; // offset % from center
-  y: number; // offset % from top
-  scale: number; // 0.5 to 2.0
-  rotation: number; // -180 to 180 degrees
+  x: number;
+  y: number;
+  scale: number;
+  rotation: number;
 }
 
 export interface MockupState {
   activeView: 'front' | 'back';
+  activePlacementId: string;
   frontTransform: MockupTransform;
   backTransform: MockupTransform;
   designerAssistance: boolean;
@@ -59,7 +79,7 @@ export interface GuidedOrderState {
   currentStep: number;
   customer: CustomerData;
   product: SelectedProduct;
-  sizes: SizeQtyMap;
+  colorVariants: ColorVariant[];
   artwork: ArtworkData;
   mockup: MockupState;
   isUrgentOrder: boolean;
@@ -75,12 +95,16 @@ interface OrderFlowContextType {
   setStep: (step: number) => void;
   updateCustomer: (data: Partial<CustomerData>) => void;
   updateProduct: (data: Partial<SelectedProduct>) => void;
-  updateSizeQty: (size: keyof SizeQtyMap, qty: number) => void;
+  addColorVariant: (color: string, colorHex: string) => void;
+  removeColorVariant: (id: string) => void;
+  updateVariantSizeQty: (variantId: string, size: keyof SizeQtyMap, qty: number) => void;
   updateArtworkMode: (mode: 'has_design' | 'need_help') => void;
-  setArtworkFile: (file: File | null, previewUrl: string) => void;
+  setArtworkFile: (file: File | null, previewUrl: string, placementId?: string) => void;
+  updatePlacementTransform: (placementId: string, transform: Partial<PlacementArtworkData>) => void;
+  removePlacementArtwork: (placementId: string) => void;
   updateInstructions: (text: string) => void;
-  updateMockupTransform: (view: 'front' | 'back', transform: Partial<MockupTransform>) => void;
   setActiveView: (view: 'front' | 'back') => void;
+  setActivePlacementId: (id: string) => void;
   setDesignerAssistance: (assist: boolean) => void;
   toggleUrgentOrder: () => void;
   updateDelivery: (data: Partial<DeliveryData>) => void;
@@ -91,11 +115,11 @@ interface OrderFlowContextType {
   grandTotal: number;
 }
 
-const defaultTransform: MockupTransform = { x: 0, y: 0, scale: 1, rotation: 0 };
+const defaultSizes: SizeQtyMap = { XS: 0, S: 10, M: 20, L: 15, XL: 5, XXL: 0, XXXL: 0 };
 
 const initialOrderState: GuidedOrderState = {
   currentStep: 1,
-  customer: { name: '', phone: '' },
+  customer: { name: '', phone: '', email: '', organization: '' },
   product: {
     id: 'tshirt-roundneck',
     name: 'Classic Round Neck T-Shirt',
@@ -105,17 +129,26 @@ const initialOrderState: GuidedOrderState = {
     colorHex: '#8c5b45',
     pricePerUnit: 199,
   },
-  sizes: { XS: 0, S: 15, M: 25, L: 20, XL: 10, XXL: 0, XXXL: 0 },
+  colorVariants: [
+    {
+      id: 'var-1',
+      color: 'Warm Brown',
+      colorHex: '#8c5b45',
+      sizes: { ...defaultSizes },
+    },
+  ],
   artwork: {
     file: null,
     previewUrl: '',
     mode: 'has_design',
     instructions: '',
+    placements: {},
   },
   mockup: {
     activeView: 'front',
-    frontTransform: { ...defaultTransform },
-    backTransform: { ...defaultTransform },
+    activePlacementId: 'front',
+    frontTransform: { x: 0, y: 0, scale: 1, rotation: 0 },
+    backTransform: { x: 0, y: 0, scale: 1, rotation: 0 },
     designerAssistance: false,
   },
   isUrgentOrder: false,
@@ -129,35 +162,35 @@ const OrderFlowContext = createContext<OrderFlowContextType | undefined>(undefin
 export function OrderFlowProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<GuidedOrderState>(initialOrderState);
 
-  // Auto-restore state from localStorage on mount
   useEffect(() => {
     try {
-      const saved = localStorage.getItem('teepresso_order_state');
+      const saved = localStorage.getItem('teepresso_order_state_v2');
       if (saved) {
         const parsed = JSON.parse(saved);
         if (parsed && parsed.product) {
-          setState(prev => ({ ...prev, ...parsed, artwork: { ...prev.artwork, mode: parsed.artwork?.mode || 'has_design' } }));
+          setState(prev => ({ ...prev, ...parsed }));
         }
       }
     } catch {
-      // Ignore localStorage errors
+      // Ignore localStorage read errors
     }
   }, []);
 
-  // Save state updates to localStorage
   useEffect(() => {
     try {
       const { artwork, ...serializableState } = state;
-      localStorage.setItem('teepresso_order_state', JSON.stringify(serializableState));
+      localStorage.setItem('teepresso_order_state_v2', JSON.stringify(serializableState));
     } catch {
-      // Ignore serialization errors
+      // Ignore localStorage write errors
     }
   }, [state]);
 
-  // Total calculation helpers
-  const totalPieces = (Object.values(state.sizes) as number[]).reduce((sum, val) => sum + (val || 0), 0);
+  // Compute total pieces across all color variants
+  const totalPieces = state.colorVariants.reduce((total, variant) => {
+    const variantPieces = (Object.values(variant.sizes) as number[]).reduce((sum, qty) => sum + (qty || 0), 0);
+    return total + variantPieces;
+  }, 0);
 
-  // Dynamic volume discount rate per piece
   const getUnitPriceForVolume = (basePrice: number, pieces: number) => {
     if (pieces >= 150) return Math.round(basePrice * 0.8);
     if (pieces >= 75) return Math.round(basePrice * 0.9);
@@ -169,7 +202,7 @@ export function OrderFlowProvider({ children }: { children: ReactNode }) {
   const urgentFee = state.isUrgentOrder ? Math.round(subtotal * 0.2) : 0;
   const grandTotal = subtotal + urgentFee;
 
-  const nextStep = () => setState(prev => ({ ...prev, currentStep: Math.min(prev.currentStep + 1, 8) }));
+  const nextStep = () => setState(prev => ({ ...prev, currentStep: Math.min(prev.currentStep + 1, 4) }));
   const prevStep = () => setState(prev => ({ ...prev, currentStep: Math.max(prev.currentStep - 1, 1) }));
   const setStep = (step: number) => setState(prev => ({ ...prev, currentStep: step }));
 
@@ -177,34 +210,120 @@ export function OrderFlowProvider({ children }: { children: ReactNode }) {
     setState(prev => ({ ...prev, customer: { ...prev.customer, ...data } }));
 
   const updateProduct = (data: Partial<SelectedProduct>) =>
-    setState(prev => ({ ...prev, product: { ...prev.product, ...data } }));
+    setState(prev => ({
+      ...prev,
+      product: { ...prev.product, ...data },
+      // Update default color variant
+      colorVariants: prev.colorVariants.map((v, i) =>
+        i === 0 && data.color && data.colorHex ? { ...v, color: data.color, colorHex: data.colorHex } : v
+      ),
+    }));
 
-  const updateSizeQty = (size: keyof SizeQtyMap, qty: number) =>
-    setState(prev => ({ ...prev, sizes: { ...prev.sizes, [size]: Math.max(0, qty) } }));
+  const addColorVariant = (color: string, colorHex: string) => {
+    const newVariant: ColorVariant = {
+      id: `var-${Date.now()}`,
+      color,
+      colorHex,
+      sizes: { XS: 0, S: 0, M: 10, L: 10, XL: 0, XXL: 0, XXXL: 0 },
+    };
+    setState(prev => ({ ...prev, colorVariants: [...prev.colorVariants, newVariant] }));
+  };
+
+  const removeColorVariant = (id: string) => {
+    setState(prev => ({
+      ...prev,
+      colorVariants: prev.colorVariants.length > 1 ? prev.colorVariants.filter(v => v.id !== id) : prev.colorVariants,
+    }));
+  };
+
+  const updateVariantSizeQty = (variantId: string, size: keyof SizeQtyMap, qty: number) => {
+    setState(prev => ({
+      ...prev,
+      colorVariants: prev.colorVariants.map(variant => {
+        if (variant.id !== variantId) return variant;
+        return {
+          ...variant,
+          sizes: {
+            ...variant.sizes,
+            [size]: Math.max(0, qty),
+          },
+        };
+      }),
+    }));
+  };
 
   const updateArtworkMode = (mode: 'has_design' | 'need_help') =>
     setState(prev => ({ ...prev, artwork: { ...prev.artwork, mode } }));
 
-  const setArtworkFile = (file: File | null, previewUrl: string) =>
-    setState(prev => ({ ...prev, artwork: { ...prev.artwork, file, previewUrl } }));
-
-  const updateInstructions = (instructions: string) =>
-    setState(prev => ({ ...prev, artwork: { ...prev.artwork, instructions } }));
-
-  const updateMockupTransform = (view: 'front' | 'back', transform: Partial<MockupTransform>) =>
+  const setArtworkFile = (file: File | null, previewUrl: string, placementId = 'front') =>
     setState(prev => ({
       ...prev,
-      mockup: {
-        ...prev.mockup,
-        [view === 'front' ? 'frontTransform' : 'backTransform']: {
-          ...prev.mockup[view === 'front' ? 'frontTransform' : 'backTransform'],
-          ...transform,
+      artwork: {
+        ...prev.artwork,
+        file,
+        previewUrl,
+        placements: {
+          ...prev.artwork.placements,
+          [placementId]: {
+            placementId,
+            file,
+            previewUrl,
+            x: 0,
+            y: 0,
+            scale: 1,
+            rotation: 0,
+          },
         },
       },
     }));
 
+  const updatePlacementTransform = (placementId: string, transform: Partial<PlacementArtworkData>) =>
+    setState(prev => {
+      const currentPlacement = prev.artwork.placements[placementId] || {
+        placementId,
+        file: null,
+        previewUrl: '',
+        x: 0,
+        y: 0,
+        scale: 1,
+        rotation: 0,
+      };
+      return {
+        ...prev,
+        artwork: {
+          ...prev.artwork,
+          placements: {
+            ...prev.artwork.placements,
+            [placementId]: {
+              ...currentPlacement,
+              ...transform,
+            },
+          },
+        },
+      };
+    });
+
+  const removePlacementArtwork = (placementId: string) =>
+    setState(prev => {
+      const newPlacements = { ...prev.artwork.placements };
+      delete newPlacements[placementId];
+      return {
+        ...prev,
+        artwork: {
+          ...prev.artwork,
+          placements: newPlacements,
+        },
+      };
+    });
+
+  const updateInstructions = (instructions: string) =>
+    setState(prev => ({ ...prev, artwork: { ...prev.artwork, instructions } }));
+
   const setActiveView = (view: 'front' | 'back') =>
     setState(prev => ({ ...prev, mockup: { ...prev.mockup, activeView: view } }));
+
+  const setActivePlacementId = (activePlacementId: string) =>
+    setState(prev => ({ ...prev, mockup: { ...prev.mockup, activePlacementId } }));
 
   const setDesignerAssistance = (designerAssistance: boolean) =>
     setState(prev => ({ ...prev, mockup: { ...prev.mockup, designerAssistance } }));
@@ -228,12 +347,16 @@ export function OrderFlowProvider({ children }: { children: ReactNode }) {
     setStep,
     updateCustomer,
     updateProduct,
-    updateSizeQty,
+    addColorVariant,
+    removeColorVariant,
+    updateVariantSizeQty,
     updateArtworkMode,
     setArtworkFile,
+    updatePlacementTransform,
+    removePlacementArtwork,
     updateInstructions,
-    updateMockupTransform,
     setActiveView,
+    setActivePlacementId,
     setDesignerAssistance,
     toggleUrgentOrder,
     updateDelivery,

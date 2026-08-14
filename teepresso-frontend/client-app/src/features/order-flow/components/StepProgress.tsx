@@ -6,14 +6,10 @@ import { Check } from 'lucide-react';
 import styles from './StepProgress.module.css';
 
 const STEPS = [
-  { num: 1, label: 'Customer' },
-  { num: 2, label: 'Product' },
-  { num: 3, label: 'Quantities' },
-  { num: 4, label: 'Artwork' },
-  { num: 5, label: 'Mockup' },
-  { num: 6, label: 'Review' },
-  { num: 7, label: 'Delivery' },
-  { num: 8, label: 'Payment' },
+  { num: 1, label: 'Your Details' },
+  { num: 2, label: 'Product & Quantities' },
+  { num: 3, label: 'Upload & Design' },
+  { num: 4, label: 'Review & Order' },
 ];
 
 export function StepProgress() {

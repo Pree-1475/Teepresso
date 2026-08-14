@@ -36,14 +36,15 @@
 }
 
 .navLink {
-  font-family: var(--font-body);
-  font-size: 13px;
-  font-weight: 600;
-  color: #1A1A1A;
+  font-family: var(--font-heading); /* Upgraded from body to heading font for premium look */
+  font-size: 14px;
+  font-weight: 500;
+  color: #2D1A13; /* Darker brown for better contrast */
   text-decoration: none;
-  padding-bottom: 2px;
+  padding: 4px 0;
   border-bottom: 2px solid transparent;
   transition: all 0.2s ease;
+  letter-spacing: 0.02em;
 }
 
 .navLink:hover {

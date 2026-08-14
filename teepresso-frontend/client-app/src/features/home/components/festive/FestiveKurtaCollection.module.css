@@ -1,0 +1,134 @@
+.section {
+  padding: 60px 0; /* Cut padding in half */
+  background-color: transparent; /* Removed white background */
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 40px; /* Reduced margin */
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.8s ease-out;
+}
+
+.header.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.title {
+  font-family: 'Playfair Display', serif;
+  font-size: 42px;
+  font-weight: 500;
+  color: #2D1A13;
+  margin: 0 0 12px 0; /* Reduced margin */
+}
+
+.subtitle {
+  font-family: var(--font-body);
+  font-size: 16px;
+  color: #5C4A3D;
+  margin: 0;
+  letter-spacing: 0.02em;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 40px; /* Reduced gap */
+  width: 100%;
+  max-width: 1000px;
+  margin-bottom: 40px; /* Reduced margin */
+}
+
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 60px;
+  }
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.8s ease-out;
+}
+
+.card.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.colorSwatch {
+  width: 140px;
+  height: 200px;
+  border-radius: 100px; /* Elegant pill shape */
+  margin-bottom: 32px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.06);
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.card:hover .colorSwatch {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+}
+
+.productName {
+  font-family: 'Playfair Display', serif;
+  font-size: 24px;
+  font-weight: 500;
+  color: #2D1A13;
+  margin: 0 0 12px 0;
+}
+
+.productDesc {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: #5C4A3D;
+  line-height: 1.6;
+  margin: 0;
+  max-width: 260px;
+}
+
+.footer {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.8s ease-out 0.4s;
+}
+
+.footer.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.ctaLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #2D1A13;
+  text-decoration: none;
+  padding-bottom: 4px;
+  border-bottom: 1px solid #2D1A13;
+  transition: all 0.3s ease;
+}
+
+.ctaLink:hover {
+  color: #B56C4A;
+  border-bottom-color: #B56C4A;
+  gap: 16px; /* Arrow slides right slightly */
+}

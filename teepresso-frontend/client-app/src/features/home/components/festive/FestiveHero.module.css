@@ -1,0 +1,255 @@
+.heroSection {
+  background-color: #FDF9F1;
+  padding: 0;
+  margin-top: -120px; /* Increased pull-up to ensure no white gap under header */
+  position: relative;
+  overflow: hidden;
+  /* Add a subtle cream gradient on the left to make text pop, fading to transparent */
+  background-image: 
+    linear-gradient(to right, rgba(253, 249, 241, 0.85) 0%, rgba(253, 249, 241, 0.4) 35%, rgba(253, 249, 241, 0) 60%),
+    url('/images/festive/brush-stroke-bg.png');
+  background-size: 100%, 130%; 
+  background-position: left top, center bottom; /* Anchored strictly to the bottom edge */
+  background-repeat: no-repeat, no-repeat;
+}
+
+.heroSection::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    linear-gradient(90deg, rgba(181, 108, 74, 0.025) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(181, 108, 74, 0.025) 1px, transparent 1px);
+  background-size: 6px 6px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@media (min-width: 1024px) {
+  .heroSection {
+    background-size: 100%, 115%;
+    background-position: left top, right bottom; /* Anchored strictly to the bottom edge */
+  }
+}
+
+.container {
+  padding-top: 120px; /* Perfectly offsets the -120px margin-top */
+  padding-bottom: 0; /* Removed bottom padding so image hits the end perfectly */
+}
+
+.grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-12);
+}
+
+@media (min-width: 1024px) {
+  .grid {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 80vh;
+  }
+}
+
+/* --------------------------------------------------
+   TYPOGRAPHY & CONTENT
+-------------------------------------------------- */
+
+.textContent {
+  flex: 1;
+  max-width: 550px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  padding-top: var(--spacing-24); /* Increased padding to nudge text lower */
+}
+
+.title {
+  font-family: 'Playfair Display', serif; /* Elegant festive font */
+  font-size: 48px; /* Reduced from 56px */
+  font-weight: 600; /* Bolder looks great with Playfair */
+  color: #2D1A13;
+  margin: 0 0 var(--spacing-6) 0;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.highlight {
+  color: #B56C4A; /* Terracotta/Rust color */
+}
+
+@media (min-width: 768px) {
+  .title {
+    font-size: 60px; /* Reduced from 72px */
+  }
+}
+
+.description {
+  font-family: var(--font-body);
+  font-size: 18px; /* Reduced from 20px */
+  color: #2D1A13;
+  margin: 0 0 var(--spacing-8) 0;
+  line-height: 1.4;
+  position: relative;
+  padding-top: var(--spacing-6);
+}
+
+.description::before {
+  content: "✧";
+  color: #B56C4A;
+  position: absolute;
+  top: 0;
+  left: 0;
+  font-size: 16px;
+}
+
+.description::after {
+  content: "";
+  position: absolute;
+  top: 8px;
+  left: 20px;
+  width: 60px;
+  height: 1px;
+  background-color: #D9CDBF;
+}
+
+.actions {
+  display: flex;
+  margin-bottom: var(--spacing-12);
+}
+
+.primaryBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background-color: #2D1A13;
+  color: #FFFFFF;
+  padding: 12px 28px; /* Reduced from 18px 36px */
+  border-radius: 999px;
+  font-family: var(--font-body);
+  font-size: 15px; /* Reduced from 16px */
+  font-weight: 500;
+  text-decoration: none;
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+.primaryBtn:hover {
+  background-color: #1A0F0B;
+  transform: translateY(-2px);
+}
+
+/* Features List */
+.featuresList {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-6);
+  border-top: 1px solid rgba(45, 26, 19, 0.1);
+  padding-top: var(--spacing-8);
+}
+
+@media (min-width: 640px) {
+  .featuresList {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.featureItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.featureIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #F0E6D8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #5C3D2E;
+}
+
+.featureItem span {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: #2D1A13;
+}
+
+/* --------------------------------------------------
+   IMAGE STAGE
+-------------------------------------------------- */
+
+.imageStage {
+  flex: 1.2;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  position: relative;
+  min-height: 500px;
+}
+
+.heroImage {
+  width: 120%; /* Bleeds off edge */
+  max-width: 800px;
+  object-fit: contain;
+  margin-right: -10%;
+  transform: scale(1.1);
+}
+
+@media (min-width: 1024px) {
+  .imageStage {
+    margin-right: -100px;
+  }
+  
+  .heroImage {
+    transform: scale(1.2);
+  }
+}
+
+/* --------------------------------------------------
+   BOTTOM BAR
+-------------------------------------------------- */
+.bottomBar {
+  background-color: #2D1A13;
+  color: #FDF9F1;
+  padding: 16px 0;
+}
+
+.bottomBarContainer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+}
+
+@media (min-width: 768px) {
+  .bottomBarContainer {
+    justify-content: space-between;
+  }
+}
+
+.separator {
+  color: #5C3D2E;
+}
+
+.threadCurl {
+  position: absolute;
+  bottom: -40px;
+  left: -40px;
+  width: 280px;
+  height: 280px;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0.25;
+}

@@ -62,6 +62,30 @@ export function ProductsPage() {
 
       <div className="container">
         
+        {/* Custom Kurta Seasonal Spotlight Entry */}
+        <div className={styles.kurtaSpotlightBanner}>
+          <div>
+            <span className={styles.kurtaTag}>Festive & Cultural Seasonal Spotlight</span>
+            <h2 className={styles.kurtaSpotlightTitle}>Custom Group Kurtas</h2>
+            <p className={styles.kurtaSpotlightDesc}>
+              Unify your college fest team, colony celebration, or community group with matching, high-quality custom printed kurtas. Crafted with premium breathable cotton and custom chest or back printing.
+            </p>
+            <Link href="/custom-kurtas" className={styles.kurtaBtn}>
+              Explore Custom Kurta Experience <ArrowRight size={16} />
+            </Link>
+          </div>
+          <div>
+            <Image
+              src="/images/kurtas/hero.png"
+              alt="Custom Group Kurtas"
+              width={500}
+              height={300}
+              className={styles.kurtaImgPreview}
+              unoptimized
+            />
+          </div>
+        </div>
+
         {/* 4. Quantity / Bulk Context Banner */}
         <div className={styles.bulkContextBanner}>
           <div className={styles.bulkBannerText}>
@@ -120,29 +144,6 @@ export function ProductsPage() {
           ))}
         </div>
 
-        {/* 5. Custom Kurta Seasonal Spotlight Entry */}
-        <div className={styles.kurtaSpotlightBanner}>
-          <div>
-            <span className={styles.kurtaTag}>Festive & Cultural Seasonal Spotlight</span>
-            <h2 className={styles.kurtaSpotlightTitle}>Custom Group Kurtas</h2>
-            <p className={styles.kurtaSpotlightDesc}>
-              Unify your college fest team, colony celebration, or community group with matching, high-quality custom printed kurtas. Crafted with premium breathable cotton and custom chest or back printing.
-            </p>
-            <Link href="/custom-kurtas" className={styles.kurtaBtn}>
-              Explore Custom Kurta Experience <ArrowRight size={16} />
-            </Link>
-          </div>
-          <div>
-            <Image
-              src="/images/kurtas/hero.png"
-              alt="Custom Group Kurtas"
-              width={500}
-              height={300}
-              className={styles.kurtaImgPreview}
-              unoptimized
-            />
-          </div>
-        </div>
 
         {/* 6. Simple CTA near the end */}
         <div className={styles.quoteCtaSection}>

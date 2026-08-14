@@ -117,12 +117,11 @@ export function HowItWorksSection() {
   const ordersCounter = useCountUp(12438);
   const ratingCounter = useCountUp(49, 1200);
 
-  // Placeholder price calculation
   const basePrices: Record<string, number> = {
     'Round Neck': 349, 
     'Polo': 499, 
     'Hoodie': 899, 
-    'Oversized': 449, 
+    'Kurta': 599, 
     'Sweatshirt': 699,
   };
 
@@ -280,14 +279,15 @@ export function HowItWorksSection() {
                         <button 
                           key={p} 
                           type="button" 
-                          className={`${styles.productChip} ${product === p ? styles.activeChip : ''}`}
+                          className={`${styles.productChip} ${product === p ? styles.activeChip : ''} ${p === 'Kurta' ? styles.kurtaHighlightChip : ''}`}
                           onClick={() => setProduct(p)}
                         >
+                          {p === 'Kurta' && <span className={styles.festiveBadge}>FESTIVE</span>}
                           <div className={styles.chipIcon}>
                             {p === 'Round Neck' && <Shirt size={20} />}
                             {p === 'Polo' && <User size={20} />}
                             {p === 'Hoodie' && <Layers size={20} />}
-                            {p === 'Oversized' && <Shirt size={20} />}
+                            {p === 'Kurta' && <User size={20} />}
                             {p === 'Sweatshirt' && <Droplet size={20} />}
                           </div>
                           <span>{p}</span>

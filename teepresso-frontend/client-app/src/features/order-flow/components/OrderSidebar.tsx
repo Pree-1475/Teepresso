@@ -21,7 +21,7 @@ export function OrderSidebar() {
     <>
       {/* Desktop Sticky Sidebar */}
       <div className={styles.sidebar}>
-        <h3 className={styles.title}>Live Order Summary</h3>
+        <h3 className={styles.title}>Order Summary</h3>
 
         <div className={styles.section}>
           <div className={styles.row}>
@@ -42,12 +42,7 @@ export function OrderSidebar() {
             <span className={styles.value}>{totalPieces} Pcs</span>
           </div>
 
-          <div className={styles.row}>
-            <span className={styles.label}>Mockup Mode:</span>
-            <span className={styles.value}>
-              {mockup.designerAssistance ? 'Design Team Proofing' : 'Custom Configured'}
-            </span>
-          </div>
+
         </div>
 
         <div className={styles.priceBreakdownSection}>
@@ -70,15 +65,15 @@ export function OrderSidebar() {
         </div>
 
         <div className={styles.estimate}>
-          <span className={styles.estimateLabel}>Delivery Timeline</span>
+          <span className={styles.estimateLabel}>Delivery</span>
           <span className={styles.estimateValue}>
-            {isUrgentOrder ? '⚡ Express 48 Hours' : '📦 4–5 Business Days'}
+            {isUrgentOrder ? 'Express (48 Hours)' : 'Standard (4-5 Days)'}
           </span>
         </div>
       </div>
 
       {/* Mobile Sticky Bottom Summary Bar */}
-      {currentStep < 8 && (
+      {currentStep < 4 && (
         <div className={styles.mobileStickyBar}>
           <div className={styles.mobileStickyLeft}>
             <span className={styles.mobilePieceLabel}>{totalPieces} Pcs • {product.name}</span>

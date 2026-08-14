@@ -13,16 +13,28 @@ export interface ProductItem {
 
 export const CATEGORIES = [
   'All',
+  'Kurtas',
   'T-Shirts',
   'Oversized',
   'Polos',
   'Hoodies',
   'Sweatshirts',
   'Jerseys',
-  'Kurtas',
 ] as const;
 
 export const PRODUCTS_CATALOG: ProductItem[] = [
+  {
+    id: 'custom-kurta-seasonal',
+    name: 'Custom Group Kurta (Seasonal)',
+    category: 'Kurtas',
+    shortDesc: 'Premium Slub Cotton Festive Kurtas with custom chest logo, colony emblem, or back print for groups.',
+    startingPrice: 499,
+    priceRange: '₹499 – ₹699 / pc',
+    colors: ['#8c5b45', '#d2c4b4', '#d35400', '#27ae60', '#8e44ad'],
+    image: '/images/kurtas/hero.png',
+    isSeasonalKurta: true,
+    popularFor: 'Colonies, Fests & Festive Groups',
+  },
   {
     id: 'tshirt-roundneck',
     name: 'Classic Round Neck T-Shirt',
@@ -89,16 +101,5 @@ export const PRODUCTS_CATALOG: ProductItem[] = [
     image: '/images/products/tshirt.png',
     popularFor: 'Sports Leagues & Marathons',
   },
-  {
-    id: 'custom-kurta-seasonal',
-    name: 'Custom Group Kurta (Seasonal)',
-    category: 'Kurtas',
-    shortDesc: 'Premium Slub Cotton Festive Kurtas with custom chest logo, colony emblem, or back print for groups.',
-    startingPrice: 499,
-    priceRange: '₹499 – ₹699 / pc',
-    colors: ['#8c5b45', '#d2c4b4', '#d35400', '#27ae60', '#8e44ad'],
-    image: '/images/kurtas/hero.png',
-    isSeasonalKurta: true,
-    popularFor: 'Colonies, Fests & Festive Groups',
-  },
+
 ];

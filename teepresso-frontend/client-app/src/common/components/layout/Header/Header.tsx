@@ -6,6 +6,8 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/features/auth/context/AuthContext';
 import { Menu, X, ShoppingBag, User as UserIcon, LogOut, PackageCheck, Layers } from 'lucide-react';
 import styles from './Header.module.css';
+import { STOREFRONT_MODE } from '@/common/config/storefront';
+import { FestiveHeader } from './FestiveHeader';
 
 export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);

@@ -107,3 +107,40 @@ ul, ol {
   from { opacity: 0; }
   to { opacity: 1; }
 }
+
+/* Apparel & Textile Custom Accents */
+.fabricOverlay {
+  position: relative;
+}
+
+.fabricOverlay::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    linear-gradient(90deg, rgba(139, 90, 43, 0.035) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(139, 90, 43, 0.035) 1px, transparent 1px);
+  background-size: 4px 4px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.doubleStitchDivider {
+  width: 100%;
+  height: 8px;
+  border-top: 1.5px dashed rgba(139, 90, 43, 0.18);
+  border-bottom: 1.5px dashed rgba(139, 90, 43, 0.18);
+  opacity: 0.8;
+  margin: 0;
+  background-color: #FDFAF7;
+}
+
+@keyframes tagWobble {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-2deg) translateY(-1px); }
+  75% { transform: rotate(2deg) translateY(0); }
+}
+
