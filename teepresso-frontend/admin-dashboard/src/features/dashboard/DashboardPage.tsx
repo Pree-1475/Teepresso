@@ -1,366 +1,242 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
-  SlidersHorizontal,
-  ArrowUpRight,
-  TrendingUp,
-  MapPin,
-  ChevronRight,
-  MoreVertical,
-  Search,
-  Sliders,
-  Upload,
+  Calendar,
+  Download,
   Plus,
-  Compass,
-  AlertCircle
+  ArrowUpRight,
+  ArrowDownRight,
+  MoreVertical,
+  Search
 } from 'lucide-react';
 import styles from './DashboardPage.module.css';
 
-interface InventoryItem {
-  id: string;
-  name: string;
-  sku: string;
-  supplier: string;
-  category: string;
-  cost: number;
-  onHand: number;
-  value: number;
-  demand: 'High' | 'Low' | 'Medium';
-  imgUrl: string;
-}
-
-const INITIAL_INVENTORY: InventoryItem[] = [
-  {
-    id: '1',
-    name: 'Jaunt 360 Camera',
-    sku: 'SKU-837263802',
-    supplier: 'Jaunt',
-    category: 'Electronics',
-    cost: 48300,
-    onHand: 13,
-    value: 627900,
-    demand: 'High',
-    imgUrl: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=80&auto=format&fit=crop&q=60'
-  },
-  {
-    id: '2',
-    name: 'Theta S Close Up 360',
-    sku: 'SKU-32887763',
-    supplier: 'Theta',
-    category: 'Electronics',
-    cost: 14700,
-    onHand: 103,
-    value: 1514100,
-    demand: 'Low',
-    imgUrl: 'https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=80&auto=format&fit=crop&q=60'
-  },
-  {
-    id: '3',
-    name: 'Heavyweight Oversized Streetwear Tee',
-    sku: 'SKU-77382910',
-    supplier: 'Teepresso Hub',
-    category: 'T-Shirts',
-    cost: 349,
-    onHand: 480,
-    value: 167520,
-    demand: 'High',
-    imgUrl: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=80&auto=format&fit=crop&q=60'
-  },
-  {
-    id: '4',
-    name: 'Classic Pique Corporate Polo Shirt',
-    sku: 'SKU-88291039',
-    supplier: 'Teepresso Hub',
-    category: 'Polos',
-    cost: 429,
-    onHand: 220,
-    value: 94380,
-    demand: 'Medium',
-    imgUrl: 'https://images.unsplash.com/photo-1581655353564-df123a1eb820?w=80&auto=format&fit=crop&q=60'
-  }
-];
-
 export function DashboardPage() {
-  const [inventory, setInventory] = useState<InventoryItem[]>(INITIAL_INVENTORY);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('All');
-  const [selectedSupplier, setSelectedSupplier] = useState('All');
+  const navigate = useNavigate();
 
-  // Filters
-  const filteredItems = inventory.filter(item => {
-    const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) || item.sku.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = selectedCategory === 'All' || item.category === selectedCategory;
-    const matchesSupplier = selectedSupplier === 'All' || item.supplier === selectedSupplier;
-    return matchesSearch && matchesCategory && matchesSupplier;
-  });
+  const recentOrders = [
+    { id: 'TP-1042', customer: 'College Fest 2025', items: '240 pcs', total: '₹48,000', status: 'Approved', priority: 'High', time: '10:30 AM' },
+    { id: 'TP-1041', customer: 'ZettaScale Tech Inc', items: '50 pcs', total: '₹12,500', status: 'In Design', priority: 'Normal', time: '09:15 AM' },
+    { id: 'TP-1040', customer: 'Greenwood RWA', items: '85 pcs', total: '₹22,100', status: 'Printing', priority: 'Normal', time: '08:45 AM' },
+    { id: 'TP-1039', customer: 'Mumbai Marathon', items: '500 pcs', total: '₹85,000', status: 'QC Check', priority: 'High', time: 'Yesterday' },
+    { id: 'TP-1038', customer: 'Local Cafe Merch', items: '30 pcs', total: '₹9,000', status: 'Dispatched', priority: 'Normal', time: 'Yesterday' },
+  ];
 
   return (
-    <div className="admin-page-container">
-      {/* 3 Main Dashboard Cards Redesign (Orders, Stock, Reorders) */}
-      <div className={styles.cardsGrid}>
-        
-        {/* 1. Yellow Orders Card */}
-        <div className={styles.ordersCard}>
-          <div className={styles.cardHeaderRow}>
-            <span className={styles.cardHeading}>Orders</span>
-            <button className={styles.smallPillBtn}>
-              <SlidersHorizontal size={12} />
-            </button>
-          </div>
+    <div className={styles.dashboardContainer}>
+      
+      {/* Page Header */}
+      <div className={styles.pageHeader}>
+        <div>
+          <h1 className={styles.pageTitle}>Overview</h1>
+          <p className={styles.pageSubtitle}>Business performance and operational activity.</p>
+        </div>
+        <div className={styles.headerActions}>
+          <button className="erp-btn-secondary" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <Calendar size={14} />
+            <span>This Month</span>
+          </button>
+          <button className="erp-btn-secondary" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <Download size={14} />
+            <span>Export</span>
+          </button>
+          <button className="erp-btn-primary" onClick={() => navigate('/offline-orders')} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <Plus size={14} />
+            <span>New Order</span>
+          </button>
+        </div>
+      </div>
 
-          <div className={styles.ordersStatsGrid}>
-            <div className={styles.statGroup}>
-              <span className={styles.statNum}>1</span>
-              <span className={styles.statLabel}>Overdue</span>
-            </div>
-            <div className={styles.statGroup}>
-              <span className={styles.statNum}>3</span>
-              <span className={styles.statLabel}>Returns</span>
-            </div>
-            <div className={styles.statGroup}>
-              <span className={styles.statNum}>14</span>
-              <span className={styles.statLabel}>In progress</span>
-            </div>
-            <div className={styles.statGroup}>
-              <span className={styles.statNum}>94</span>
-              <span className={styles.statLabel}>Completed</span>
-            </div>
-          </div>
-
-          {/* Stripe Pattern Visual Bar Graph */}
-          <div className={styles.stripeChartContainer}>
-            <div className={styles.stripeBar} style={{ height: '35%', width: '18px' }}></div>
-            <div className={styles.stripeBar} style={{ height: '55%', width: '18px' }}></div>
-            <div className={styles.stripeBar} style={{ height: '85%', width: '18px' }}></div>
-            <div className={styles.stripeBar} style={{ height: '40%', width: '18px' }}></div>
-            <div className={styles.stripeBar} style={{ height: '70%', width: '18px' }}></div>
+      {/* KPI Row */}
+      <div className={styles.kpiGrid}>
+        <div className={styles.kpiCard}>
+          <span className={styles.kpiLabel}>Total Orders</span>
+          <div className={styles.kpiValueRow}>
+            <span className={styles.kpiValue}>1,284</span>
           </div>
         </div>
 
-        {/* 2. Coral Stock Card */}
-        <div className={styles.stockCard}>
-          <div className={styles.cardHeaderRow}>
-            <span className={styles.cardHeading}>Stock</span>
-            <button className={styles.smallPillBtn}>
-              <SlidersHorizontal size={12} />
-            </button>
-          </div>
-
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flex: 1 }}>
-            {/* Stock category markers */}
-            <div className={styles.stockMarkers}>
-              <div className={styles.markerRow}>
-                <span className={`${styles.markerDot} ${styles.dotInStock}`}></span>
-                <span className={styles.markerText}>In stock</span>
-              </div>
-              <div className={styles.markerRow}>
-                <span className={`${styles.markerDot} ${styles.dotOutStock}`}></span>
-                <span className={styles.markerText}>Out of stock</span>
-              </div>
-              <div className={styles.markerRow}>
-                <span className={`${styles.markerDot} ${styles.dotLowStock}`}></span>
-                <span className={styles.markerText}>Low stock</span>
-              </div>
-              <div className={styles.markerRow}>
-                <span className={`${styles.markerDot} ${styles.dotDeadStock}`}></span>
-                <span className={styles.markerText}>Dead stock</span>
-              </div>
-            </div>
-
-            {/* Pie/Donut Chart visual with yellow pill badge */}
-            <div className={styles.pieContainer}>
-              <div className={styles.donutGraphic}>
-                <div className={styles.donutHole}>
-                  <div className={styles.centerBadge}>134</div>
-                </div>
-              </div>
-            </div>
+        <div className={styles.kpiCard}>
+          <span className={styles.kpiLabel}>Revenue</span>
+          <div className={styles.kpiValueRow}>
+            <span className={styles.kpiValue}>₹2.84L</span>
+            <span className={styles.kpiTrendPositive}>
+              <ArrowUpRight size={12} /> 8.4% vs last month
+            </span>
           </div>
         </div>
 
-        {/* 3. Dark Reorders Card */}
-        <div className={styles.reordersCard}>
-          <div className={styles.cardHeaderRow}>
-            <span className={styles.cardHeadingDark}>Reorders</span>
-            <button className={styles.darkArrowBtn}>
-              <ArrowUpRight size={13} color="#FFFFFF" />
-            </button>
+        <div className={styles.kpiCard}>
+          <span className={styles.kpiLabel}>Pending Orders</span>
+          <div className={styles.kpiValueRow}>
+            <span className={styles.kpiValue}>18</span>
           </div>
+        </div>
 
-          {/* Product Dome Stack */}
-          <div className={styles.productStackContainer}>
-            <div className={styles.stackedCardBack2}></div>
-            <div className={styles.stackedCardBack1}></div>
-            <div className={styles.stackedCardActive}>
-              <img
-                src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=180&auto=format&fit=crop&q=80"
-                alt="Jaunt Camera Dome"
-                className={styles.productActiveImg}
-              />
-            </div>
+        <div className={styles.kpiCard}>
+          <span className={styles.kpiLabel}>Urgent Orders</span>
+          <div className={styles.kpiValueRow}>
+            <span className={styles.kpiValue} style={{ color: 'var(--color-status-danger)' }}>7</span>
           </div>
+        </div>
 
-          {/* Product Demand stats */}
-          <div className={styles.reorderFooter}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-              <span className={styles.demandBadge}>⚡ High demand</span>
-              <strong className={styles.productTitle}>Jaunt 360 Camera</strong>
-              <div className={styles.demandDetail}>Estimated demand: 100+ • In stock: 13</div>
-            </div>
-            <button className={styles.yellowAddBtn}>
-              <Plus size={16} color="#0F0F11" />
-            </button>
+        <div className={styles.kpiCard}>
+          <span className={styles.kpiLabel}>Ready to Dispatch</span>
+          <div className={styles.kpiValueRow}>
+            <span className={styles.kpiValue}>12</span>
           </div>
         </div>
       </div>
 
-      {/* Logistics Map & Status Card */}
-      <div className={styles.logisticsMapRow}>
-        <div className={styles.logisticsCard}>
-          <div className={styles.cardHeaderRow}>
-            <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-text-title)' }}>Logistics</span>
-          </div>
-
-          <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap', alignItems: 'center' }}>
-            {/* Visual USA Map routes illustration */}
-            <div className={styles.mapIllustrationContainer}>
-              <div className={styles.mapGridBackground}></div>
-              <div className={styles.yellowStateHighlight}></div>
-              <svg className={styles.routeSvg} width="100%" height="100%">
-                <path d="M 50 80 Q 150 40 280 90" fill="transparent" stroke="#E2E8F0" strokeWidth="2" strokeDasharray="4 4" />
-                <circle cx="50" cy="80" r="5" fill="#FF8F5C" />
-                <circle cx="280" cy="90" r="5" fill="#ECEF22" />
-              </svg>
-              <div className={styles.delayRouteBadge}>Delay +2d</div>
+      <div className={styles.mainGrid}>
+        {/* Left Column: Analytics & Pipeline */}
+        <div className={styles.leftCol}>
+          
+          {/* Production Pipeline */}
+          <div className={styles.panel}>
+            <div className={styles.panelHeader}>
+              <h2 className={styles.panelTitle}>Production Pipeline</h2>
+              <button className={styles.panelLink} onClick={() => navigate('/orders')}>View All Orders</button>
             </div>
-
-            {/* Delayed items list */}
-            <div style={{ flex: 1, minWidth: '240px' }}>
-              <span className={styles.deliveryDelayText}>Delivery is delayed</span>
-              <div className={styles.delayedPillRow}>
-                <div className={styles.delayItemAvatar}>
-                  <img src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=40&auto=format&fit=crop&q=80" alt="product" />
-                </div>
-                <div className={styles.delayItemAvatar}>
-                  <img src="https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=40&auto=format&fit=crop&q=80" alt="product" />
-                </div>
-                <div className={styles.delayCountBadge}>+32</div>
+            
+            <div className={styles.pipelineChart}>
+              <div className={styles.pipelineStage}>
+                <div className={styles.stageLabel}>Design In Progress</div>
+                <div className={styles.stageBar}><div className={styles.stageFill} style={{ width: '40%' }}></div></div>
+                <div className={styles.stageCount}>12</div>
+              </div>
+              <div className={styles.pipelineStage}>
+                <div className={styles.stageLabel}>Waiting for Approval</div>
+                <div className={styles.stageBar}><div className={styles.stageFill} style={{ width: '60%' }}></div></div>
+                <div className={styles.stageCount}>18</div>
+              </div>
+              <div className={styles.pipelineStage}>
+                <div className={styles.stageLabel}>Printing</div>
+                <div className={styles.stageBar}><div className={styles.stageFill} style={{ width: '80%', background: 'var(--color-primary)' }}></div></div>
+                <div className={styles.stageCount}>24</div>
+              </div>
+              <div className={styles.pipelineStage}>
+                <div className={styles.stageLabel}>Quality Check</div>
+                <div className={styles.stageBar}><div className={styles.stageFill} style={{ width: '25%' }}></div></div>
+                <div className={styles.stageCount}>8</div>
+              </div>
+              <div className={styles.pipelineStage}>
+                <div className={styles.stageLabel}>Ready for Dispatch</div>
+                <div className={styles.stageBar}><div className={styles.stageFill} style={{ width: '35%', background: 'var(--color-status-success)' }}></div></div>
+                <div className={styles.stageCount}>12</div>
               </div>
             </div>
           </div>
+
+          {/* Recent Orders Table */}
+          <div className={styles.panel}>
+            <div className={styles.panelHeader}>
+              <h2 className={styles.panelTitle}>Recent Orders</h2>
+              <div className={styles.tableActions}>
+                <div className={styles.compactSearch}>
+                  <Search size={12} />
+                  <input type="text" placeholder="Search orders..." />
+                </div>
+              </div>
+            </div>
+            
+            <div className="erp-table-container">
+              <table className="erp-table">
+                <thead>
+                  <tr>
+                    <th>Order ID</th>
+                    <th>Customer</th>
+                    <th>Items</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Priority</th>
+                    <th>Updated</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {recentOrders.map(order => (
+                    <tr key={order.id} onClick={() => navigate(`/orders/${order.id}`)}>
+                      <td className="text-mono">{order.id}</td>
+                      <td>{order.customer}</td>
+                      <td className="text-muted">{order.items}</td>
+                      <td>{order.total}</td>
+                      <td>
+                        <span className={`badge ${order.status === 'Approved' ? 'badge-success' : order.status === 'Printing' ? 'badge-info' : 'badge-neutral'}`}>
+                          {order.status}
+                        </span>
+                      </td>
+                      <td>
+                        {order.priority === 'High' ? (
+                          <span className="badge badge-danger">High</span>
+                        ) : (
+                          <span className="text-muted">Normal</span>
+                        )}
+                      </td>
+                      <td className="text-muted">{order.time}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
         </div>
-      </div>
 
-      {/* Table Filters Bar */}
-      <div className={styles.filtersBar}>
-        {/* Search input capsule */}
-        <div className={styles.searchCapsule}>
-          <Search size={14} color="var(--color-text-muted)" />
-          <input
-            type="text"
-            placeholder="Search"
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-            className={styles.searchField}
-          />
+        {/* Right Column: Activity Timeline */}
+        <div className={styles.rightCol}>
+          
+          <div className={styles.panel}>
+            <div className={styles.panelHeader}>
+              <h2 className={styles.panelTitle}>Recent Activity</h2>
+            </div>
+            
+            <div className={styles.activityTimeline}>
+              <div className={styles.activityItem}>
+                <div className={styles.activityDot}></div>
+                <div className={styles.activityContent}>
+                  <p>Order <span className="text-mono">#TP1042</span> approved by customer</p>
+                  <span className={styles.activityTime}>10:30 AM</span>
+                </div>
+              </div>
+              
+              <div className={styles.activityItem}>
+                <div className={styles.activityDot}></div>
+                <div className={styles.activityContent}>
+                  <p>Design uploaded for <span className="text-mono">#TP1041</span></p>
+                  <span className={styles.activityTime}>09:20 AM</span>
+                </div>
+              </div>
+
+              <div className={styles.activityItem}>
+                <div className={styles.activityDot}></div>
+                <div className={styles.activityContent}>
+                  <p>Payment received for <span className="text-mono">#TP1040</span></p>
+                  <span className={styles.activityTime}>09:05 AM</span>
+                </div>
+              </div>
+
+              <div className={styles.activityItem}>
+                <div className={styles.activityDot}></div>
+                <div className={styles.activityContent}>
+                  <p>Order <span className="text-mono">#TP1039</span> moved to printing</p>
+                  <span className={styles.activityTime}>08:20 AM</span>
+                </div>
+              </div>
+              
+               <div className={styles.activityItem}>
+                <div className={styles.activityDot}></div>
+                <div className={styles.activityContent}>
+                  <p>Order <span className="text-mono">#TP1038</span> dispatched via Delhivery</p>
+                  <span className={styles.activityTime}>Yesterday</span>
+                </div>
+              </div>
+            </div>
+            <button className={styles.panelLink} style={{ marginTop: '16px', display: 'block', width: '100%', textAlign: 'center' }}>
+              View All Activity
+            </button>
+          </div>
+
         </div>
-
-        {/* Dropdowns */}
-        <select
-          value={selectedCategory}
-          onChange={e => setSelectedCategory(e.target.value)}
-          className={styles.dropdownSelect}
-        >
-          <option value="All">Category</option>
-          <option value="Electronics">Electronics</option>
-          <option value="T-Shirts">T-Shirts</option>
-          <option value="Polos">Polos</option>
-        </select>
-
-        <select
-          value={selectedSupplier}
-          onChange={e => setSelectedSupplier(e.target.value)}
-          className={styles.dropdownSelect}
-        >
-          <option value="All">Supplier</option>
-          <option value="Jaunt">Jaunt</option>
-          <option value="Theta">Theta</option>
-          <option value="Teepresso Hub">Teepresso Hub</option>
-        </select>
-
-        <select className={styles.dropdownSelect}>
-          <option>Storage</option>
-        </select>
-
-        {/* Action controls */}
-        <button className={styles.controlPill} title="Filter parameters">
-          <Sliders size={13} />
-        </button>
-
-        <button className={styles.controlPill} title="Export inventory list">
-          <Upload size={13} />
-        </button>
-
-        <button className={styles.yellowActionBtn} title="Register new product blank">
-          <Plus size={14} color="#0F0F11" />
-        </button>
-      </div>
-
-      {/* High Density Premium Inventory Table */}
-      <div className="admin-table-container">
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th style={{ width: '40px', textAlign: 'center' }}>
-                <input type="checkbox" className={styles.checkboxInput} />
-              </th>
-              <th>Product</th>
-              <th>Supplier</th>
-              <th>Category</th>
-              <th>Cost</th>
-              <th>On hand</th>
-              <th>On hand value</th>
-              <th>Demand</th>
-              <th style={{ width: '50px', textAlign: 'right' }}>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredItems.map(item => (
-              <tr key={item.id}>
-                <td style={{ textAlign: 'center' }}>
-                  <input type="checkbox" className={styles.checkboxInput} />
-                </td>
-                <td>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <div className={styles.productThumbnail}>
-                      <img src={item.imgUrl} alt={item.name} />
-                    </div>
-                    <div>
-                      <div className={styles.productNameText}>{item.name}</div>
-                      <div className={styles.skuText}>{item.sku}</div>
-                    </div>
-                  </div>
-                </td>
-                <td style={{ fontWeight: 500 }}>{item.supplier}</td>
-                <td>{item.category}</td>
-                <td style={{ fontWeight: 600 }}>₹{item.cost.toLocaleString('en-IN')}</td>
-                <td style={{ fontWeight: 600 }}>{item.onHand}</td>
-                <td style={{ fontWeight: 700, color: 'var(--color-text-title)' }}>
-                  ₹{item.value.toLocaleString('en-IN')}
-                </td>
-                <td>
-                  <span className={`${styles.demandPill} ${item.demand === 'High' ? styles.demandHigh : styles.demandLow}`}>
-                    {item.demand}
-                  </span>
-                </td>
-                <td style={{ textAlign: 'right' }}>
-                  <button className={styles.threeDotsBtn}>
-                    <MoreVertical size={14} />
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
       </div>
     </div>
   );

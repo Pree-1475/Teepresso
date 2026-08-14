@@ -1,11 +1,11 @@
 import React, { useState, useEffect, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'react-router-dom';
 import { Check, Edit3, Send, Loader2 } from 'lucide-react';
 import { Button } from '@/common/components/ui/Button/Button';
 import styles from './approval.module.css';
 
 function ApprovalFlowContent() {
-  const searchParams = useSearchParams();
+  const [searchParams] = useSearchParams();
   const orderId = searchParams.get('order') || 'TP-2026-8842';
 
   const [order, setOrder] = useState<any | null>(null);

@@ -1,0 +1,138 @@
+.erpTopbar {
+  height: 56px;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface-white);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  flex-shrink: 0;
+  z-index: 100;
+}
+
+.brandSection {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  width: 240px; /* Fixed width to align search */
+}
+
+.brandName {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text-title);
+  letter-spacing: 0.02em;
+}
+
+.brandBadge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--color-surface-white);
+  background: var(--color-primary);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.searchSection {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  max-width: 480px;
+}
+
+.searchButton {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  background: var(--color-surface-beige);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  padding: 6px 12px;
+  color: var(--color-text-muted);
+  transition: all 0.15s ease;
+}
+
+.searchButton:hover {
+  background: var(--color-surface-white);
+  border-color: var(--color-border);
+  box-shadow: var(--shadow-sm);
+  color: var(--color-text-body);
+}
+
+.searchIcon {
+  flex-shrink: 0;
+}
+
+.searchText {
+  flex: 1;
+  text-align: left;
+  font-size: 13px;
+}
+
+.searchShortcut {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  background: var(--color-surface-white);
+  border: 1px solid var(--color-border);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.actionsSection {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+  width: 240px;
+}
+
+.iconButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  transition: all 0.15s ease;
+}
+
+.iconButton:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text-title);
+}
+
+.divider {
+  width: 1px;
+  height: 16px;
+  background: var(--color-border);
+}
+
+.profileSection {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--color-surface-hover);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary);
+}
+
+.userName {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-title);
+}

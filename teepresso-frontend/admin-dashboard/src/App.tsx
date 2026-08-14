@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import '@/common/styles/globals.css';
-import { Sidebar } from '@/common/components/layout/Sidebar';
-import { Topbar } from '@/common/components/layout/Topbar';
+import { TopNavbar } from '@/common/components/layout/TopNavbar';
+import { RightNavDock } from '@/common/components/layout/RightNavDock';
 
 import { LoginPage } from '@/features/auth/LoginPage';
 import { DashboardPage } from '@/features/dashboard/DashboardPage';
@@ -17,8 +17,30 @@ import { DispatchPage } from '@/features/fulfillment/DispatchPage';
 import { AttendancePage } from '@/features/attendance/AttendancePage';
 import { ReportsPage } from '@/features/reports/ReportsPage';
 
+function AnimatedRoutes() {
+  const location = useLocation();
+
+  return (
+    <div key={location.pathname} className="page-transition-wrapper">
+      <Routes location={location}>
+        <Route path="/" element={<DashboardPage />} />
+        <Route path="/orders" element={<OrdersPage />} />
+        <Route path="/offline-orders" element={<OfflineOrdersPage />} />
+        <Route path="/mockups" element={<MockupsQueuePage />} />
+        <Route path="/products" element={<ProductsAdminPage />} />
+        <Route path="/customers" element={<CustomersAdminPage />} />
+        <Route path="/inventory" element={<InventoryPage />} />
+        <Route path="/dispatch" element={<DispatchPage />} />
+        <Route path="/attendance" element={<AttendancePage />} />
+        <Route path="/reports" element={<ReportsPage />} />
+        <Route path="/analytics" element={<AnalyticsPage />} />
+        <Route path="*" element={<DashboardPage />} />
+      </Routes>
+    </div>
+  );
+}
+
 export function App() {
-  // Check if session is stored in localStorage
   const storedUser = localStorage.getItem('teepresso_user');
   const [user, setUser] = useState<{ role: string; name: string } | null>(
     storedUser ? JSON.parse(storedUser) : null
@@ -41,36 +63,19 @@ export function App() {
 
   return (
     <BrowserRouter>
-      <div className="admin-layout">
-        <Sidebar onLogout={handleLogout} />
-        <div className="admin-main-content">
-          <Topbar />
-          <Routes>
-            {/* Common overview page */}
-            <Route path="/" element={<DashboardPage />} />
-            
-            {/* Orders pipeline */}
-            <Route path="/orders" element={<OrdersPage />} />
-            <Route path="/offline-orders" element={<OfflineOrdersPage />} />
-            
-            {/* Mockups and assets */}
-            <Route path="/mockups" element={<MockupsQueuePage />} />
-            
-            {/* Product catalog and customer administration */}
-            <Route path="/products" element={<ProductsAdminPage />} />
-            <Route path="/customers" element={<CustomersAdminPage />} />
-            
-            {/* Operations sub-consoles */}
-            <Route path="/inventory" element={<InventoryPage />} />
-            <Route path="/dispatch" element={<DispatchPage />} />
-            <Route path="/attendance" element={<AttendancePage />} />
-            
-            {/* Analytics & financials */}
-            <Route path="/reports" element={<ReportsPage />} />
-            <Route path="/analytics" element={<AnalyticsPage />} />
-            
-            <Route path="*" element={<DashboardPage />} />
-          </Routes>
+      <div className="erp-shell">
+        {/* Left Vertical Nav Rail */}
+        <RightNavDock />
+
+        {/* Right Main Column */}
+        <div className="erp-main-col">
+          {/* Top Header Navbar */}
+          <TopNavbar onLogout={handleLogout} />
+
+          {/* Center Main Workstation Stage */}
+          <main className="erp-workspace">
+            <AnimatedRoutes />
+          </main>
         </div>
       </div>
     </BrowserRouter>

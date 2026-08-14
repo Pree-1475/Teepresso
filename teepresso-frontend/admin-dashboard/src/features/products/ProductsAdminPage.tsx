@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Edit2 } from 'lucide-react';
+import { Search, Plus, Download, MoreHorizontal } from 'lucide-react';
 import styles from './ProductsAdminPage.module.css';
 
 interface ProductAdminItem {
@@ -53,58 +53,102 @@ const PRODUCTS_ADMIN_DATA: ProductAdminItem[] = [
 
 export function ProductsAdminPage() {
   const [products] = useState<ProductAdminItem[]>(PRODUCTS_ADMIN_DATA);
+  const [search, setSearch] = useState('');
+
+  const filtered = products.filter(p => 
+    p.name.toLowerCase().includes(search.toLowerCase()) || 
+    p.category.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
-    <div className="admin-page-container">
+    <div className={styles.workspace}>
+      
+      {/* Header */}
       <div className={styles.header}>
         <div>
           <h1 className={styles.title}>Product Catalog</h1>
           <p className={styles.subtitle}>Apparel inventory & volume pricing brackets</p>
         </div>
-        <button type="button" className={styles.addBtn}>
-          <Plus size={14} /> Add Product
-        </button>
+        <div className={styles.actions}>
+          <button className="erp-btn-primary" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <Plus size={14} />
+            <span>Add Product</span>
+          </button>
+        </div>
       </div>
 
-      <div className={styles.grid}>
-        {products.map(item => (
-          <div key={item.id} className={styles.productCard}>
-            <div className={styles.cardTop}>
-              <span className={styles.categoryBadge}>{item.category}</span>
-              <div className="status-dot-badge">
-                <span className="status-dot status-dot-emerald"></span>
-                <span>In Stock</span>
-              </div>
-            </div>
-
-            <h3 className={styles.productName}>{item.name}</h3>
-
-            <div className={styles.priceRow}>
-              <span className={styles.priceLabel}>Base Rate:</span>
-              <span className={styles.priceValue}>₹{item.startingPrice} <span style={{ fontSize: '11px', fontWeight: 400 }}>/ pc</span></span>
-            </div>
-
-            <div className={styles.metaRow}>
-              <span>MOQ: <strong>{item.minQty} Pcs</strong></span>
-            </div>
-
-            <div className={styles.swatchRow}>
-              <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>Colors ({item.availableColors.length}):</span>
-              <div style={{ display: 'flex', gap: '4px' }}>
-                {item.availableColors.map((hex, idx) => (
-                  <span key={idx} className={styles.dot} style={{ backgroundColor: hex }} />
-                ))}
-              </div>
-            </div>
-
-            <div className={styles.cardFooter}>
-              <button type="button" className={styles.editBtn}>
-                <Edit2 size={12} /> Edit Pricing
-              </button>
-            </div>
-          </div>
-        ))}
+      {/* Toolbar */}
+      <div className={styles.toolbar}>
+        <div className={styles.searchBox}>
+          <Search size={14} className="text-muted" />
+          <input
+            type="text"
+            placeholder="Search Product Name, Category..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            className={styles.searchInput}
+          />
+        </div>
+        
+        <div className={styles.filterGroup}>
+          <button className="erp-btn-secondary" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <Download size={14} />
+            <span>Export Catalog</span>
+          </button>
+        </div>
       </div>
+
+      {/* Clean Table Container */}
+      <div className="erp-table-container">
+        <table className="erp-table">
+          <thead>
+            <tr>
+              <th style={{ width: '40px' }}><input type="checkbox" /></th>
+              <th>Product Name</th>
+              <th>Category</th>
+              <th>Base Rate</th>
+              <th>Min Qty (MOQ)</th>
+              <th>Available Colors</th>
+              <th>Status</th>
+              <th style={{ width: '40px' }}></th>
+            </tr>
+          </thead>
+          <tbody>
+            {filtered.map(p => (
+              <tr key={p.id}>
+                <td><input type="checkbox" /></td>
+                <td>
+                  <div style={{ fontWeight: 500 }}>{p.name}</div>
+                </td>
+                <td className="text-muted">{p.category}</td>
+                <td>
+                  <strong>₹{p.startingPrice}</strong> <span className="text-muted" style={{ fontSize: '11px' }}>/ pc</span>
+                </td>
+                <td><strong>{p.minQty} Pcs</strong></td>
+                <td>
+                  <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+                    {p.availableColors.map((hex, idx) => (
+                      <span key={idx} className={styles.colorDot} style={{ backgroundColor: hex }} />
+                    ))}
+                    <span className="text-muted" style={{ fontSize: '11px', marginLeft: '4px' }}>({p.availableColors.length})</span>
+                  </div>
+                </td>
+                <td>
+                  {p.inStock ? (
+                    <span className="badge badge-success">In Stock</span>
+                  ) : (
+                    <span className="badge badge-danger">Out of Stock</span>
+                  )}
+                </td>
+                <td>
+                  <button className={styles.moreBtn}><MoreHorizontal size={14} /></button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
     </div>
   );
 }

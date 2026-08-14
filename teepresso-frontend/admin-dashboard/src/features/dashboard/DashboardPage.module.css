@@ -1,589 +1,247 @@
-.cardsGrid {
-  display: grid;
-  grid-template-columns: 1.1fr 1.1fr 1fr;
-  grid-template-rows: auto auto;
-  gap: 16px;
-  margin-bottom: 24px;
-}
-
-.ordersCard {
-  grid-column: 1;
-  grid-row: 1;
-  background-color: #ECEF22;
-  border-radius: var(--radius-xl);
-  padding: 24px;
+.dashboardContainer {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  height: 240px;
-  position: relative;
-  overflow: hidden;
-  box-shadow: var(--shadow-sm);
-}
-
-.stockCard {
-  grid-column: 2;
-  grid-row: 1;
-  background: linear-gradient(135deg, #FF9B6A 0%, #FF6C3B 100%);
-  border-radius: var(--radius-xl);
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  height: 240px;
-  color: #FFFFFF;
-  box-shadow: var(--shadow-sm);
-}
-
-.reordersCard {
-  grid-column: 3;
-  grid-row: 1 / span 2;
-  background-color: #0F0F11;
-  border-radius: var(--radius-xl);
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  height: 528px; /* Sum of two rows plus gap */
-  color: #FFFFFF;
-  box-shadow: var(--shadow-md);
-  position: relative;
-  overflow: hidden;
-}
-
-.logisticsMapRow {
-  grid-column: 1 / span 2;
-  grid-row: 2;
-}
-
-.logisticsCard {
-  background: rgba(255, 255, 255, 0.45);
-  backdrop-filter: blur(10px);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-xl);
-  padding: 24px;
-  height: 272px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  box-shadow: var(--shadow-sm);
-}
-
-.cardHeaderRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  gap: 32px;
   width: 100%;
 }
 
-.cardHeading {
-  font-size: 16px;
-  font-weight: 700;
-  color: #0F0F11;
-  letter-spacing: -0.01em;
-}
-
-.cardHeadingDark {
-  font-size: 16px;
-  font-weight: 700;
-  color: #FFFFFF;
-  letter-spacing: -0.01em;
-}
-
-/* Small circle action buttons on card corners */
-.smallPillBtn {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: rgba(0, 0, 0, 0.05);
+/* Page Header */
+.pageHeader {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #0F0F11;
-  transition: background 0.15s;
-}
-
-.smallPillBtn:hover {
-  background: rgba(0, 0, 0, 0.1);
-}
-
-.darkArrowBtn {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.15s;
-}
-
-.darkArrowBtn:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-/* Orders stats numbers layout */
-.ordersStatsGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px 24px;
-  margin-top: 10px;
-}
-
-.statGroup {
-  display: flex;
-  flex-direction: column;
-}
-
-.statNum {
-  font-size: 26px;
-  font-weight: 800;
-  color: #0F0F11;
-  line-height: 1;
-}
-
-.statLabel {
-  font-size: 11px;
-  color: rgba(15, 15, 17, 0.6);
-  font-weight: 600;
-  margin-top: 2px;
-}
-
-/* Striped Bar Chart Visual matching mockup */
-.stripeChartContainer {
-  position: absolute;
-  bottom: 0;
-  right: 24px;
-  height: 100px;
-  display: flex;
+  justify-content: space-between;
   align-items: flex-end;
-  gap: 8px;
 }
 
-.stripeBar {
-  background: repeating-linear-gradient(
-    45deg,
-    #0F0F11,
-    #0F0F11 4px,
-    #ECEF22 4px,
-    #ECEF22 8px
-  );
-  border-radius: 6px 6px 0 0;
-  transition: height 0.3s ease;
+.pageTitle {
+  font-size: 20px;
+  margin-bottom: 4px;
 }
 
-/* Stock Card indicators */
-.stockMarkers {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 16px;
-}
-
-.markerRow {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.markerDot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-}
-
-.dotInStock { background-color: #0F0F11; }
-.dotOutStock { background-color: #FFFFFF; }
-.dotLowStock {
-  background: repeating-linear-gradient(45deg, #FF6C3B, #FF6C3B 2px, #FFFFFF 2px, #FFFFFF 4px);
-}
-.dotDeadStock {
-  background: repeating-linear-gradient(45deg, #0F0F11, #0F0F11 2px, #FF6C3B 2px, #FF6C3B 4px);
-}
-
-.markerText {
-  font-size: 12px;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.85);
-}
-
-/* Donut Graphic Visual matching mockup */
-.pieContainer {
-  width: 120px;
-  height: 120px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  margin-top: 8px;
-}
-
-.donutGraphic {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  background: conic-gradient(
-    #0F0F11 0% 60%,
-    rgba(255, 255, 255, 0.4) 60% 75%,
-    #FFD2BD 75% 90%,
-    #FFFFFF 90% 100%
-  );
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.donutHole {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: #FF8754; /* Matches gradient center */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.centerBadge {
-  background-color: #ECEF22;
-  color: #0F0F11;
-  font-size: 11px;
-  font-weight: 800;
-  padding: 2px 8px;
-  border-radius: 12px;
-  box-shadow: var(--shadow-sm);
-}
-
-/* Reorders Stack Card animation styles */
-.productStackContainer {
-  position: relative;
-  height: 200px;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 32px 0;
-}
-
-.stackedCardBack2 {
-  position: absolute;
-  width: 160px;
-  height: 160px;
-  background-color: #1F1F24;
-  border-radius: var(--radius-lg);
-  transform: translateY(-24px) scale(0.85);
-  opacity: 0.4;
-  z-index: 1;
-}
-
-.stackedCardBack1 {
-  position: absolute;
-  width: 170px;
-  height: 170px;
-  background-color: #29292E;
-  border-radius: var(--radius-lg);
-  transform: translateY(-12px) scale(0.92);
-  opacity: 0.7;
-  z-index: 2;
-}
-
-.stackedCardActive {
-  position: absolute;
-  width: 180px;
-  height: 180px;
-  background-color: #1C1C1F;
-  border-radius: var(--radius-lg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  z-index: 3;
-  box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-  border: 1px solid rgba(255,255,255,0.05);
-}
-
-.productActiveImg {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.reorderFooter {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  width: 100%;
-  margin-top: auto;
-}
-
-.demandBadge {
-  font-size: 9px;
-  font-weight: 700;
-  color: #FF8F5C;
-  background-color: rgba(255, 143, 92, 0.15);
-  padding: 2px 6px;
-  border-radius: var(--radius-sm);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  width: fit-content;
-}
-
-.productTitle {
-  font-size: 15px;
-  font-weight: 700;
-  color: #FFFFFF;
-  margin-top: 4px;
-}
-
-.demandDetail {
-  font-size: 11px;
-  color: var(--color-text-subtle);
-}
-
-.yellowAddBtn {
-  width: 36px;
-  height: 36px;
-  border-radius: 12px;
-  background-color: #ECEF22;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.15s;
-}
-
-.yellowAddBtn:hover {
-  background-color: #D8DB1E;
-}
-
-/* Logistics map illustration styles */
-.mapIllustrationContainer {
-  width: 340px;
-  height: 150px;
-  background: rgba(0, 0, 0, 0.03);
-  border-radius: var(--radius-lg);
-  position: relative;
-  overflow: hidden;
-}
-
-.mapGridBackground {
-  position: absolute;
-  inset: 0;
-  background-image: radial-gradient(rgba(0, 0, 0, 0.1) 1.5px, transparent 1.5px);
-  background-size: 12px 12px;
-}
-
-.yellowStateHighlight {
-  position: absolute;
-  width: 80px;
-  height: 50px;
-  background-color: #ECEF22;
-  border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
-  top: 40px;
-  left: 60px;
-  opacity: 0.6;
-  filter: blur(8px);
-}
-
-.routeSvg {
-  position: absolute;
-  inset: 0;
-  z-index: 5;
-}
-
-.delayRouteBadge {
-  position: absolute;
-  top: 40px;
-  left: 130px;
-  background-color: #FF8F5C;
-  color: #FFFFFF;
-  font-size: 9px;
-  font-weight: 700;
-  padding: 2px 6px;
-  border-radius: var(--radius-sm);
-  box-shadow: var(--shadow-sm);
-  z-index: 10;
-}
-
-.deliveryDelayText {
-  display: block;
-  font-size: 12px;
-  font-weight: 600;
+.pageSubtitle {
+  font-size: 13px;
   color: var(--color-text-muted);
-  margin-bottom: 8px;
 }
 
-.delayedPillRow {
+.headerActions {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  gap: 12px;
 }
 
-.delayItemAvatar {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  overflow: hidden;
+/* KPI Grid */
+.kpiGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+}
+
+.kpiCard {
+  background: var(--color-surface-white);
   border: 1px solid var(--color-border);
-}
-
-.delayItemAvatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.delayCountBadge {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  background-color: rgba(0, 0, 0, 0.05);
-  color: var(--color-text-title);
+  border-radius: var(--radius-md);
+  padding: 16px;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  font-weight: 700;
-}
-
-/* Filters bar capsule layout */
-.filtersBar {
-  display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 8px;
-  margin-bottom: 16px;
+}
+
+.kpiLabel {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+
+.kpiValueRow {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
   flex-wrap: wrap;
 }
 
-.searchCapsule {
+.kpiValue {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--color-text-title);
+  line-height: 1;
+}
+
+.kpiTrendPositive {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-status-success);
+}
+
+/* Main Layout Grid */
+.mainGrid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+}
+
+@media (max-width: 1024px) {
+  .mainGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.leftCol {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.rightCol {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Panels */
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.panelHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.panelTitle {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.panelLink {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-primary);
+}
+
+.panelLink:hover {
+  text-decoration: underline;
+}
+
+/* Production Pipeline Minimal Vis */
+.pipelineChart {
+  background: var(--color-surface-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.pipelineStage {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.stageLabel {
+  width: 140px;
+  font-size: 12px;
+  color: var(--color-text-body);
+}
+
+.stageBar {
+  flex: 1;
+  height: 6px;
+  background: var(--color-surface-hover);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+
+.stageFill {
+  height: 100%;
+  background: var(--color-text-muted);
+  border-radius: var(--radius-pill);
+}
+
+.stageCount {
+  width: 32px;
+  text-align: right;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-title);
+}
+
+/* Compact Search */
+.tableActions {
+  display: flex;
+  gap: 12px;
+}
+
+.compactSearch {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: rgba(255, 255, 255, 0.45);
+  background: var(--color-surface-white);
   border: 1px solid var(--color-border);
-  border-radius: 16px;
-  padding: 6px 14px;
-  width: 240px;
+  border-radius: var(--radius-sm);
+  padding: 4px 8px;
 }
 
-.searchField {
+.compactSearch input {
   border: none;
   background: transparent;
   outline: none;
   font-size: 12px;
-  width: 100%;
-  color: var(--color-text-title);
+  width: 140px;
 }
 
-.dropdownSelect {
-  background: rgba(255, 255, 255, 0.45);
+/* Activity Timeline */
+.activityTimeline {
+  background: var(--color-surface-white);
   border: 1px solid var(--color-border);
-  border-radius: 16px;
-  padding: 6px 12px;
-  font-size: 12px;
-  color: var(--color-text-body);
-  outline: none;
-  cursor: pointer;
-}
-
-.dropdownSelect:focus {
-  border-color: var(--color-text-subtle);
-}
-
-.controlPill {
-  width: 32px;
-  height: 32px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.45);
-  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 24px;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--color-text-body);
-  transition: all 0.15s ease;
+  flex-direction: column;
+  gap: 20px;
 }
 
-.controlPill:hover {
-  background: rgba(255, 255, 255, 0.75);
-}
-
-.yellowActionBtn {
-  width: 32px;
-  height: 32px;
-  border-radius: 12px;
-  background-color: #ECEF22;
+.activityItem {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.15s ease;
+  gap: 12px;
+  position: relative;
 }
 
-.yellowActionBtn:hover {
-  background-color: #D8DB1E;
+.activityItem:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 3px;
+  top: 14px;
+  bottom: -20px;
+  width: 1px;
+  background: var(--color-border);
 }
 
-/* High Density Table items */
-.checkboxInput {
-  width: 14px;
-  height: 14px;
-  border-radius: 4px;
-  border: 1px solid var(--color-border);
-  accent-color: #ECEF22;
-  cursor: pointer;
+.activityDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  margin-top: 6px;
+  z-index: 1;
 }
 
-.productThumbnail {
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  overflow: hidden;
-  border: 1px solid var(--color-border);
+.activityContent {
+  flex: 1;
 }
 
-.productThumbnail img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.productNameText {
+.activityContent p {
   font-size: 13px;
-  font-weight: 600;
-  color: var(--color-text-title);
+  color: var(--color-text-body);
+  margin-bottom: 2px;
 }
 
-.skuText {
-  font-size: 10px;
+.activityTime {
+  font-size: 11px;
   color: var(--color-text-muted);
-}
-
-/* Demand custom pills */
-.demandPill {
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  padding: 2px 8px;
-  border-radius: 12px;
-  letter-spacing: 0.03em;
-}
-
-.demandHigh {
-  background-color: #FFEFE7;
-  color: #FF6C3B;
-}
-
-.demandLow {
-  background-color: #E6F4FF;
-  color: #096DD9;
-}
-
-.threeDotsBtn {
-  color: var(--color-text-subtle);
-  padding: 4px;
-  border-radius: 4px;
-  transition: background-color 0.15s;
-}
-
-.threeDotsBtn:hover {
-  background-color: rgba(0, 0, 0, 0.05);
-  color: var(--color-text-title);
 }

@@ -1,145 +1,122 @@
 .sidebar {
-  width: 76px;
-  background: rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(15px);
+  width: 220px;
+  background: #FFFFFF;
   border-right: 1px solid var(--color-border);
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: space-between;
-  height: calc(100vh - 32px);
+  height: 100vh;
   position: sticky;
-  top: 16px;
-  border-radius: var(--radius-xl);
-  padding: 24px 0;
-  box-shadow: var(--shadow-sm);
+  top: 0;
+  padding: 16px 12px;
   z-index: 100;
 }
 
 .brandHeader {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 10px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: 14px;
 }
 
-/* Hourglass Logo Container */
 .logoBadge {
-  width: 44px;
-  height: 44px;
-  border-radius: 14px;
-  background-color: #0F0F11;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background: #09090B;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.2s;
 }
 
-.logoBadge:hover {
-  transform: rotate(180deg);
+.brandInfo {
+  display: flex;
+  flex-direction: column;
 }
 
-.brandTitle {
-  display: none; /* Hidden on narrow sidebar */
+.brandName {
+  font-family: var(--font-heading);
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--color-text-title);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
 }
 
-.brandSub {
-  font-size: 8px;
-  letter-spacing: 0.05em;
-  color: var(--color-text-muted);
+.brandRole {
+  font-family: var(--font-mono);
+  font-size: 9px;
   font-weight: 700;
-  text-transform: uppercase;
-  margin-top: 4px;
+  color: var(--color-text-muted);
 }
 
 .navSection {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
+  gap: 3px;
+  flex: 1;
+  overflow-y: auto;
 }
 
-.navGroupLabel {
-  display: none; /* Hidden */
-}
-
-.navItem {
-  width: 44px;
-  height: 44px;
-  border-radius: 14px;
+.navLink {
   display: flex;
   align-items: center;
-  justify-content: center;
-  color: var(--color-text-muted);
-  transition: all 0.2s ease;
-  position: relative;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-body);
+  transition: all 0.15s ease;
 }
 
-.navItem:hover {
-  background-color: rgba(255, 255, 255, 0.5);
+.navLink:hover {
+  background: #F4F4F5;
   color: var(--color-text-title);
 }
 
-/* White active pill card container */
-.navItemActive {
-  background-color: #FFFFFF !important;
-  color: #0F0F11 !important;
-  box-shadow: var(--shadow-sm);
+.navLinkActive {
+  background: #09090B !important;
+  color: #FFFFFF !important;
+  font-weight: 600;
 }
 
 .navIcon {
   flex-shrink: 0;
 }
 
-.navLabel {
-  display: none; /* Hide text label on narrow view */
-}
-
-.navCount {
-  display: none; /* Hide badge count */
-}
-
-.userProfileFooter {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-  width: 100%;
-}
-
-/* Circular Avatar Image */
-.avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background-color: #ECEF22;
-  color: #0F0F11;
-  font-size: 11px;
-  font-weight: 700;
+.userFooter {
   display: flex;
   align-items: center;
-  justify-content: center;
-  border: 1.5px solid #FFFFFF;
-  box-shadow: var(--shadow-sm);
+  justify-content: space-between;
+  padding-top: 12px;
+  border-top: 1px solid var(--color-border);
 }
 
 .userInfo {
-  display: none; /* Hidden */
+  display: flex;
+  flex-direction: column;
+}
+
+.userName {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-text-title);
+}
+
+.userRole {
+  font-size: 10px;
+  color: var(--color-text-muted);
 }
 
 .logoutBtn {
   color: var(--color-text-muted);
-  width: 36px;
-  height: 36px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.15s;
+  padding: 4px;
+  border-radius: var(--radius-xs);
 }
 
 .logoutBtn:hover {
-  background-color: rgba(239, 68, 68, 0.1);
   color: #EF4444;
 }

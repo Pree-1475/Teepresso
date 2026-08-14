@@ -1,0 +1,70 @@
+.erpSidebar {
+  width: 64px;
+  background: var(--color-surface-beige);
+  border-right: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between; /* Push bottom items down */
+  padding: 16px 0;
+  flex-shrink: 0;
+  z-index: 200;
+}
+
+.sidebarSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.iconItem {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  position: relative;
+  transition: all 0.15s ease;
+}
+
+.iconItem:hover {
+  color: var(--color-text-title);
+  background: var(--color-surface-hover);
+}
+
+/* Active State: Subtle darker background, primary brand color icon */
+.iconItemActive {
+  background: var(--color-surface-hover) !important;
+  color: var(--color-primary) !important;
+}
+
+/* Tooltip popping out to the RIGHT of the dock */
+.tooltip {
+  position: absolute;
+  left: 48px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--color-text-title);
+  color: var(--color-surface-white);
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+  box-shadow: var(--shadow-sm);
+  z-index: 300;
+}
+
+.iconItem:hover .tooltip {
+  opacity: 1;
+  visibility: visible;
+}

@@ -1,141 +1,89 @@
+.workspace {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+}
+
 .header {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  margin-bottom: var(--spacing-6);
+  align-items: flex-end;
 }
 
 .title {
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--color-zinc-900);
+  font-size: 20px;
+  margin-bottom: 4px;
 }
 
 .subtitle {
   font-size: 13px;
-  color: var(--color-text-secondary);
-  margin-top: 2px;
+  color: var(--color-text-muted);
 }
 
-.addBtn {
-  display: inline-flex;
+.actions {
+  display: flex;
+  gap: 12px;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 6px;
-  padding: 6px 14px;
-  border-radius: var(--radius-md);
-  background-color: var(--color-brand-primary);
-  color: #ffffff;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.15s;
-}
-
-.addBtn:hover {
-  background-color: var(--color-brand-hover);
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: var(--spacing-4);
-}
-
-.productCard {
-  background: var(--color-surface);
-  border-radius: var(--radius-lg);
+  gap: 16px;
+  background: var(--color-surface-white);
   border: 1px solid var(--color-border);
-  padding: 16px;
-  box-shadow: var(--shadow-xs);
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.cardTop {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.categoryBadge {
-  font-size: 10px;
-  font-weight: 700;
-  color: var(--color-zinc-700);
-  background-color: var(--color-zinc-100);
-  padding: 2px 6px;
-  border-radius: var(--radius-sm);
-  text-transform: uppercase;
-}
-
-.productName {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--color-zinc-900);
-}
-
-.priceRow {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  background-color: var(--color-zinc-50);
-  padding: 6px 10px;
+  padding: 12px 16px;
   border-radius: var(--radius-md);
-  border: 1px solid var(--color-border-subtle);
 }
 
-.priceLabel {
-  font-size: 11px;
-  color: var(--color-text-secondary);
-}
-
-.priceValue {
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--color-zinc-900);
-}
-
-.metaRow {
-  font-size: 12px;
-  color: var(--color-text-secondary);
-}
-
-.swatchRow {
+.searchBox {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 8px;
+  background: var(--color-surface-beige);
+  border: 1px solid transparent;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  width: 320px;
+  transition: all 0.15s ease;
 }
 
-.dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  border: 1px solid rgba(0, 0, 0, 0.15);
+.searchBox:focus-within {
+  background: var(--color-surface-white);
+  border-color: var(--color-primary);
 }
 
-.cardFooter {
-  margin-top: 2px;
-  border-top: 1px solid var(--color-border);
-  padding-top: 10px;
-}
-
-.editBtn {
+.searchInput {
+  border: none;
+  background: transparent;
+  outline: none;
   width: 100%;
-  display: inline-flex;
+  font-size: 13px;
+}
+
+.filterGroup {
+  display: flex;
+  gap: 12px;
+}
+
+.moreBtn {
+  color: var(--color-text-muted);
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
-  padding: 6px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--color-border);
-  background-color: var(--color-surface);
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--color-zinc-700);
-  transition: all 0.15s;
 }
 
-.editBtn:hover {
-  background-color: var(--color-zinc-100);
-  color: var(--color-zinc-900);
+.moreBtn:hover {
+  background: var(--color-border);
+  color: var(--color-text-title);
+}
+
+.colorDot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
 }

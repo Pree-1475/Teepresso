@@ -1,160 +1,82 @@
-.refreshBtn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background-color: var(--color-surface-white);
-  border: 1px solid var(--color-border);
-  color: var(--color-text-body);
-  font-size: 12px;
-  font-weight: 500;
-  padding: 6px 12px;
-  border-radius: var(--radius-md);
-  transition: all 0.15s ease;
-}
-
-.refreshBtn:hover {
-  background-color: var(--color-surface-hover);
-  border-color: var(--color-text-muted);
-}
-
-.statsStrip {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  margin-bottom: 20px;
-}
-
-.statBox {
-  background: var(--color-surface-white);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: 16px;
+.workspace {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 24px;
+  width: 100%;
 }
 
-.statLabel {
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.title {
+  font-size: 20px;
+  margin-bottom: 4px;
+}
+
+.subtitle {
+  font-size: 13px;
   color: var(--color-text-muted);
 }
 
-.statVal {
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--color-text-title);
+.actions {
+  display: flex;
+  gap: 12px;
 }
 
-.alertText {
-  color: #D97706;
-}
-
-.alertsBar {
-  background-color: var(--color-brand-light);
-  border: 1px solid var(--color-brand-border);
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  background: var(--color-surface-white);
+  border: 1px solid var(--color-border);
+  padding: 12px 16px;
   border-radius: var(--radius-md);
-  padding: 10px 14px;
-  font-size: 12px;
-  color: #B45309;
+}
+
+.searchBox {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 20px;
-}
-
-.skulink {
-  text-decoration: underline;
-  cursor: pointer;
-  font-weight: 500;
-}
-
-.lowStockCount {
-  color: #E11D48;
-  font-weight: 700;
-}
-
-.alertDot {
-  margin-left: 4px;
-}
-
-.logStockBtn {
-  background-color: var(--color-surface-white);
-  border: 1px solid var(--color-border);
-  color: var(--color-text-body);
-  font-size: 12px;
-  font-weight: 500;
-  padding: 4px 10px;
-  border-radius: var(--radius-md);
-  transition: all 0.15s;
-}
-
-.logStockBtn:hover {
-  background-color: var(--color-surface-hover);
-  border-color: var(--color-text-muted);
-}
-
-.txInBadge, .txOutBadge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 11px;
-  font-weight: 600;
-  padding: 2px 6px;
+  background: var(--color-surface-beige);
+  border: 1px solid transparent;
+  padding: 6px 12px;
   border-radius: var(--radius-sm);
+  width: 320px;
+  transition: all 0.15s ease;
 }
 
-.txInBadge {
-  background-color: #ECFDF5;
-  color: #047857;
+.searchBox:focus-within {
+  background: var(--color-surface-white);
+  border-color: var(--color-primary);
 }
 
-.txOutBadge {
-  background-color: #FEF3C7;
-  color: #B45309;
-}
-
-.modalHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 20px;
-  border-bottom: 1px solid var(--color-border);
-  padding-bottom: 12px;
-}
-
-.closeBtn {
-  font-size: 16px;
-  color: var(--color-text-muted);
-  cursor: pointer;
-}
-
-.closeBtn:hover {
-  color: var(--color-text-title);
-}
-
-.label {
-  display: block;
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--color-text-muted);
-  margin-bottom: 6px;
-}
-
-.select, .input {
-  width: 100%;
-  padding: 8px 10px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  font-size: 13px;
-  color: var(--color-text-title);
-  background-color: #FFFFFF;
-}
-
-.select:focus, .input:focus {
+.searchInput {
+  border: none;
+  background: transparent;
   outline: none;
-  border-color: var(--color-brand-primary);
+  width: 100%;
+  font-size: 13px;
+}
+
+.filterGroup {
+  display: flex;
+  gap: 12px;
+}
+
+.moreBtn {
+  color: var(--color-text-muted);
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.moreBtn:hover {
+  background: var(--color-border);
+  color: var(--color-text-title);
 }

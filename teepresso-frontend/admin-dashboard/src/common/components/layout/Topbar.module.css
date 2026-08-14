@@ -1,18 +1,95 @@
 .topbar {
-  height: 64px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 16px;
-  margin-bottom: 24px;
+  padding: 14px 28px;
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(15px);
+  border-bottom: 1px solid var(--color-border);
+  position: sticky;
+  top: 0;
+  z-index: 90;
+  gap: 16px;
+}
+
+.leftSection {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .pageHeading {
   font-family: var(--font-heading);
-  font-size: 28px;
-  font-weight: 700;
+  font-size: 19px;
+  font-weight: 800;
   color: var(--color-text-title);
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.liveTickerContainer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 2px 8px;
+}
+
+.tickerPulse {
+  color: #10B981;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.4; }
+  50% { opacity: 1; }
+  100% { opacity: 0.4; }
+}
+
+.tickerText {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.searchCapsule {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  padding: 7px 14px;
+  width: 340px;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.searchCapsule:hover {
+  background: #FFFFFF;
+  border-color: var(--color-border-hover);
+}
+
+.searchPlaceholder {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  flex: 1;
+}
+
+.cmdShortcut {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--color-text-title);
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--color-border);
 }
 
 .rightGroup {
@@ -21,55 +98,37 @@
   gap: 10px;
 }
 
-/* Capsule buttons matching the image */
-.capsuleBtn {
+.roleBadge {
   display: flex;
   align-items: center;
-  gap: 8px;
-  background-color: rgba(255, 255, 255, 0.45);
-  border: 1px solid var(--color-border);
-  border-radius: 16px;
-  padding: 8px 16px;
-  height: 36px;
-  cursor: pointer;
-  transition: all 0.15s ease;
+  gap: 5px;
+  background: var(--color-brand-primary);
+  color: var(--color-obsidian);
+  border-radius: var(--radius-pill);
+  padding: 6px 12px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  box-shadow: var(--shadow-sm);
 }
 
-.capsuleBtn:hover {
-  background-color: rgba(255, 255, 255, 0.7);
-  border-color: var(--color-text-subtle);
-}
-
-.capsuleIcon {
-  color: var(--color-text-muted);
-}
-
-.capsuleText {
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--color-text-body);
-}
-
-.chevron {
-  color: var(--color-text-muted);
-}
-
-/* Icon pills on the right */
-.iconPill {
+.toggleDockBtn {
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 16px;
-  background-color: rgba(255, 255, 255, 0.45);
-  border: 1px solid var(--color-border);
-  color: var(--color-text-body);
-  transition: all 0.15s ease;
-}
-
-.iconPill:hover {
-  background-color: rgba(255, 255, 255, 0.7);
-  border-color: var(--color-text-subtle);
+  gap: 6px;
+  background: #FFFFFF;
   color: var(--color-text-title);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.15s ease;
+}
+
+.toggleDockBtn:hover, .toggleDockBtnActive {
+  background: var(--color-obsidian);
+  color: #FFFFFF;
+  border-color: var(--color-obsidian);
 }

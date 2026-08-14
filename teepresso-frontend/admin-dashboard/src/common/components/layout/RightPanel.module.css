@@ -1,0 +1,287 @@
+.panel {
+  width: 270px;
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(15px);
+  border-left: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: width 0.2s ease;
+  z-index: 50;
+  box-shadow: var(--shadow-sm);
+}
+
+.panelClosed {
+  width: 14px;
+}
+
+.toggleBtn {
+  position: absolute;
+  top: 16px;
+  left: -12px;
+  width: 24px;
+  height: 24px;
+  background: #FFFFFF;
+  color: var(--color-text-title);
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  z-index: 60;
+}
+
+.toggleBtn:hover {
+  background: var(--color-brand-primary);
+  color: #000000;
+}
+
+.content {
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.panelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.headerTitle {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  letter-spacing: 0.05em;
+  color: var(--color-text-title);
+}
+
+.livePulse {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: #10B981;
+}
+
+.sectionCard {
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cardHeader {
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-text-title);
+}
+
+.cardDesc {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  line-height: 1.3;
+}
+
+.actionBtn {
+  width: 100%;
+  background: var(--color-brand-primary);
+  color: #000000;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.actionBtn:hover {
+  background: var(--color-brand-hover);
+}
+
+.selectInput {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-weight: 500;
+  background: #FFFFFF;
+}
+
+.punchBtnRow {
+  display: flex;
+  gap: 6px;
+}
+
+.punchInBtn, .punchOutBtn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: #FFFFFF;
+}
+
+.punchInBtn {
+  background: #10B981;
+}
+
+.punchOutBtn {
+  background: #EF4444;
+}
+
+.punchLogText {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  text-align: center;
+  background: #F1F5F9;
+  padding: 4px;
+  border-radius: 4px;
+}
+
+.tickerItem {
+  background: #FFFFFF;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.tickerItem strong {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--color-text-title);
+}
+
+.tickerItem span {
+  font-size: 10px;
+  color: var(--color-text-muted);
+}
+
+/* Mini-Game Arcade Card */
+.gameCard {
+  background: var(--color-obsidian);
+  color: #FFFFFF;
+  border-radius: var(--radius-md);
+  padding: 12px;
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.gameHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 6px;
+}
+
+.gameScreen {
+  position: relative;
+  height: 135px;
+  background: #18181B;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.gameStartOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.85);
+  color: #FFFFFF;
+}
+
+.gamePlayBtn {
+  background: var(--color-brand-primary);
+  color: #000000;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.gameScoreBoard {
+  position: absolute;
+  top: 6px;
+  left: 8px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--color-brand-primary);
+  font-weight: 700;
+}
+
+.fallingItem {
+  position: absolute;
+  font-size: 18px;
+  transform: translateX(-50%);
+}
+
+.catchBasket {
+  position: absolute;
+  bottom: 6px;
+  transform: translateX(-50%);
+  background: var(--color-brand-primary);
+  color: #000000;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.gameControlsRow {
+  display: flex;
+  gap: 6px;
+}
+
+.gameDirBtn {
+  flex: 1;
+  background: #27272A;
+  color: #FFFFFF;
+  border: 1px solid #3F3F46;
+  border-radius: 4px;
+  padding: 5px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.gameDirBtn:hover {
+  background: var(--color-brand-primary);
+  color: #000000;
+}
