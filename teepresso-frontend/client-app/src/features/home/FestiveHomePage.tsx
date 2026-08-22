@@ -5,8 +5,7 @@ import { IndustriesSection } from '@/features/home/components/IndustriesSection'
 import { HowItWorksSection } from '@/features/home/components/HowItWorksSection';
 import { SeasonalKurtaSection } from '@/features/home/components/SeasonalKurtaSection';
 import { FeaturedProducts } from '@/features/home/components/FeaturedProducts';
-import { WhyChooseUsSection } from '@/features/home/components/WhyChooseUsSection';
-import { TestimonialsSection } from '@/features/home/components/TestimonialsSection';
+import { TrustAndReviewsSection } from '@/features/home/components/TrustAndReviewsSection';
 import { GallerySection } from '@/features/home/components/GallerySection';
 import { FAQSection } from '@/features/home/components/FAQSection';
 import { CTASection } from '@/features/home/components/CTASection';
@@ -25,9 +24,7 @@ export function FestiveHomePage() {
       <div className="doubleStitchDivider" />
       <FeaturedProducts />
       <div className="doubleStitchDivider" />
-      <WhyChooseUsSection />
-      <div className="doubleStitchDivider" />
-      <TestimonialsSection />
+      <TrustAndReviewsSection />
       <div className="doubleStitchDivider" />
       <GallerySection />
       <div className="doubleStitchDivider" />

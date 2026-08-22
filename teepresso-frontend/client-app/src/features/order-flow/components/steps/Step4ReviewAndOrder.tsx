@@ -32,11 +32,9 @@ export function Step4ReviewAndOrder() {
   } = useOrderFlow();
 
   const { 
-    product, 
-    colorVariants, 
+    items, 
     customer, 
     delivery, 
-    artwork, 
     isUrgentOrder, 
     paymentCompleted, 
     orderId 
@@ -60,6 +58,8 @@ export function Step4ReviewAndOrder() {
     }, 800);
   };
 
+  const customizableItems = items.filter(item => item.requiresMockup);
+
   // Render Confirmation Screen after success
   if (paymentCompleted || submittedId) {
     return (
@@ -81,7 +81,7 @@ export function Step4ReviewAndOrder() {
           <div className={styles.successInfoGrid}>
             <div className={styles.successInfoCard}>
               <h4><ShoppingBag size={16} /> Selected Apparel</h4>
-              <p>{totalPieces} Pcs • {product.name}</p>
+              <p>{totalPieces} Pcs Total</p>
             </div>
             <div className={styles.successInfoCard}>
               <h4><MapPin size={16} /> Delivery Destination</h4>
@@ -145,47 +145,75 @@ export function Step4ReviewAndOrder() {
           {/* 2. Product & Quantities Summary */}
           <div className={styles.summaryCardBlock}>
             <div className={styles.summaryCardHeader}>
-              <h3><ShoppingBag size={18} /> Product & Quantities</h3>
+              <h3><ShoppingBag size={18} /> Products ({totalPieces} Pcs)</h3>
               <button type="button" className={styles.editStepBtn} onClick={() => setStep(2)}>
                 <Edit2 size={14} /> Edit
               </button>
             </div>
             <div className={styles.summaryCardBody}>
-              <p><strong>Garment:</strong> {product.name} ({totalPieces} Pcs Total)</p>
-              {colorVariants.map(v => (
-                <div key={v.id} className={styles.summaryVariantRow}>
-                  <span className={styles.colorDot} style={{ backgroundColor: v.colorHex }} />
-                  <span>{v.color}:</span>
-                  <span className={styles.sizeBreakdownSummaryText}>
-                    {(Object.entries(v.sizes) as [string, number][])
-                      .filter(([_, q]) => q > 0)
-                      .map(([s, q]) => `${s}×${q}`)
-                      .join(', ')}
-                  </span>
-                </div>
-              ))}
+              {items.map((item, index) => {
+                let itemPieces = 0;
+                if (item.requiresSizes || item.requiresColors) {
+                  itemPieces = item.colorVariants.reduce((total, variant) => {
+                    return total + (Object.values(variant.sizes) as number[]).reduce((sum, qty) => sum + (qty || 0), 0);
+                  }, 0);
+                } else {
+                  itemPieces = item.quantity || 0;
+                }
+
+                return (
+                  <div key={item.id} style={{ marginBottom: index < items.length - 1 ? '16px' : '0', paddingBottom: index < items.length - 1 ? '16px' : '0', borderBottom: index < items.length - 1 ? '1px solid #e5e7eb' : 'none' }}>
+                    <p style={{ margin: '0 0 8px 0' }}>
+                      <strong>{item.name}</strong> — {itemPieces} Pcs
+                    </p>
+                    
+                    {item.requiresSizes && item.requiresColors ? (
+                      item.colorVariants.map(v => (
+                        <div key={v.id} className={styles.summaryVariantRow}>
+                          <span className={styles.colorDot} style={{ backgroundColor: v.colorHex }} />
+                          <span>{v.color}:</span>
+                          <span className={styles.sizeBreakdownSummaryText}>
+                            {(Object.entries(v.sizes) as [string, number][])
+                              .filter(([_, q]) => q > 0)
+                              .map(([s, q]) => `${s}×${q}`)
+                              .join(', ')}
+                          </span>
+                        </div>
+                      ))
+                    ) : (
+                      <p style={{ margin: 0, fontSize: '0.9rem', color: '#6b7280' }}>Standard sizing/no color options</p>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
 
           {/* 3. Artwork & Placements Summary */}
-          <div className={styles.summaryCardBlock}>
-            <div className={styles.summaryCardHeader}>
-              <h3><Sparkles size={18} /> Artwork & Design</h3>
-              <button type="button" className={styles.editStepBtn} onClick={() => setStep(3)}>
-                <Edit2 size={14} /> Edit
-              </button>
+          {customizableItems.length > 0 && (
+            <div className={styles.summaryCardBlock}>
+              <div className={styles.summaryCardHeader}>
+                <h3><Sparkles size={18} /> Artwork & Design</h3>
+                <button type="button" className={styles.editStepBtn} onClick={() => setStep(3)}>
+                  <Edit2 size={14} /> Edit
+                </button>
+              </div>
+              <div className={styles.summaryCardBody}>
+                {customizableItems.map((item, index) => (
+                  <div key={item.id} style={{ marginBottom: index < customizableItems.length - 1 ? '12px' : '0' }}>
+                    <p style={{ margin: '0 0 4px 0' }}><strong>{item.name}</strong></p>
+                    {Object.keys(item.artwork.placements).length > 0 ? (
+                      <p style={{ margin: 0, fontSize: '0.9rem' }}>
+                        Placements: {Object.keys(item.artwork.placements).map(p => p.toUpperCase()).join(', ')}
+                      </p>
+                    ) : (
+                      <p style={{ margin: 0, fontSize: '0.9rem', color: '#6b7280' }}>No design files uploaded.</p>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
-            <div className={styles.summaryCardBody}>
-              <p>
-                <strong>Mode:</strong> {artwork.mode === 'has_design' ? 'Custom Artwork Uploaded' : 'Free Designer Proof Request'}
-              </p>
-              {Object.keys(artwork.placements).length > 0 && (
-                <p>
-                  <strong>Placements:</strong> {Object.keys(artwork.placements).map(p => p.toUpperCase()).join(', ')}
-                </p>
-              )}
-            </div>
-          </div>
+          )}
 
           {/* 4. Delivery Address Section */}
           <div className={styles.summaryCardBlockFull}>

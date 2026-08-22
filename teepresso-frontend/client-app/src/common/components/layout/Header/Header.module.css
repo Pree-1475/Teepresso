@@ -15,49 +15,124 @@
 }
 
 .container {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  display: flex;
   align-items: center;
-  gap: var(--spacing-4);
+  justify-content: center;
+  position: relative;
+  min-height: 40px;
+}
+
+@media (min-width: 992px) {
+  .container {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: var(--spacing-4);
+  }
 }
 
 /* Left Navigation */
 .leftNav {
-  display: none;
+  display: flex;
   align-items: center;
-  gap: var(--spacing-6);
-  justify-self: start;
+  gap: var(--spacing-4);
+  position: absolute;
+  left: var(--spacing-4);
 }
 
 @media (min-width: 992px) {
   .leftNav {
+    position: static;
+    justify-self: start;
+    gap: var(--spacing-6);
+  }
+}
+
+.desktopLeftLinks {
+  display: none;
+  align-items: center;
+  gap: var(--spacing-6);
+}
+
+@media (min-width: 992px) {
+  .desktopLeftLinks {
     display: flex;
   }
 }
 
+.mobileOnlyProfile {
+  display: block;
+}
+@media (min-width: 992px) {
+  .mobileOnlyProfile {
+    display: none;
+  }
+}
+
+.desktopOnlyProfile {
+  display: none;
+}
+@media (min-width: 992px) {
+  .desktopOnlyProfile {
+    display: block;
+  }
+}
+
 .navLink {
-  font-family: var(--font-heading); /* Upgraded from body to heading font for premium look */
+  font-family: var(--font-heading);
   font-size: 14px;
   font-weight: 500;
-  color: #2D1A13; /* Darker brown for better contrast */
+  color: #2D1A13;
   text-decoration: none;
   padding: 4px 0;
-  border-bottom: 2px solid transparent;
-  transition: all 0.2s ease;
+  transition: color 0.3s ease;
   letter-spacing: 0.02em;
+  position: relative;
 }
 
-.navLink:hover {
-  border-bottom-color: rgba(26, 26, 26, 0.3);
+.navLink::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background-color: #1A1A1A;
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  transform: translateX(-50%);
+  border-radius: 2px;
 }
 
-.activeLink {
-  border-bottom-color: #1A1A1A;
+.navLink:hover::after, .activeLink::after {
+  width: 100%;
+}
+
+.navLink:hover, .activeLink {
+  color: #1A1A1A;
 }
 
 /* Center Logo */
 .logo {
   justify-self: center;
+}
+
+.newBadge {
+  background: linear-gradient(135deg, #D4AF37 0%, #FFF5D1 50%, #D4AF37 100%);
+  background-size: 200% auto;
+  color: #4A3500;
+  font-size: 9px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 12px;
+  margin-left: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  animation: goldShimmer 3s infinite linear;
+  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.4);
+}
+
+@keyframes goldShimmer {
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
 }
 
 .logoText {
@@ -73,8 +148,17 @@
 .rightNav {
   display: flex;
   align-items: center;
-  gap: var(--spacing-6);
-  justify-self: end;
+  gap: var(--spacing-4);
+  position: absolute;
+  right: var(--spacing-4);
+}
+
+@media (min-width: 992px) {
+  .rightNav {
+    position: static;
+    justify-self: end;
+    gap: var(--spacing-6);
+  }
 }
 
 .desktopRightLinks {
@@ -93,7 +177,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background-color: #3B2419; /* Dark brown */
+  background: linear-gradient(90deg, #3B2419, #2D1A13);
   color: #FFFFFF;
   font-family: var(--font-body);
   font-size: 13px;
@@ -101,12 +185,30 @@
   padding: 10px 20px;
   border-radius: 40px; /* Pill shaped */
   text-decoration: none;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  box-shadow: 0 4px 15px rgba(45, 26, 19, 0.25);
+  position: relative;
+  overflow: hidden;
+}
+
+.quoteBtn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.6s ease;
+}
+
+.quoteBtn:hover::before {
+  left: 100%;
 }
 
 .quoteBtn:hover {
-  background-color: #2D1A13;
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(45, 26, 19, 0.4);
 }
 
 .bagBtn {
@@ -127,10 +229,16 @@
   gap: var(--spacing-2);
   background-color: var(--color-primary-50);
   border: 1px solid var(--color-primary-300);
-  padding: 4px 12px 4px 4px;
+  padding: 4px;
   border-radius: var(--radius-full);
   cursor: pointer;
   transition: all var(--transition-fast);
+}
+
+@media (min-width: 992px) {
+  .userProfileBtn {
+    padding: 4px 12px 4px 4px;
+  }
 }
 
 .userProfileBtn:hover {
@@ -151,9 +259,16 @@
 }
 
 .userNameText {
+  display: none;
   font-size: 13px;
   font-weight: 600;
   color: var(--color-primary-900);
+}
+
+@media (min-width: 992px) {
+  .userNameText {
+    display: block;
+  }
 }
 
 .userDropdownMenu {
@@ -212,39 +327,86 @@
   color: var(--color-error-text);
 }
 
-.mobileMenuBtn {
+/* Floating Action Button (Mobile) */
+.fabButton {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  width: calc(100% - 32px); /* Spans width of device with some margin */
+  max-width: 400px; /* Prevent it from getting absurdly long on tablets */
+  transform: translateX(-50%) scale(1);
   display: flex;
   align-items: center;
   justify-content: center;
-  background: none;
+  gap: 8px;
+  background-color: #453327; /* Desiminimals brown */
+  color: #fff;
+  font-family: var(--font-heading);
+  font-size: 13px;
+  font-weight: 700;
+  padding: 14px 24px;
+  border-radius: 40px; /* Pill shape */
   border: none;
-  color: #1A1A1A;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  z-index: 110;
   cursor: pointer;
-  padding: 4px;
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.fabHidden {
+  transform: translateX(-50%) scale(1);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.1s ease;
 }
 
 @media (min-width: 992px) {
-  .mobileMenuBtn {
+  .fabButton {
     display: none;
   }
 }
 
-/* Mobile Menu */
-.mobileMenu {
-  position: absolute;
-  top: 100%;
+/* Mobile Menu Overlay */
+.mobileMenuOverlay {
+  position: fixed;
+  top: 0;
   left: 0;
-  width: 100%;
-  background-color: #F8F5F2;
-  border-bottom: 1px solid var(--color-border);
-  padding: var(--spacing-4) 0;
-  box-shadow: var(--shadow-md);
-  animation: slideDown var(--transition-normal) ease-out;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.4); /* Just a simple dark overlay */
+  z-index: 90;
+  animation: fadeIn 0.3s ease-out;
 }
 
-@keyframes slideDown {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
+/* Mobile Menu Drawer (Now a Floating Card) */
+.mobileMenu {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 32px); /* Exactly matches FAB width */
+  max-width: 400px;
+  background-color: #453327; /* Matches FAB */
+  border-radius: 40px; /* Matches FAB pill shape */
+  padding: 32px 0 80px 0; /* Extra padding at bottom for close button */
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+  z-index: 120;
+  pointer-events: none;
+  /* Seamless expanding upwards animation */
+  max-height: 48px;
+  padding: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 0.5s cubic-bezier(0.165, 0.84, 0.44, 1), padding 0.5s cubic-bezier(0.165, 0.84, 0.44, 1), opacity 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.mobileMenuOpen {
+  pointer-events: auto;
+  opacity: 1;
+  max-height: 500px;
+  padding: 32px 0 80px 0;
 }
 
 .mobileNavList {
@@ -255,21 +417,83 @@
   padding: 0;
 }
 
-.mobileNavLink {
-  display: block;
-  padding: var(--spacing-3) var(--spacing-4);
-  font-family: var(--font-body);
-  font-size: 15px;
-  font-weight: 600;
-  color: #1A1A1A;
-  text-decoration: none;
-  border-bottom: 1px solid rgba(0,0,0,0.05);
+.mobileNavList li {
+  display: flex;
+  justify-content: center; /* Center the dynamic width pills */
+  opacity: 0;
+  transform: translateX(40px);
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
-.mobileNavLink:last-child {
-  border-bottom: none;
+.mobileMenuOpen .mobileNavList li {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.mobileMenuOpen .mobileNavList li:nth-child(1) { transition-delay: 0.1s; }
+.mobileMenuOpen .mobileNavList li:nth-child(2) { transition-delay: 0.15s; }
+.mobileMenuOpen .mobileNavList li:nth-child(3) { transition-delay: 0.2s; }
+.mobileMenuOpen .mobileNavList li:nth-child(4) { transition-delay: 0.25s; }
+.mobileMenuOpen .mobileNavList li:nth-child(5) { transition-delay: 0.3s; }
+.mobileMenuOpen .mobileNavList li:nth-child(6) { transition-delay: 0.35s; }
+.mobileMenuOpen .mobileNavList li:nth-child(7) { transition-delay: 0.4s; }
+
+.mobileNavLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  margin: 2px 0; 
+  font-family: var(--font-heading);
+  font-size: 16px;
+  font-weight: 500;
+  color: #FFFFFF; /* White text */
+  text-decoration: none;
+  transition: all 0.2s ease;
+  letter-spacing: 0.05em;
+  background: transparent; /* Remove pill background */
+  border: none;
+  cursor: pointer;
+  width: fit-content;
+  white-space: nowrap;
+}
+
+.mobileActionPill {
+  background: #FFFFFF !important;
+  color: #453327 !important;
+  border-radius: 30px;
+  padding: 10px 24px;
+  margin-top: 12px;
+}
+
+.mobileActionPill:hover {
+  background: #F8F5F2 !important;
+  color: #453327 !important;
 }
 
 .mobileNavLink:hover {
-  background-color: rgba(0,0,0,0.02);
+  color: rgba(255, 255, 255, 0.7); /* Subtle fade on hover */
+  transform: scale(1.02);
+}
+
+.fabCloseButton {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: transparent;
+  border: none;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.fabCloseButton:hover {
+  transform: translateX(-50%) scale(1.1);
 }

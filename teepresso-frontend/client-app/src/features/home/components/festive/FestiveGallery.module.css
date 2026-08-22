@@ -1,11 +1,11 @@
 .section {
-  padding: var(--spacing-32) 0;
+  padding: var(--spacing-16) 0;
   background-color: var(--color-background);
 }
 
 .header {
   text-align: center;
-  margin-bottom: var(--spacing-20);
+  margin-bottom: var(--spacing-10);
   opacity: 0;
   transform: translateY(20px);
   transition: opacity 0.8s ease-out, transform 0.8s ease-out;
@@ -25,17 +25,33 @@
 }
 
 .masonryGrid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  display: flex;
+  flex-direction: row;
+  overflow-x: auto;
   gap: var(--spacing-4);
-  grid-auto-rows: 200px;
+  padding-bottom: var(--spacing-4); /* Space for scrollbar */
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+.masonryGrid > div {
+  flex: 0 0 80%;
+  height: 300px;
+  scroll-snap-align: center;
 }
 
 @media (min-width: 768px) {
   .masonryGrid {
+    display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: var(--spacing-6);
     grid-auto-rows: 250px;
+    overflow-x: visible;
+  }
+  
+  .masonryGrid > div {
+    flex: none;
+    height: auto;
   }
 }
 

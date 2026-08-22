@@ -1,18 +1,18 @@
-/* src/features/catalog/custom-kurtas.module.css */
-
 .pageContainer {
   display: flex;
   flex-direction: column;
-  background-color: var(--color-background);
+  background-color: #FDFDFD;
   min-height: 100vh;
 }
 
-/* ============================================
-   1. HERO SECTION
-   ============================================ */
+.altBg {
+  background-color: #FAFAFA;
+}
+
+/* 1. HERO SECTION */
 .heroSection {
-  padding: 32px 0;
-  background: #FDFDFD;
+  padding: 60px 0;
+  background: #F4F0EC;
   border-bottom: 1px solid rgba(0, 0, 0, 0.04);
 }
 
@@ -20,26 +20,19 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 16px;
-}
-
-@media (min-width: 768px) {
-  .heroContainer {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-  }
+  gap: 24px;
 }
 
 .heroText {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 12px;
+  max-width: 600px;
 }
 
 .heroTitle {
   font-family: var(--font-serif);
-  font-size: 28px;
+  font-size: 48px;
   line-height: 1.1;
   color: #1A1A1A;
   margin: 0;
@@ -52,259 +45,646 @@
 
 .heroSubtitle {
   font-family: var(--font-body);
-  font-size: 15px;
-  color: rgba(26, 26, 26, 0.6);
+  font-size: 18px;
+  color: rgba(26, 26, 26, 0.7);
   margin: 0;
+  line-height: 1.5;
 }
 
 .heroActions {
   display: flex;
   align-items: center;
+  gap: 20px;
+  margin-top: 16px;
 }
 
-.heroCta {
-  background: #1A1A1A;
-  color: #FFFFFF;
-  border: none;
-  border-radius: 6px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  transition: all 0.2s ease;
+.secondaryLink {
+  font-family: var(--font-heading);
+  font-size: 14px;
+  font-weight: 600;
+  color: #1A1A1A;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  letter-spacing: 0.05em;
 }
 
-.heroCta:hover {
-  background: #2A2A2A;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-}
-
-/* ============================================
-   2. KURTA OPTIONS (SURPRISE PILLS)
-   ============================================ */
-.optionsSection {
-  padding: 40px 0 24px;
-  background-color: #FAFAFA;
-}
-
-.sectionHeaderCompact {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 32px;
+/* 2. QUICK INTRO */
+.introSection {
+  padding: 40px 0;
   text-align: center;
 }
 
-.sectionTitle {
+.introHeading {
   font-family: var(--font-serif);
   font-size: 28px;
   color: #1A1A1A;
   margin-bottom: 8px;
 }
 
+.introText {
+  font-family: var(--font-body);
+  font-size: 16px;
+  color: rgba(26, 26, 26, 0.6);
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+/* 3. COLLECTION */
+.collectionSection {
+  padding: 60px 0;
+}
+
+.sectionHeader {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.sectionTitle {
+  font-family: var(--font-heading);
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: #1A1A1A;
+  margin-bottom: 8px;
+}
+
 .sectionDesc {
   font-family: var(--font-body);
-  font-size: 15px;
-  color: rgba(26, 26, 26, 0.5);
+  font-size: 16px;
+  color: rgba(26, 26, 26, 0.6);
 }
 
-.optionsListSurprise {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
+.collectionGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 16px;
-  justify-content: center;
 }
 
-.surpriseStyleBox {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  background: #FFFFFF;
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  border-radius: 100px;
-  padding: 8px 24px 8px 12px;
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
-  cursor: default;
-  position: relative;
-  overflow: hidden;
-  animation: slideUpFade 0.6s ease forwards;
-  opacity: 0;
-  transform: translateY(20px);
-}
-
-@keyframes slideUpFade {
-  to {
-    opacity: 1;
-    transform: translateY(0);
+@media (min-width: 768px) {
+  .collectionGrid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
   }
 }
 
-.surpriseStyleBox::before {
-  content: '';
+.collectionCard {
+  background: #FFF;
+  border: 1px solid rgba(0,0,0,0.05);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.collectionCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+}
+
+.collectionCard img {
+  width: 100%;
+  aspect-ratio: 4/5;
+  object-fit: cover;
+  background: #F4F0EC;
+}
+
+.collectionCard h3 {
+  font-family: var(--font-heading);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: #1A1A1A;
+}
+
+/* 4 & 5. KURTAS & PRODUCT SECTIONS */
+.productSection {
+  padding: 80px 0;
+  border-top: 1px solid rgba(0,0,0,0.04);
+}
+
+.productHeader {
+  margin-bottom: 40px;
+}
+
+.productTitle {
+  font-family: var(--font-serif);
+  font-size: 40px;
+  color: #1A1A1A;
+  margin-bottom: 8px;
+}
+
+.productDesc {
+  font-family: var(--font-body);
+  font-size: 18px;
+  color: rgba(26, 26, 26, 0.7);
+  max-width: 600px;
+}
+
+.kurtaGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+@media (min-width: 768px) {
+  .kurtaGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 40px;
+  }
+}
+
+.kurtaCard {
+  cursor: pointer;
+  group: kurta-card;
+}
+
+.kurtaImageWrapper {
+  position: relative;
+  background: #F4F0EC;
+  aspect-ratio: 4/5;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.kurtaImageWrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.kurtaCard:hover .kurtaImageWrapper img {
+  transform: scale(1.05);
+}
+
+.quickViewOverlay {
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: linear-gradient(135deg, #2D1A13, #4A2C1F);
-  z-index: 0;
+  background: rgba(255,255,255,0.8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   opacity: 0;
-  transition: opacity 0.4s ease;
+  transition: opacity 0.3s ease;
+  font-family: var(--font-heading);
+  font-size: 14px;
+  font-weight: 600;
+  color: #1A1A1A;
 }
 
-.surpriseStyleBox:hover {
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 12px 24px rgba(45, 26, 19, 0.15);
-  border-color: transparent;
-}
-
-.surpriseStyleBox:hover::before {
+.kurtaCard:hover .quickViewOverlay {
   opacity: 1;
 }
 
-.surpriseStyleIcon {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: #F4F0EC;
-  color: #8C5940;
-  font-size: 16px;
-  z-index: 1;
-  transition: all 0.4s ease;
-}
-
-.surpriseStyleBox:hover .surpriseStyleIcon {
-  background: rgba(255, 255, 255, 0.2);
-  color: #FFFFFF;
-  transform: rotate(90deg);
-}
-
-.surpriseStyleInfo {
+.kurtaInfo {
   display: flex;
   flex-direction: column;
-  z-index: 1;
-  transition: all 0.4s ease;
+  gap: 8px;
 }
 
-.surpriseOptionName {
+.kurtaName {
   font-family: var(--font-heading);
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 600;
-  color: #1A1A1A;
-  margin: 0;
-  transition: color 0.4s ease;
+  letter-spacing: 0.05em;
 }
 
-.surpriseOptionMeta {
+.kurtaPrice {
+  font-family: var(--font-body);
+  color: #8C5940;
+  font-size: 16px;
+}
+
+.colorDots {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.colorDot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1px solid rgba(0,0,0,0.1);
+}
+
+.colorDotMore {
+  font-size: 12px;
+  color: #666;
+  line-height: 16px;
+}
+
+.designTags {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.designTag {
+  font-size: 12px;
+  background: #EEE;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+/* QUICK VIEW MODAL */
+.modalOverlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.modalContent {
+  background: #FFF;
+  width: 100%;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: 8px;
+  position: relative;
+}
+
+.closeBtn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+  z-index: 10;
+}
+
+.modalGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .modalGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.modalImageWrapper {
+  background: #F4F0EC;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modalImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  aspect-ratio: 4/5;
+}
+
+.modalInfo {
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+}
+
+.modalCategory {
+  font-size: 12px;
+  text-transform: uppercase;
+  color: #8C5940;
+  letter-spacing: 0.1em;
+  margin-bottom: 8px;
+}
+
+.modalTitle {
+  font-family: var(--font-serif);
+  font-size: 28px;
+  margin-bottom: 8px;
+}
+
+.modalPrice {
+  font-size: 18px;
+  color: #666;
+  margin-bottom: 16px;
+}
+
+.modalDesc {
+  font-size: 15px;
+  color: #444;
+  line-height: 1.5;
+  margin-bottom: 32px;
+}
+
+.modalSection {
+  margin-bottom: 24px;
+}
+
+.modalSectionTitle {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #999;
+  margin-bottom: 12px;
+}
+
+.sizeTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.sizeTag {
+  border: 1px solid #DDD;
+  padding: 6px 12px;
+  font-size: 13px;
+  border-radius: 4px;
+}
+
+.colorTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.colorTag {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-family: var(--font-body);
-  font-size: 11px;
-  color: #8C5940;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  transition: color 0.4s ease;
+  font-size: 13px;
+  border: 1px solid #DDD;
+  padding: 6px 12px;
+  border-radius: 4px;
 }
 
-.surpriseMetaDivider {
-  width: 4px;
-  height: 4px;
+.colorSwatch {
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
-  background: rgba(140, 89, 64, 0.3);
-  transition: background 0.4s ease;
+  border: 1px solid rgba(0,0,0,0.1);
 }
 
-.surpriseStyleBox:hover .surpriseOptionName {
-  color: #FFFFFF;
+.modalActions {
+  margin-top: auto;
+  padding-top: 24px;
+  border-top: 1px solid #EEE;
 }
 
-.surpriseStyleBox:hover .surpriseOptionMeta {
-  color: rgba(255, 255, 255, 0.8);
+.fullWidthBtn {
+  width: 100%;
+  justify-content: center;
 }
 
-.surpriseStyleBox:hover .surpriseMetaDivider {
-  background: rgba(255, 255, 255, 0.4);
+.modalHelpText {
+  font-size: 12px;
+  color: #888;
+  text-align: center;
+  margin-top: 12px;
 }
 
-/* (Customization CSS removed as it's no longer used) */
+/* 6-8. KHANDUVA, PANCHA, PAGDI Layouts */
+.rowLayout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+  align-items: center;
+}
 
-/* ============================================
-   4. BULK ORDERING & CTA
-   ============================================ */
-.bulkSection {
-  padding: 40px 0 60px;
-  background-color: #FFFFFF;
+.rowLayoutReverse {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+  align-items: center;
+}
+
+@media (min-width: 768px) {
+  .rowLayout {
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+  }
+  .rowLayoutReverse {
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+  }
+  .rowLayoutReverse .rowText {
+    order: 2;
+  }
+  .rowLayoutReverse .rowImages {
+    order: 1;
+  }
+}
+
+.rowText {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.variantList {
+  width: 100%;
+  margin: 24px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.variantItem {
+  display: flex;
+  justify-content: space-between;
+  padding: 16px;
+  background: #FFF;
+  border: 1px solid rgba(0,0,0,0.05);
+  border-radius: 6px;
+}
+
+.variantName {
+  font-weight: 500;
+}
+
+.variantPrice {
+  color: #8C5940;
+}
+
+.mainImage {
+  width: 100%;
+  background: #F4F0EC;
+  aspect-ratio: 4/5;
+  object-fit: cover;
+}
+
+/* 9. BUILD YOUR ORDER */
+.buildOrderSection {
+  padding: 80px 0;
+  background: #2D1A13;
+  color: #FFF;
   text-align: center;
 }
 
-.bulkContent {
-  max-width: 700px;
+.buildOrderBox {
+  max-width: 600px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-.bulkTitle {
+.buildOrderTitle {
   font-family: var(--font-serif);
-  font-size: 40px;
-  color: #2D1A13;
-  margin-bottom: 16px;
-  line-height: 1.2;
+  font-size: 36px;
+  margin-bottom: 8px;
 }
 
-.bulkDesc {
-  font-family: var(--font-body);
+.buildOrderDesc {
   font-size: 18px;
-  color: rgba(45, 26, 19, 0.7);
-  margin-bottom: 24px;
-  line-height: 1.5;
-}
-
-.groupTags {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 12px;
+  color: rgba(255,255,255,0.7);
   margin-bottom: 32px;
 }
 
-.groupTags span {
-  background: #FDFAF7;
-  border: 1px solid rgba(45, 26, 19, 0.1);
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-family: var(--font-body);
-  font-size: 14px;
-  font-weight: 500;
-  color: #2D1A13;
-}
-
-.ctaWrapper {
+.orderExample {
   display: flex;
+  flex-wrap: wrap;
+  align-items: center;
   justify-content: center;
-  width: 100%;
+  gap: 12px;
+  font-family: var(--font-heading);
+  font-size: 18px;
+  background: rgba(255,255,255,0.05);
+  padding: 24px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.1);
+  margin-bottom: 16px;
 }
 
-.finalCta {
-  padding: 16px 40px;
-  font-size: 16px;
-  letter-spacing: 0.05em;
-  box-shadow: 0 12px 32px rgba(45, 26, 19, 0.15);
+.plus {
+  color: #8C5940;
 }
 
-@media (max-width: 768px) {
-  .heroTitle {
-    font-size: 36px;
-  }
-  .bulkTitle {
-    font-size: 32px;
-  }
-  .placementHeader {
-    flex-direction: column;
+.orderNote {
+  font-size: 14px;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 32px;
+}
+
+.buildOrderBtn {
+  background: #FFF;
+  color: #1A1A1A;
+}
+.buildOrderBtn:hover {
+  background: #F4F0EC;
+}
+
+/* 10. HOW CUSTOMIZATION WORKS */
+.howItWorksSection {
+  padding: 80px 0;
+}
+
+.sectionTitleCenter {
+  font-family: var(--font-serif);
+  font-size: 32px;
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.stepsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+@media (min-width: 768px) {
+  .stepsGrid {
+    grid-template-columns: repeat(5, 1fr);
     gap: 16px;
-    align-items: flex-start;
   }
+}
+
+.stepItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 16px;
+}
+
+.stepNum {
+  font-family: var(--font-serif);
+  font-size: 40px;
+  color: #8C5940;
+  opacity: 0.3;
+}
+
+/* 11. GALLERY */
+.gallerySection {
+  padding: 80px 0;
+}
+
+.galleryGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+@media (min-width: 768px) {
+  .galleryGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.galleryCard {
+  background: #FFF;
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+.galleryCard img {
+  width: 100%;
+  aspect-ratio: 1/1;
+  object-fit: cover;
+  background: #F4F0EC;
+}
+
+.galleryInfo {
+  padding: 20px;
+}
+
+.galleryInfo h4 {
+  font-family: var(--font-serif);
+  font-size: 20px;
+  margin-bottom: 4px;
+}
+
+.galleryInfo span {
+  font-size: 14px;
+  color: #8C5940;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* 12. FINAL CTA */
+.finalCtaSection {
+  padding: 100px 0;
+  text-align: center;
+  background: #F4F0EC;
+}
+
+.finalTitle {
+  font-family: var(--font-serif);
+  font-size: 32px;
+  margin-bottom: 16px;
+}
+
+.finalDesc {
+  font-size: 18px;
+  color: rgba(26,26,26,0.7);
+  margin-bottom: 32px;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
 }

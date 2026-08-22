@@ -13,16 +13,16 @@
    ============================================ */
 .gridContainer {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 60px;
-  padding: 60px 0;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 40px;
+  padding: 10px 0;
 }
 
 @media (min-width: 1024px) {
   .gridContainer {
-    grid-template-columns: 1.2fr 1fr;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
     gap: 80px;
-    padding: 80px 0;
+    padding: 15px 0;
   }
 }
 
@@ -38,7 +38,7 @@
 .header {
   display: flex;
   flex-direction: column;
-  margin-bottom: 40px;
+  margin-bottom: 16px;
 }
 
 .journeyPill {
@@ -54,7 +54,8 @@
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: #2D1A13;
-  margin-bottom: 16px;
+  margin-top: -10px; /* Pull it up more */
+  margin-bottom: 8px;
   align-self: flex-start;
   background: rgba(45, 26, 19, 0.04);
 }
@@ -68,31 +69,86 @@
   margin-bottom: 12px;
 }
 
+.animatedHeadingWrapper {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.arrowTshirtWrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  overflow: hidden;
+  max-width: 0;
+  opacity: 0;
+  white-space: nowrap;
+}
+
+/* When the section is visible, expand it */
+:global(.headerVisible) .arrowTshirtWrapper,
+.headerVisible .arrowTshirtWrapper {
+  animation: expandArrow 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  animation-delay: 0.5s;
+}
+
+@keyframes expandArrow {
+  0% {
+    max-width: 0;
+    opacity: 0;
+  }
+  100% {
+    max-width: 250px;
+    opacity: 1;
+  }
+}
+
+.arrow {
+  color: var(--color-accent-teal);
+}
+
+.inStepsText {
+  display: block;
+  font-size: 0.7em;
+  color: rgba(45, 26, 19, 0.7);
+  margin-top: 4px;
+}
+
 .mainSubtitle {
   font-family: var(--font-body);
-  font-size: var(--text-lg);
+  font-size: var(--text-md);
   color: rgba(45, 26, 19, 0.65);
-  margin-bottom: 24px;
+  margin-bottom: 16px;
 }
 
 .topBadgesRow {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px 24px;
+  display: none; /* Hide on mobile to save space */
+}
+
+@media (min-width: 768px) {
+  .topBadgesRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    margin-bottom: 24px;
+  }
 }
 
 .topBadge {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
   font-family: var(--font-body);
-  font-size: 13px;
+  font-size: 11px;
   font-weight: var(--font-weight-medium);
-  color: #2D1A13;
+  color: rgba(45, 26, 19, 0.75);
 }
 
 .topBadgeIcon {
   color: var(--color-accent-teal);
+  width: 12px;
+  height: 12px;
 }
 
 /* Vertical Timeline */
@@ -267,6 +323,17 @@
   margin-bottom: 12px;
 }
 
+/* Accordion elements (Mobile only, hide on desktop) */
+.accordionChevron {
+  display: none;
+}
+.stepTitleRow {
+  display: contents; /* Ignore this wrapper on desktop */
+}
+.accordionBody {
+  display: contents; /* Ignore this wrapper on desktop */
+}
+
 .timePill {
   display: inline-flex;
   align-items: center;
@@ -347,10 +414,22 @@
 }
 
 /* ============================================
+   LEFT COLUMN: TIMELINE & STATS
+   ============================================ */
+.leftColumn {
+  display: flex;
+  flex-direction: column;
+  max-width: 100%; /* Prevent horizontal blowout */
+  min-width: 0;
+}
+
+/* ============================================
    RIGHT COLUMN: STICKY CALCULATOR
    ============================================ */
 .rightColumn {
   position: relative;
+  max-width: 100%; /* Prevent horizontal blowout */
+  min-width: 0;
 }
 
 .stickyCalculator {
@@ -358,10 +437,12 @@
   top: 100px;
   display: flex;
   flex-direction: column;
+  max-width: 100%;
 }
 
 .quoteIntro {
   margin-bottom: 24px;
+  max-width: 100%;
 }
 
 .quoteTitle {
@@ -414,6 +495,9 @@
   box-shadow:
     0 8px 30px rgba(0, 0, 0, 0.06),
     0 1px 3px rgba(0, 0, 0, 0.04);
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
 }
 
 /* Calculator Body */
@@ -422,12 +506,16 @@
   flex-direction: column;
   gap: 28px;
   margin-bottom: 24px;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .calcSection {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .calcLabelRow {
@@ -476,6 +564,7 @@
   cursor: pointer;
   transition: all var(--transition-fast);
   color: var(--color-text-secondary);
+  position: relative;
 }
 
 .productChip span {
@@ -504,6 +593,32 @@
 
 .productChip.activeChip .chipIcon {
   color: #FFFFFF;
+}
+
+/* Premium Shimmering Gold Badge for Kurta */
+.festiveBadge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: linear-gradient(135deg, #D4AF37 0%, #FFF5D1 50%, #D4AF37 100%);
+  background-size: 200% auto;
+  color: #4A3500;
+  font-family: var(--font-body);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  padding: 3px 8px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(212, 175, 55, 0.4);
+  text-transform: uppercase;
+  animation: goldShimmer 3s infinite linear;
+  z-index: 2;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+@keyframes goldShimmer {
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
 }
 
 /* Quantity Stepper */
@@ -744,7 +859,7 @@
 
 @media (max-width: 768px) {
   .wrapper {
-    padding: 48px 0;
+    padding: 24px 0;
   }
 
   .mainTitle {
@@ -939,7 +1054,7 @@
 
 @media (max-width: 768px) {
   .wrapper {
-    padding: 48px 0;
+    padding: 24px 0;
   }
 
   .mainTitle {
@@ -950,19 +1065,108 @@
     gap: 8px 16px;
   }
 
-  .timelineStep {
+  .verticalTimeline {
     gap: 16px;
+    margin-bottom: 40px;
   }
 
-  .timelineIconWrapper {
-    width: 50px;
-    height: 50px;
+  /* Hide the vertical dashed line on mobile */
+  .verticalTimeline::before {
+    display: none;
   }
-  
+
+  .timelineStep {
+    padding-left: 0; /* Remove padding since node moves inside card */
+    min-height: auto;
+    cursor: pointer;
+  }
+
+  /* Move the node inside the card or to the top left of it */
+  .timelineNode {
+    position: relative;
+    top: 0;
+    left: 0;
+    transform: none;
+    width: 32px;
+    height: 32px;
+    font-size: 12px;
+    border-width: 2px;
+    margin-right: 12px;
+  }
+
   .timelineContent {
     padding: 16px;
     flex-direction: column;
     gap: 12px;
+    margin-left: 0;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+  
+  .quoteCard {
+    padding: 20px 20px 0;
+  }
+
+  /* --- Mobile Accordion Logic --- */
+  
+  /* Layout title row horizontally with node, title, and chevron */
+  .stepTitleRow {
+    display: flex;
+    align-items: center;
+    width: 100%;
+  }
+  
+  .stepTitleRow .stepTitle {
+    margin-bottom: 0;
+    flex: 1;
+    font-size: 18px;
+  }
+
+  .accordionChevron {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-primary-500);
+    transition: transform 0.3s ease;
+  }
+
+  /* Body starts hidden */
+  .accordionBody {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transition: grid-template-rows 0.3s ease, opacity 0.3s ease;
+    overflow: hidden;
+  }
+
+  .accordionBody > div {
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .timelineIconWrapper {
+    display: none; /* Hide icon on mobile to save space, or just keep it hidden until expanded */
+  }
+
+  /* Expanded State */
+  .timelineStep.isExpanded .accordionBody {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(0,0,0,0.05);
+  }
+
+  .timelineStep.isExpanded .accordionChevron {
+    transform: rotate(180deg);
+  }
+  
+  .timelineStep.isExpanded .timelineContent {
+    border-color: var(--color-accent-teal);
+    background-color: #FDF9F1;
   }
 
   .statsBar {
@@ -986,6 +1190,8 @@
     flex-direction: column;
     align-items: stretch;
     gap: 16px;
+    margin: 0 -20px; /* Match new quoteCard padding */
+    padding: 20px;
   }
 
   .getQuoteBtn {
@@ -1009,12 +1215,19 @@
   }
 
   .bottomTrustBar {
-    flex-direction: column;
-    gap: 10px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  
+  .bottomTrustItem {
+    font-size: 10px; /* slightly smaller to fit */
+    gap: 4px;
   }
 
   .trustDivider {
-    display: none;
+    display: block;
+    margin: 0 4px;
   }
 }
 

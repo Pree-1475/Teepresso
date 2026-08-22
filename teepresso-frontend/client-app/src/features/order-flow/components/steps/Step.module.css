@@ -31,6 +31,13 @@
   gap: 16px;
 }
 
+@media (max-width: 640px) {
+  .stepHeaderRow {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
 .actionRow {
   display: flex;
   justify-content: space-between;
@@ -43,6 +50,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-shrink: 0;
 }
 
 .primaryBtnCompact {
@@ -99,6 +107,25 @@
   width: calc(100% - 16px);
 }
 
+.browseCatalogBtn {
+  background: #f7f3f0;
+  color: #8c5b45;
+  border: 1px solid #e5dbd3;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.browseCatalogBtn:hover {
+  background: #e5dbd3;
+}
+
 .stepTitleGroup {
   display: flex;
   align-items: center;
@@ -142,6 +169,17 @@
 }
 
 /* Sections */
+.uploadRow {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.uploadRow > div {
+  flex: 1 1 250px;
+}
+
 .sectionBlock {
   display: flex;
   flex-direction: column;
@@ -289,8 +327,9 @@
 }
 
 .visualTileSelected {
-  box-shadow: 0 0 0 1px #8c5b45, 0 12px 24px rgba(140, 91, 69, 0.12) !important;
+  border: 2px solid #8c5b45 !important;
   background: #fdfaf7 !important;
+  box-shadow: 0 4px 16px rgba(140, 91, 69, 0.15) !important;
 }
 
 .productBadgePill {

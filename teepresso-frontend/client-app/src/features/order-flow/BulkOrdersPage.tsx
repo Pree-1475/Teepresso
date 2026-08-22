@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'react-router-dom';
 import { OrderFlowProvider, useOrderFlow } from '@/features/order-flow/components/OrderFlowContext';
 import { OrderFlowLayout } from '@/features/order-flow/components/OrderFlowLayout';
 import { Step1YourDetails } from '@/features/order-flow/components/steps/Step1YourDetails';
@@ -9,24 +9,23 @@ import { Step4ReviewAndOrder } from '@/features/order-flow/components/steps/Step
 import { PRODUCTS_CATALOG } from '@/features/catalog/data/productsData';
 
 function StepRenderer() {
-  const { state, updateProduct } = useOrderFlow();
-  const searchParams = useSearchParams();
+  const { state, addOrderItem } = useOrderFlow();
+  const [searchParams] = useSearchParams();
 
-  // Read URL query parameter e.g., ?product=custom-kurta-seasonal or ?product=polo-corporate
+  const prodId = searchParams.get('product');
+
+  // Read URL query parameter e.g., ?product=custom-kurta-seasonal
   React.useEffect(() => {
-    const prodId = searchParams.get('product');
     if (prodId) {
       const match = PRODUCTS_CATALOG.find(p => p.id === prodId);
       if (match) {
-        updateProduct({
-          id: match.id,
-          name: match.name,
-          category: match.category,
-          pricePerUnit: match.startingPrice,
-        });
+        // Only add if not already in state
+        if (!state.items.some(item => item.productId === match.id)) {
+          addOrderItem(match);
+        }
       }
     }
-  }, [searchParams]);
+  }, [prodId, state.items.length]); // Add length dependency to prevent infinite loops but allow check
 
   switch (state.currentStep) {
     case 1: return <Step1YourDetails />;

@@ -14,14 +14,17 @@ html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  width: 100%;
+  overflow-x: clip;
 }
 
-body {
+body, #root {
   background-color: var(--color-background);
   color: var(--color-text-primary);
   font-family: var(--font-body);
   line-height: 1.6;
-  overflow-x: hidden; /* No horizontal scrolling */
+  width: 100%;
+  overflow-x: clip; /* clip prevents scroll but keeps position: sticky working! */
 }
 
 /* Typography defaults */

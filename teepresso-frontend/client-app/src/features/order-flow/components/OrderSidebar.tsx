@@ -15,7 +15,7 @@ export function OrderSidebar() {
     nextStep 
   } = useOrderFlow();
 
-  const { product, isUrgentOrder, mockup, currentStep } = state;
+  const { items, isUrgentOrder, currentStep } = state;
 
   return (
     <>
@@ -24,25 +24,29 @@ export function OrderSidebar() {
         <h3 className={styles.title}>Order Summary</h3>
 
         <div className={styles.section}>
-          <div className={styles.row}>
-            <span className={styles.label}>Selected Product:</span>
-            <span className={styles.value}>{product.name}</span>
-          </div>
+          {items.map((item, index) => {
+             let itemPieces = 0;
+             if (item.requiresSizes || item.requiresColors) {
+               itemPieces = item.colorVariants.reduce((total, variant) => {
+                 return total + (Object.values(variant.sizes) as number[]).reduce((sum, qty) => sum + (qty || 0), 0);
+               }, 0);
+             } else {
+               itemPieces = item.quantity || 0;
+             }
 
-          <div className={styles.row}>
-            <span className={styles.label}>Color:</span>
-            <span className={styles.value} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: product.colorHex, display: 'inline-block' }} />
-              {product.color}
-            </span>
-          </div>
-
-          <div className={styles.row}>
-            <span className={styles.label}>Total Quantity:</span>
-            <span className={styles.value}>{totalPieces} Pcs</span>
-          </div>
-
-
+             return (
+              <div key={item.id} style={{ marginBottom: '12px', paddingBottom: '12px', borderBottom: index < items.length - 1 ? '1px solid #e5e7eb' : 'none' }}>
+                <div className={styles.row}>
+                  <span className={styles.label}>Product:</span>
+                  <span className={styles.value}>{item.name}</span>
+                </div>
+                <div className={styles.row}>
+                  <span className={styles.label}>Quantity:</span>
+                  <span className={styles.value}>{itemPieces} Pcs</span>
+                </div>
+              </div>
+            );
+          })}
         </div>
 
         <div className={styles.priceBreakdownSection}>
@@ -76,7 +80,7 @@ export function OrderSidebar() {
       {currentStep < 4 && (
         <div className={styles.mobileStickyBar}>
           <div className={styles.mobileStickyLeft}>
-            <span className={styles.mobilePieceLabel}>{totalPieces} Pcs • {product.name}</span>
+            <span className={styles.mobilePieceLabel}>{totalPieces} Pcs Total</span>
             <span className={styles.mobilePrice}>₹{grandTotal.toLocaleString('en-IN')}</span>
           </div>
 

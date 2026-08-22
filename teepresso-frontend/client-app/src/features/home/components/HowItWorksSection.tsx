@@ -8,6 +8,7 @@ import {
   Droplet, Check, Shield, ArrowRight,
   Clock, Layers, Sprout, Minus, Plus, User
 } from 'lucide-react';
+import { useScrollReveal } from '@/common/hooks/useScrollReveal';
 import styles from './HowItWorksSection.module.css';
 
 /* ──────────────────────────────────────────────
@@ -111,17 +112,19 @@ const ChevronUpDown = () => (
    COMPONENT
    ────────────────────────────────────────────── */
 export function HowItWorksSection() {
-  const [product, setProduct] = useState('Round Neck');
+  const [product, setProduct] = useState('Kurta');
   const [quantity, setQuantity] = useState('50');
+  const [expandedStep, setExpandedStep] = useState<number | null>(0);
 
+  const { ref: headerRef, isVisible: isHeaderVisible } = useScrollReveal({ threshold: 0.5 });
   const ordersCounter = useCountUp(12438);
   const ratingCounter = useCountUp(49, 1200);
 
   const basePrices: Record<string, number> = {
+    'Kurta': 599, 
     'Round Neck': 349, 
     'Polo': 499, 
     'Hoodie': 899, 
-    'Kurta': 599, 
     'Sweatshirt': 699,
   };
 
@@ -160,12 +163,21 @@ export function HowItWorksSection() {
               ═══════════════════════════════════════════ */}
           <div className={styles.leftColumn}>
             
-            <div className={styles.header}>
+            <div className={`${styles.header} ${isHeaderVisible ? styles.headerVisible : ''}`} ref={headerRef}>
               <div className={styles.journeyPill}>
                 <Star size={12} /> YOUR ORDER JOURNEY
               </div>
               <h2 className={styles.mainTitle}>
-                From Idea to T-Shirt in 5 Simple Steps
+                <div className={styles.animatedHeadingWrapper}>
+                  <span className={styles.ideaText}>Idea</span>
+                  <span className={styles.arrowTshirtWrapper}>
+                    <span className={styles.arrow}>→</span>
+                    <span className={styles.tshirtText}>T-Shirt</span>
+                  </span>
+                </div>
+                <div className={styles.inStepsText}>
+                  in 5 Simple Steps
+                </div>
               </h2>
               <p className={styles.mainSubtitle}>
                 We make custom apparel easy, transparent and reliable.
@@ -184,36 +196,52 @@ export function HowItWorksSection() {
             </div>
 
             <div className={styles.verticalTimeline}>
-              {steps.map((step, idx) => (
-                <div key={idx} className={styles.timelineStep}>
-                  <div className={styles.timelineNode}>
-                    {String(idx + 1).padStart(2, '0')}
-                  </div>
-                  
-                  <div className={styles.timelineContent} data-step={String(idx + 1).padStart(2, '0')}>
-                    <div className={styles.timelineIconWrapper}>
-                      <Image
-                        src={`${step.image}?v=${Date.now()}`}
-                        alt={step.title.replace('\n', ' ')}
-                        width={60}
-                        height={60}
-                        style={{ objectFit: 'contain' }}
-                        unoptimized={true}
-                      />
+              {steps.map((step, idx) => {
+                const isExpanded = expandedStep === idx;
+                return (
+                  <div 
+                    key={idx} 
+                    className={`${styles.timelineStep} ${isExpanded ? styles.isExpanded : ''}`}
+                    onClick={() => setExpandedStep(isExpanded ? null : idx)}
+                  >
+                    <div className={styles.timelineNode}>
+                      {String(idx + 1).padStart(2, '0')}
                     </div>
-                    <div className={styles.timelineText}>
-                      <h3 className={styles.stepTitle}>
-                        {step.title.replace('\n', ' ')}
-                      </h3>
-                      <p className={styles.stepDesc}>{step.description}</p>
-                      <div className={styles.timePill}>
-                        <Clock size={12} />
-                        {step.time}
+                    
+                    <div className={styles.timelineContent} data-step={String(idx + 1).padStart(2, '0')}>
+                      <div className={styles.timelineIconWrapper}>
+                        <Image
+                          src={`${step.image}?v=${Date.now()}`}
+                          alt={step.title.replace('\n', ' ')}
+                          width={60}
+                          height={60}
+                          style={{ objectFit: 'contain' }}
+                          unoptimized={true}
+                        />
+                      </div>
+                      <div className={styles.timelineText}>
+                        <div className={styles.stepTitleRow}>
+                          <h3 className={styles.stepTitle}>
+                            {step.title.replace('\n', ' ')}
+                          </h3>
+                          <div className={styles.accordionChevron}>
+                            <ChevronUpDown />
+                          </div>
+                        </div>
+                        <div className={styles.accordionBody}>
+                          <div className={styles.accordionInner}>
+                            <p className={styles.stepDesc}>{step.description}</p>
+                            <div className={styles.timePill}>
+                              <Clock size={12} />
+                              {step.time}
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             <div className={styles.statsBarContainer}>

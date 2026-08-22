@@ -1,23 +1,100 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowRight, Users, Shirt, Palette, Clock } from 'lucide-react';
+import { useScrollReveal } from '@/common/hooks/useScrollReveal';
 import styles from './FestiveHero.module.css';
 
 export const FestiveHero = () => {
+  const { ref: revealRef, isVisible } = useScrollReveal({ threshold: 0.1 });
+  const mobileVideoRef = useRef<HTMLVideoElement>(null);
+  const desktopVideoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const desktopVideo = desktopVideoRef.current;
+    if (desktopVideo) {
+      const initVideo = () => {
+        desktopVideo.currentTime = 4;
+        desktopVideo.play().catch(e => console.log("Desktop auto-play prevented", e));
+      };
+
+      if (desktopVideo.readyState >= 1) {
+        initVideo();
+      } else {
+        desktopVideo.addEventListener('loadedmetadata', initVideo);
+      }
+
+      const handleTimeUpdate = () => {
+        if (desktopVideo.currentTime >= 10) {
+          desktopVideo.currentTime = 4;
+          desktopVideo.play().catch(e => console.log("Play prevented on loop", e));
+        }
+      };
+
+      desktopVideo.addEventListener('timeupdate', handleTimeUpdate);
+      return () => {
+        desktopVideo.removeEventListener('loadedmetadata', initVideo);
+        desktopVideo.removeEventListener('timeupdate', handleTimeUpdate);
+      };
+    }
+  }, []);
+
+  // Ensure mobile video attempts autoplay as well
+  useEffect(() => {
+    const mobileVideo = mobileVideoRef.current;
+    if (mobileVideo) {
+      mobileVideo.play().catch(e => console.log("Mobile auto-play prevented", e));
+    }
+  }, []);
+
   return (
-    <section className={styles.heroSection}>
+    <section className={styles.heroSection} ref={revealRef}>
+      
+      {/* Mobile Background Video */}
+      <video 
+        ref={mobileVideoRef}
+        src="/images/festive/0821 (2).mp4" 
+        className={styles.mobileVideoBackground}
+        autoPlay
+        muted 
+        loop
+        playsInline
+        onEnded={(e) => { e.currentTarget.play().catch(() => {}); }}
+      />
+
+      {/* Desktop Background Video */}
+      <video 
+        ref={desktopVideoRef}
+        src="/images/hero-desktop.mp4" 
+        className={styles.desktopVideoBackground}
+        muted 
+        playsInline /* Looping is handled by JS from 4s to 10s */
+      />
+      
+      {/* Gradient Overlay to ensure text readability */}
+      <div className={styles.gradientOverlay}></div>
       <div className={`container ${styles.container}`}>
         <div className={styles.grid}>
           {/* Text Content */}
-          <div className={styles.textContent}>
+          <div className={`${styles.textContent} ${isVisible ? 'fade-in' : ''}`}>
+            <div className={styles.modeLabel}>
+              <span className={styles.modeIcon}>✦</span> FESTIVE MODE
+            </div>
+            
             <h1 className={styles.title}>
               YOUR GROUP.<br/>
               YOUR IDENTITY.<br/>
               <span className={styles.highlight}>YOUR KURTAS.</span>
             </h1>
+
+            <div className={styles.decorativeLine}>
+              <span className={styles.star}>✦</span>
+              <div className={styles.line}></div>
+            </div>
+
             <p className={styles.description}>
-              Custom printed kurtas for communities,<br/>
-              associations and events.
+              Custom printed kurtas<br/>
+              for communities, associations<br/>
+              and events.
             </p>
             <div className={styles.actions}>
               <Link href="/bulk-orders?product=custom-kurta-seasonal" className={styles.primaryBtn}>

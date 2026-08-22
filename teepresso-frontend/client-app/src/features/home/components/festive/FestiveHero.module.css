@@ -4,13 +4,6 @@
   margin-top: -120px; /* Increased pull-up to ensure no white gap under header */
   position: relative;
   overflow: hidden;
-  /* Add a subtle cream gradient on the left to make text pop, fading to transparent */
-  background-image: 
-    linear-gradient(to right, rgba(253, 249, 241, 0.85) 0%, rgba(253, 249, 241, 0.4) 35%, rgba(253, 249, 241, 0) 60%),
-    url('/images/festive/brush-stroke-bg.png');
-  background-size: 100%, 130%; 
-  background-position: left top, center bottom; /* Anchored strictly to the bottom edge */
-  background-repeat: no-repeat, no-repeat;
 }
 
 .heroSection::before {
@@ -25,13 +18,54 @@
     linear-gradient(0deg, rgba(181, 108, 74, 0.025) 1px, transparent 1px);
   background-size: 6px 6px;
   pointer-events: none;
+  z-index: 2; /* Ensure it stays above the video and gradient */
+}
+
+.mobileVideoBackground,
+.desktopVideoBackground {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+.mobileVideoBackground {
+  display: block;
+  object-position: 35% center;
+}
+
+.desktopVideoBackground {
+  display: none;
+}
+
+.gradientOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* Significantly reduced gradient since we now use a glass box for text */
+  background-image: linear-gradient(to bottom, rgba(253, 249, 241, 0.3) 0%, rgba(253, 249, 241, 0) 30%);
+  pointer-events: none;
   z-index: 1;
 }
 
 @media (min-width: 1024px) {
-  .heroSection {
-    background-size: 100%, 115%;
-    background-position: left top, right bottom; /* Anchored strictly to the bottom edge */
+  .mobileVideoBackground {
+    display: none;
+  }
+
+  .desktopVideoBackground {
+    display: block;
+    object-position: center;
+  }
+
+  .gradientOverlay {
+    /* Significantly reduced gradient */
+    background-image: linear-gradient(to right, rgba(253, 249, 241, 0.3) 0%, rgba(253, 249, 241, 0) 30%);
   }
 }
 
@@ -44,6 +78,8 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-12);
+  min-height: 90vh; /* Increased from 80vh to move the image lower down the screen */
+  justify-content: flex-start;
 }
 
 @media (min-width: 1024px) {
@@ -65,17 +101,21 @@
   z-index: 10;
   display: flex;
   flex-direction: column;
-  padding-top: var(--spacing-24); /* Increased padding to nudge text lower */
+  padding-top: var(--spacing-8); /* Move text up */
 }
 
 .title {
   font-family: 'Playfair Display', serif; /* Elegant festive font */
-  font-size: 48px; /* Reduced from 56px */
+  font-size: clamp(32px, 10vw, 48px); /* Fluid size to prevent horizontal overflow */
   font-weight: 600; /* Bolder looks great with Playfair */
   color: #2D1A13;
   margin: 0 0 var(--spacing-6) 0;
   line-height: 1.1;
   letter-spacing: -0.02em;
+  text-shadow: 
+    0 2px 15px rgba(253, 249, 241, 0.95),
+    0 4px 30px rgba(253, 249, 241, 0.8),
+    0 0 40px rgba(255, 255, 255, 0.6);
 }
 
 .highlight {
@@ -88,33 +128,63 @@
   }
 }
 
-.description {
+.modeLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   font-family: var(--font-body);
-  font-size: 18px; /* Reduced from 20px */
-  color: #2D1A13;
-  margin: 0 0 var(--spacing-8) 0;
-  line-height: 1.4;
-  position: relative;
-  padding-top: var(--spacing-6);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: #B56C4A; /* Terracotta accent */
+  margin-bottom: var(--spacing-5);
+  align-self: flex-start;
+  text-transform: uppercase;
+  
+  /* Premium Glassmorphism Box for just the label */
+  background: rgba(253, 249, 241, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
-.description::before {
-  content: "✧";
-  color: #B56C4A;
-  position: absolute;
-  top: 0;
-  left: 0;
+.modeIcon {
   font-size: 16px;
 }
 
-.description::after {
-  content: "";
-  position: absolute;
-  top: 8px;
-  left: 20px;
-  width: 60px;
+.decorativeLine {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: var(--spacing-6);
+  width: 100%;
+  max-width: 300px;
+}
+
+.star {
+  color: #B56C4A;
+  font-size: 14px;
+}
+
+.line {
   height: 1px;
-  background-color: #D9CDBF;
+  flex: 1;
+  background: linear-gradient(to right, #B56C4A, transparent);
+  opacity: 0.8;
+}
+
+.description {
+  font-family: var(--font-body);
+  font-size: 18px; /* Reduced from 20px */
+  color: #5C4A3D;
+  margin: 0 0 var(--spacing-8) 0;
+  max-width: 400px;
+  text-shadow: 
+    0 2px 10px rgba(253, 249, 241, 0.9),
+    0 4px 20px rgba(255, 255, 255, 0.8);
 }
 
 .actions {

@@ -1,13 +1,16 @@
 import React from 'react';
 import Link from 'next/link';
 import { ArrowRight, Coffee } from 'lucide-react';
+import { useScrollReveal } from '@/common/hooks/useScrollReveal';
 import styles from './HeroSection.module.css';
 
 export function HeroSection() {
+  const { ref, isVisible } = useScrollReveal({ threshold: 0.1 });
+
   return (
-    <section className={styles.heroSection}>
+    <section className={styles.heroSection} ref={ref}>
       <div className={`container ${styles.heroContainer}`}>
-        <div className={styles.heroContent}>
+        <div className={`${styles.heroContent} ${isVisible ? 'fade-in' : ''}`}>
           
           <span className={styles.subtitle}>
             WEAR YOUR TEAM. LIVE YOUR IDENTITY.

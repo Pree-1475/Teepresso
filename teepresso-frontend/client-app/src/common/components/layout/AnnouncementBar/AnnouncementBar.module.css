@@ -1,15 +1,38 @@
 .bar {
   background-color: #2D1A13; /* Dark brown */
   color: #FDF9F1; /* Warm beige */
-  text-align: center;
-  padding: 8px 16px;
   width: 100%;
   position: relative;
   z-index: 60;
+  overflow: hidden;
 }
 
 .festiveBar {
   background-color: #2D1A13;
+}
+
+.marqueeContainer {
+  width: 100%;
+  display: flex;
+  overflow: hidden;
+  padding: 8px 0;
+}
+
+.marqueeTrack {
+  display: flex;
+  align-items: center;
+  width: max-content;
+  will-change: transform;
+  animation: scrollLeft 30s linear infinite;
+}
+
+.marqueeTrack:hover {
+  animation-play-state: paused;
+}
+
+@keyframes scrollLeft {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); } /* Shifts exactly half the track width, ensuring a seamless loop if content is repeated enough */
 }
 
 .text {
@@ -19,6 +42,8 @@
   letter-spacing: 0.05em;
   margin: 0;
   color: #FDF9F1;
+  white-space: nowrap;
+  padding-right: 40px; /* Space between repeated text */
 }
 
 .diamond {

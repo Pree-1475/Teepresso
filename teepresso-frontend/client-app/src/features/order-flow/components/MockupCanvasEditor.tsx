@@ -1,52 +1,47 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { useOrderFlow } from './OrderFlowContext';
 import { getMockupConfig } from '../data/mockupAssetMap';
 import { 
   Upload, 
   Trash2, 
   RotateCw, 
-  ZoomIn, 
-  Move, 
-  Check, 
-  Sparkles, 
   RefreshCw,
   X
 } from 'lucide-react';
 import styles from './MockupCanvasEditor.module.css';
 
-export function MockupCanvasEditor() {
+interface MockupCanvasEditorProps {
+  itemId: string;
+}
+
+export function MockupCanvasEditor({ itemId }: MockupCanvasEditorProps) {
   const { 
     state, 
-    setArtworkFile, 
-    updatePlacementTransform, 
-    removePlacementArtwork,
-    setActiveView,
-    setActivePlacementId
+    setItemArtworkFile, 
+    updateItemPlacementTransform, 
+    removeItemPlacementArtwork,
+    setItemActiveView,
+    setItemActivePlacementId
   } = useOrderFlow();
 
-  const { product, artwork, mockup } = state;
-  const mockupConfig = getMockupConfig(product.id);
+  const item = state.items.find(i => i.id === itemId);
+  if (!item) return null;
+
+  const { artwork, mockup } = item;
+  const mockupConfig = getMockupConfig(item.productId);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [selectedPlacement, setSelectedPlacement] = useState<string>('front');
   const [showPopover, setShowPopover] = useState<boolean>(false);
-  const [popoverPos, setPopoverPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
 
-  // Currently selected artwork placement
   const activePlacementData = artwork.placements[selectedPlacement];
 
   const handleHotspotClick = (placementId: string, e: React.MouseEvent) => {
     e.stopPropagation();
     setSelectedPlacement(placementId);
-    setActivePlacementId(placementId);
-
-    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-    setPopoverPos({
-      x: rect.left + rect.width / 2,
-      y: rect.top,
-    });
+    setItemActivePlacementId(itemId, placementId);
     setShowPopover(true);
   };
 
@@ -54,7 +49,7 @@ export function MockupCanvasEditor() {
     const file = e.target.files?.[0];
     if (file) {
       const previewUrl = URL.createObjectURL(file);
-      setArtworkFile(file, previewUrl, selectedPlacement);
+      setItemArtworkFile(itemId, file, previewUrl, selectedPlacement);
       setShowPopover(false);
     }
   };
@@ -69,7 +64,7 @@ export function MockupCanvasEditor() {
     const onMouseMove = (moveEvent: MouseEvent) => {
       const dx = ((moveEvent.clientX - startX) / 300) * 100;
       const dy = ((moveEvent.clientY - startY) / 300) * 100;
-      updatePlacementTransform(selectedPlacement, {
+      updateItemPlacementTransform(itemId, selectedPlacement, {
         x: Math.max(-50, Math.min(50, initialX + dx)),
         y: Math.max(-50, Math.min(50, initialY + dy)),
       });
@@ -99,20 +94,19 @@ export function MockupCanvasEditor() {
         <button
           type="button"
           className={`${styles.viewToggleBtn} ${mockup.activeView === 'front' ? styles.viewToggleActive : ''}`}
-          onClick={() => setActiveView('front')}
+          onClick={() => setItemActiveView(itemId, 'front')}
         >
           Front View
         </button>
         <button
           type="button"
           className={`${styles.viewToggleBtn} ${mockup.activeView === 'back' ? styles.viewToggleActive : ''}`}
-          onClick={() => setActiveView('back')}
+          onClick={() => setItemActiveView(itemId, 'back')}
         >
           Back View
         </button>
       </div>
 
-      {/* Desktop Workspace: Front Garment (Left) & Back Garment (Right) */}
       <div className={styles.dualGarmentCanvasRow}>
         {/* FRONT GARMENT WORKSPACE */}
         <div className={`${styles.garmentWorkspaceCard} ${mockup.activeView === 'back' ? styles.hideMobileView : ''}`}>
@@ -124,7 +118,6 @@ export function MockupCanvasEditor() {
               className={styles.garmentBaseImg} 
             />
 
-            {/* Hotspots over Front View */}
             {mockupConfig.availablePlacements
               .filter(p => p.view === 'front')
               .map(placement => {
@@ -176,7 +169,6 @@ export function MockupCanvasEditor() {
               className={styles.garmentBaseImg} 
             />
 
-            {/* Hotspots over Back View */}
             {mockupConfig.availablePlacements
               .filter(p => p.view === 'back')
               .map(placement => {
@@ -219,7 +211,6 @@ export function MockupCanvasEditor() {
         </div>
       </div>
 
-      {/* Contextual Floating Control Panel / Popover */}
       {showPopover && (
         <div className={styles.contextualPopoverModal}>
           <div className={styles.contextualHeader}>
@@ -245,7 +236,7 @@ export function MockupCanvasEditor() {
                     type="button"
                     className={styles.iconCtrlBtn}
                     onClick={() =>
-                      updatePlacementTransform(selectedPlacement, {
+                      updateItemPlacementTransform(itemId, selectedPlacement, {
                         scale: Math.max(0.5, (activePlacementData.scale || 1) - 0.1),
                       })
                     }
@@ -258,7 +249,7 @@ export function MockupCanvasEditor() {
                     type="button"
                     className={styles.iconCtrlBtn}
                     onClick={() =>
-                      updatePlacementTransform(selectedPlacement, {
+                      updateItemPlacementTransform(itemId, selectedPlacement, {
                         scale: Math.min(2.0, (activePlacementData.scale || 1) + 0.1),
                       })
                     }
@@ -271,7 +262,7 @@ export function MockupCanvasEditor() {
                     type="button"
                     className={styles.iconCtrlBtn}
                     onClick={() =>
-                      updatePlacementTransform(selectedPlacement, {
+                      updateItemPlacementTransform(itemId, selectedPlacement, {
                         rotation: ((activePlacementData.rotation || 0) + 15) % 360,
                       })
                     }
@@ -284,7 +275,7 @@ export function MockupCanvasEditor() {
                     type="button"
                     className={styles.iconCtrlBtnReset}
                     onClick={() =>
-                      updatePlacementTransform(selectedPlacement, { x: 0, y: 0, scale: 1, rotation: 0 })
+                      updateItemPlacementTransform(itemId, selectedPlacement, { x: 0, y: 0, scale: 1, rotation: 0 })
                     }
                     title="Reset Position"
                   >
@@ -296,7 +287,7 @@ export function MockupCanvasEditor() {
                   type="button"
                   className={styles.popoverActionBtnDanger}
                   onClick={() => {
-                    removePlacementArtwork(selectedPlacement);
+                    removeItemPlacementArtwork(itemId, selectedPlacement);
                     setShowPopover(false);
                   }}
                 >

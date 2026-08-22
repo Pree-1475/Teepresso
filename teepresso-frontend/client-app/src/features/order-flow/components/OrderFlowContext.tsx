@@ -1,22 +1,13 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { ProductItem } from '@/features/catalog/data/productsData';
 
 export interface CustomerData {
   name: string;
   phone: string;
   email: string;
   organization: string;
-}
-
-export interface SelectedProduct {
-  id: string;
-  name: string;
-  category: string;
-  quality: string;
-  color: string;
-  colorHex: string;
-  pricePerUnit: number;
 }
 
 export interface SizeQtyMap {
@@ -27,6 +18,9 @@ export interface SizeQtyMap {
   XL: number;
   XXL: number;
   XXXL: number;
+  '4XL': number;
+  '5XL': number;
+  '6XL': number;
 }
 
 export interface ColorVariant {
@@ -40,8 +34,8 @@ export interface PlacementArtworkData {
   placementId: string;
   file: File | null;
   previewUrl: string;
-  x: number; // offset %
-  y: number; // offset %
+  x: number;
+  y: number;
   scale: number;
   rotation: number;
 }
@@ -69,6 +63,25 @@ export interface MockupState {
   designerAssistance: boolean;
 }
 
+export interface OrderItem {
+  id: string;
+  productId: string;
+  name: string;
+  category: string;
+  pricePerUnit: number;
+  
+  requiresSizes: boolean;
+  requiresColors: boolean;
+  requiresMockup: boolean;
+  applyVolumeDiscount: boolean;
+
+  quantity: number;
+  colorVariants: ColorVariant[];
+  
+  artwork: ArtworkData;
+  mockup: MockupState;
+}
+
 export interface DeliveryData {
   address: string;
   city: string;
@@ -78,10 +91,7 @@ export interface DeliveryData {
 export interface GuidedOrderState {
   currentStep: number;
   customer: CustomerData;
-  product: SelectedProduct;
-  colorVariants: ColorVariant[];
-  artwork: ArtworkData;
-  mockup: MockupState;
+  items: OrderItem[];
   isUrgentOrder: boolean;
   delivery: DeliveryData;
   paymentCompleted: boolean;
@@ -94,63 +104,80 @@ interface OrderFlowContextType {
   prevStep: () => void;
   setStep: (step: number) => void;
   updateCustomer: (data: Partial<CustomerData>) => void;
-  updateProduct: (data: Partial<SelectedProduct>) => void;
-  addColorVariant: (color: string, colorHex: string) => void;
-  removeColorVariant: (id: string) => void;
-  updateVariantSizeQty: (variantId: string, size: keyof SizeQtyMap, qty: number) => void;
-  updateArtworkMode: (mode: 'has_design' | 'need_help') => void;
-  setArtworkFile: (file: File | null, previewUrl: string, placementId?: string) => void;
-  updatePlacementTransform: (placementId: string, transform: Partial<PlacementArtworkData>) => void;
-  removePlacementArtwork: (placementId: string) => void;
-  updateInstructions: (text: string) => void;
-  setActiveView: (view: 'front' | 'back') => void;
-  setActivePlacementId: (id: string) => void;
-  setDesignerAssistance: (assist: boolean) => void;
+  
+  addOrderItem: (product: ProductItem) => void;
+  removeOrderItem: (itemId: string) => void;
+  updateItemQuantity: (itemId: string, quantity: number) => void;
+  addItemColorVariant: (itemId: string, color: string, colorHex: string) => void;
+  removeItemColorVariant: (itemId: string, variantId: string) => void;
+  updateItemVariantSizeQty: (itemId: string, variantId: string, size: keyof SizeQtyMap, qty: number) => void;
+  updateItemColor: (itemId: string, variantId: string, color: string, colorHex: string) => void;
+  
+  updateItemArtworkMode: (itemId: string, mode: 'has_design' | 'need_help') => void;
+  setItemArtworkFile: (itemId: string, file: File | null, previewUrl: string, placementId?: string) => void;
+  updateItemPlacementTransform: (itemId: string, placementId: string, transform: Partial<PlacementArtworkData>) => void;
+  removeItemPlacementArtwork: (itemId: string, placementId: string) => void;
+  updateItemInstructions: (itemId: string, text: string) => void;
+  setItemActiveView: (itemId: string, view: 'front' | 'back') => void;
+  setItemActivePlacementId: (itemId: string, id: string) => void;
+  setItemDesignerAssistance: (itemId: string, assist: boolean) => void;
+
   toggleUrgentOrder: () => void;
   updateDelivery: (data: Partial<DeliveryData>) => void;
   completePayment: () => string;
+  
   totalPieces: number;
   subtotal: number;
   urgentFee: number;
   grandTotal: number;
 }
 
-const defaultSizes: SizeQtyMap = { XS: 0, S: 10, M: 20, L: 15, XL: 5, XXL: 0, XXXL: 0 };
+const defaultSizes: SizeQtyMap = { XS: 0, S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, '4XL': 0, '5XL': 0, '6XL': 0 };
+const initialSizesForFirst: SizeQtyMap = { XS: 0, S: 10, M: 20, L: 15, XL: 5, XXL: 0, XXXL: 0, '4XL': 0, '5XL': 0, '6XL': 0 };
+
+const defaultArtwork = (): ArtworkData => ({
+  file: null,
+  previewUrl: '',
+  mode: 'has_design',
+  instructions: '',
+  placements: {},
+});
+
+const defaultMockup = (): MockupState => ({
+  activeView: 'front',
+  activePlacementId: 'front',
+  frontTransform: { x: 0, y: 0, scale: 1, rotation: 0 },
+  backTransform: { x: 0, y: 0, scale: 1, rotation: 0 },
+  designerAssistance: false,
+});
 
 const initialOrderState: GuidedOrderState = {
   currentStep: 1,
   customer: { name: '', phone: '', email: '', organization: '' },
-  product: {
-    id: 'tshirt-roundneck',
-    name: 'Classic Round Neck T-Shirt',
-    category: 'T-Shirts',
-    quality: '180 GSM Super Combed Cotton',
-    color: 'Warm Brown',
-    colorHex: '#8c5b45',
-    pricePerUnit: 199,
-  },
-  colorVariants: [
+  items: [
     {
-      id: 'var-1',
-      color: 'Warm Brown',
-      colorHex: '#8c5b45',
-      sizes: { ...defaultSizes },
-    },
+      id: `item-${Date.now()}`,
+      productId: 'tshirt-roundneck',
+      name: 'Classic Round Neck T-Shirt',
+      category: 'T-Shirts',
+      pricePerUnit: 199,
+      requiresSizes: true,
+      requiresColors: true,
+      requiresMockup: true,
+      applyVolumeDiscount: true,
+      quantity: 0,
+      colorVariants: [
+        {
+          id: 'var-1',
+          color: 'Warm Brown',
+          colorHex: '#8c5b45',
+          sizes: { ...initialSizesForFirst },
+        },
+      ],
+      artwork: defaultArtwork(),
+      mockup: defaultMockup(),
+    }
   ],
-  artwork: {
-    file: null,
-    previewUrl: '',
-    mode: 'has_design',
-    instructions: '',
-    placements: {},
-  },
-  mockup: {
-    activeView: 'front',
-    activePlacementId: 'front',
-    frontTransform: { x: 0, y: 0, scale: 1, rotation: 0 },
-    backTransform: { x: 0, y: 0, scale: 1, rotation: 0 },
-    designerAssistance: false,
-  },
   isUrgentOrder: false,
   delivery: { address: '', city: '', pincode: '' },
   paymentCompleted: false,
@@ -164,10 +191,10 @@ export function OrderFlowProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     try {
-      const saved = localStorage.getItem('teepresso_order_state_v2');
+      const saved = localStorage.getItem('teepresso_order_state_v3');
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (parsed && parsed.product) {
+        if (parsed && parsed.items) {
           setState(prev => ({ ...prev, ...parsed }));
         }
       }
@@ -178,27 +205,55 @@ export function OrderFlowProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     try {
-      const { artwork, ...serializableState } = state;
-      localStorage.setItem('teepresso_order_state_v2', JSON.stringify(serializableState));
+      // Serialize without files
+      const serializableItems = state.items.map(item => {
+        const { artwork, ...rest } = item;
+        const serializedPlacements = Object.fromEntries(
+          Object.entries(artwork.placements).map(([k, v]) => [k, { ...v, file: null }])
+        );
+        return {
+          ...rest,
+          artwork: {
+            ...artwork,
+            file: null,
+            placements: serializedPlacements,
+          }
+        };
+      });
+      const serializableState = { ...state, items: serializableItems };
+      localStorage.setItem('teepresso_order_state_v3', JSON.stringify(serializableState));
     } catch {
       // Ignore localStorage write errors
     }
   }, [state]);
 
-  // Compute total pieces across all color variants
-  const totalPieces = state.colorVariants.reduce((total, variant) => {
-    const variantPieces = (Object.values(variant.sizes) as number[]).reduce((sum, qty) => sum + (qty || 0), 0);
-    return total + variantPieces;
-  }, 0);
+  let totalPieces = 0;
+  let subtotal = 0;
 
-  const getUnitPriceForVolume = (basePrice: number, pieces: number) => {
-    if (pieces >= 150) return Math.round(basePrice * 0.8);
-    if (pieces >= 75) return Math.round(basePrice * 0.9);
-    return basePrice;
-  };
+  state.items.forEach(item => {
+    let itemPieces = 0;
+    if (item.requiresSizes || item.requiresColors) {
+      itemPieces = item.colorVariants.reduce((total, variant) => {
+        return total + (Object.values(variant.sizes) as number[]).reduce((sum, qty) => sum + (qty || 0), 0);
+      }, 0);
+    } else {
+      itemPieces = item.quantity || 0;
+    }
+    
+    totalPieces += itemPieces;
+    
+    let effectiveUnitPrice = item.pricePerUnit;
+    if (item.applyVolumeDiscount) {
+      if (itemPieces >= 150) {
+        effectiveUnitPrice = Math.round(item.pricePerUnit * 0.8);
+      } else if (itemPieces >= 75) {
+        effectiveUnitPrice = Math.round(item.pricePerUnit * 0.9);
+      }
+    }
+    
+    subtotal += (effectiveUnitPrice * itemPieces);
+  });
 
-  const effectiveUnitPrice = getUnitPriceForVolume(state.product.pricePerUnit, totalPieces);
-  const subtotal = effectiveUnitPrice * totalPieces;
   const urgentFee = state.isUrgentOrder ? Math.round(subtotal * 0.2) : 0;
   const grandTotal = subtotal + urgentFee;
 
@@ -209,124 +264,197 @@ export function OrderFlowProvider({ children }: { children: ReactNode }) {
   const updateCustomer = (data: Partial<CustomerData>) =>
     setState(prev => ({ ...prev, customer: { ...prev.customer, ...data } }));
 
-  const updateProduct = (data: Partial<SelectedProduct>) =>
-    setState(prev => ({
-      ...prev,
-      product: { ...prev.product, ...data },
-      // Update default color variant
-      colorVariants: prev.colorVariants.map((v, i) =>
-        i === 0 && data.color && data.colorHex ? { ...v, color: data.color, colorHex: data.colorHex } : v
-      ),
-    }));
-
-  const addColorVariant = (color: string, colorHex: string) => {
-    const newVariant: ColorVariant = {
-      id: `var-${Date.now()}`,
-      color,
-      colorHex,
-      sizes: { XS: 0, S: 0, M: 10, L: 10, XL: 0, XXL: 0, XXXL: 0 },
-    };
-    setState(prev => ({ ...prev, colorVariants: [...prev.colorVariants, newVariant] }));
+  const addOrderItem = (product: ProductItem) => {
+    setState(prev => {
+      const newItem: OrderItem = {
+        id: `item-${Date.now()}`,
+        productId: product.id,
+        name: product.name,
+        category: product.category,
+        pricePerUnit: product.startingPrice,
+        requiresSizes: product.requiresSizes,
+        requiresColors: product.requiresColors,
+        requiresMockup: product.requiresMockup,
+        applyVolumeDiscount: product.applyVolumeDiscount,
+        quantity: product.requiresSizes ? 0 : 100, // default quantity if no sizes
+        colorVariants: product.requiresColors ? [
+          {
+            id: `var-${Date.now()}`,
+            color: product.colors[0] || 'Black',
+            colorHex: '#000000', // You might want to map from product.colors later
+            sizes: { ...defaultSizes },
+          }
+        ] : [],
+        artwork: defaultArtwork(),
+        mockup: defaultMockup(),
+      };
+      return { ...prev, items: [...prev.items, newItem] };
+    });
   };
 
-  const removeColorVariant = (id: string) => {
+  const removeOrderItem = (itemId: string) => {
+    setState(prev => ({ ...prev, items: prev.items.filter(i => i.id !== itemId) }));
+  };
+
+  const updateItemQuantity = (itemId: string, quantity: number) => {
     setState(prev => ({
       ...prev,
-      colorVariants: prev.colorVariants.length > 1 ? prev.colorVariants.filter(v => v.id !== id) : prev.colorVariants,
+      items: prev.items.map(item => item.id === itemId ? { ...item, quantity: Math.max(0, quantity) } : item)
     }));
   };
 
-  const updateVariantSizeQty = (variantId: string, size: keyof SizeQtyMap, qty: number) => {
+  const addItemColorVariant = (itemId: string, color: string, colorHex: string) => {
     setState(prev => ({
       ...prev,
-      colorVariants: prev.colorVariants.map(variant => {
-        if (variant.id !== variantId) return variant;
+      items: prev.items.map(item => {
+        if (item.id !== itemId) return item;
         return {
-          ...variant,
-          sizes: {
-            ...variant.sizes,
-            [size]: Math.max(0, qty),
-          },
+          ...item,
+          colorVariants: [
+            ...item.colorVariants,
+            { id: `var-${Date.now()}`, color, colorHex, sizes: { ...defaultSizes } }
+          ]
         };
-      }),
+      })
     }));
   };
 
-  const updateArtworkMode = (mode: 'has_design' | 'need_help') =>
-    setState(prev => ({ ...prev, artwork: { ...prev.artwork, mode } }));
-
-  const setArtworkFile = (file: File | null, previewUrl: string, placementId = 'front') =>
+  const removeItemColorVariant = (itemId: string, variantId: string) => {
     setState(prev => ({
       ...prev,
-      artwork: {
-        ...prev.artwork,
-        file,
-        previewUrl,
-        placements: {
-          ...prev.artwork.placements,
-          [placementId]: {
-            placementId,
+      items: prev.items.map(item => {
+        if (item.id !== itemId) return item;
+        return {
+          ...item,
+          colorVariants: item.colorVariants.length > 1 ? item.colorVariants.filter(v => v.id !== variantId) : item.colorVariants
+        };
+      })
+    }));
+  };
+
+  const updateItemVariantSizeQty = (itemId: string, variantId: string, size: keyof SizeQtyMap, qty: number) => {
+    setState(prev => ({
+      ...prev,
+      items: prev.items.map(item => {
+        if (item.id !== itemId) return item;
+        return {
+          ...item,
+          colorVariants: item.colorVariants.map(variant => {
+            if (variant.id !== variantId) return variant;
+            return { ...variant, sizes: { ...variant.sizes, [size]: Math.max(0, qty) } };
+          })
+        };
+      })
+    }));
+  };
+
+  const updateItemColor = (itemId: string, variantId: string, color: string, colorHex: string) => {
+    setState(prev => ({
+      ...prev,
+      items: prev.items.map(item => {
+        if (item.id !== itemId) return item;
+        return {
+          ...item,
+          colorVariants: item.colorVariants.map(variant => {
+            if (variant.id !== variantId) return variant;
+            return { ...variant, color, colorHex };
+          })
+        };
+      })
+    }));
+  };
+
+  const updateItemArtworkMode = (itemId: string, mode: 'has_design' | 'need_help') => {
+    setState(prev => ({
+      ...prev,
+      items: prev.items.map(item => item.id === itemId ? { ...item, artwork: { ...item.artwork, mode } } : item)
+    }));
+  };
+
+  const setItemArtworkFile = (itemId: string, file: File | null, previewUrl: string, placementId = 'front') => {
+    setState(prev => ({
+      ...prev,
+      items: prev.items.map(item => {
+        if (item.id !== itemId) return item;
+        return {
+          ...item,
+          artwork: {
+            ...item.artwork,
             file,
             previewUrl,
-            x: 0,
-            y: 0,
-            scale: 1,
-            rotation: 0,
-          },
-        },
-      },
+            placements: {
+              ...item.artwork.placements,
+              [placementId]: {
+                placementId, file, previewUrl, x: 0, y: 0, scale: 1, rotation: 0,
+              }
+            }
+          }
+        };
+      })
     }));
+  };
 
-  const updatePlacementTransform = (placementId: string, transform: Partial<PlacementArtworkData>) =>
-    setState(prev => {
-      const currentPlacement = prev.artwork.placements[placementId] || {
-        placementId,
-        file: null,
-        previewUrl: '',
-        x: 0,
-        y: 0,
-        scale: 1,
-        rotation: 0,
-      };
-      return {
-        ...prev,
-        artwork: {
-          ...prev.artwork,
-          placements: {
-            ...prev.artwork.placements,
-            [placementId]: {
-              ...currentPlacement,
-              ...transform,
-            },
-          },
-        },
-      };
-    });
+  const updateItemPlacementTransform = (itemId: string, placementId: string, transform: Partial<PlacementArtworkData>) => {
+    setState(prev => ({
+      ...prev,
+      items: prev.items.map(item => {
+        if (item.id !== itemId) return item;
+        const currentPlacement = item.artwork.placements[placementId] || {
+          placementId, file: null, previewUrl: '', x: 0, y: 0, scale: 1, rotation: 0,
+        };
+        return {
+          ...item,
+          artwork: {
+            ...item.artwork,
+            placements: {
+              ...item.artwork.placements,
+              [placementId]: { ...currentPlacement, ...transform }
+            }
+          }
+        };
+      })
+    }));
+  };
 
-  const removePlacementArtwork = (placementId: string) =>
-    setState(prev => {
-      const newPlacements = { ...prev.artwork.placements };
-      delete newPlacements[placementId];
-      return {
-        ...prev,
-        artwork: {
-          ...prev.artwork,
-          placements: newPlacements,
-        },
-      };
-    });
+  const removeItemPlacementArtwork = (itemId: string, placementId: string) => {
+    setState(prev => ({
+      ...prev,
+      items: prev.items.map(item => {
+        if (item.id !== itemId) return item;
+        const newPlacements = { ...item.artwork.placements };
+        delete newPlacements[placementId];
+        return { ...item, artwork: { ...item.artwork, placements: newPlacements } };
+      })
+    }));
+  };
 
-  const updateInstructions = (instructions: string) =>
-    setState(prev => ({ ...prev, artwork: { ...prev.artwork, instructions } }));
+  const updateItemInstructions = (itemId: string, instructions: string) => {
+    setState(prev => ({
+      ...prev,
+      items: prev.items.map(item => item.id === itemId ? { ...item, artwork: { ...item.artwork, instructions } } : item)
+    }));
+  };
 
-  const setActiveView = (view: 'front' | 'back') =>
-    setState(prev => ({ ...prev, mockup: { ...prev.mockup, activeView: view } }));
+  const setItemActiveView = (itemId: string, view: 'front' | 'back') => {
+    setState(prev => ({
+      ...prev,
+      items: prev.items.map(item => item.id === itemId ? { ...item, mockup: { ...item.mockup, activeView: view } } : item)
+    }));
+  };
 
-  const setActivePlacementId = (activePlacementId: string) =>
-    setState(prev => ({ ...prev, mockup: { ...prev.mockup, activePlacementId } }));
+  const setItemActivePlacementId = (itemId: string, activePlacementId: string) => {
+    setState(prev => ({
+      ...prev,
+      items: prev.items.map(item => item.id === itemId ? { ...item, mockup: { ...item.mockup, activePlacementId } } : item)
+    }));
+  };
 
-  const setDesignerAssistance = (designerAssistance: boolean) =>
-    setState(prev => ({ ...prev, mockup: { ...prev.mockup, designerAssistance } }));
+  const setItemDesignerAssistance = (itemId: string, designerAssistance: boolean) => {
+    setState(prev => ({
+      ...prev,
+      items: prev.items.map(item => item.id === itemId ? { ...item, mockup: { ...item.mockup, designerAssistance } } : item)
+    }));
+  };
 
   const toggleUrgentOrder = () =>
     setState(prev => ({ ...prev, isUrgentOrder: !prev.isUrgentOrder }));
@@ -346,18 +474,21 @@ export function OrderFlowProvider({ children }: { children: ReactNode }) {
     prevStep,
     setStep,
     updateCustomer,
-    updateProduct,
-    addColorVariant,
-    removeColorVariant,
-    updateVariantSizeQty,
-    updateArtworkMode,
-    setArtworkFile,
-    updatePlacementTransform,
-    removePlacementArtwork,
-    updateInstructions,
-    setActiveView,
-    setActivePlacementId,
-    setDesignerAssistance,
+    addOrderItem,
+    removeOrderItem,
+    updateItemQuantity,
+    addItemColorVariant,
+    removeItemColorVariant,
+    updateItemVariantSizeQty,
+    updateItemColor,
+    updateItemArtworkMode,
+    setItemArtworkFile,
+    updateItemPlacementTransform,
+    removeItemPlacementArtwork,
+    updateItemInstructions,
+    setItemActiveView,
+    setItemActivePlacementId,
+    setItemDesignerAssistance,
     toggleUrgentOrder,
     updateDelivery,
     completePayment,
@@ -377,3 +508,4 @@ export function useOrderFlow() {
   }
   return context;
 }
+
