@@ -3,7 +3,7 @@
   top: 0;
   width: 100%;
   background-color: transparent;
-  z-index: 50;
+  z-index: 1100;
   transition: all var(--transition-normal);
   padding: var(--spacing-6) 0;
 }
@@ -332,20 +332,20 @@
   position: fixed;
   bottom: 24px;
   left: 50%;
-  width: calc(100% - 32px); /* Spans width of device with some margin */
-  max-width: 400px; /* Prevent it from getting absurdly long on tablets */
+  width: calc(100% - 32px);
+  max-width: 400px;
   transform: translateX(-50%) scale(1);
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  background-color: #453327; /* Desiminimals brown */
+  background-color: #453327;
   color: #fff;
   font-family: var(--font-heading);
   font-size: 13px;
   font-weight: 700;
   padding: 14px 24px;
-  border-radius: 40px; /* Pill shape */
+  border-radius: 40px;
   border: none;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
   z-index: 110;
@@ -362,6 +362,23 @@
 
 @media (min-width: 992px) {
   .fabButton {
+    display: none;
+  }
+}
+
+/* Mobile Hamburger Menu */
+.mobileHamburgerBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+}
+
+@media (min-width: 992px) {
+  .mobileHamburgerBtn {
     display: none;
   }
 }
@@ -400,6 +417,10 @@
   transition: max-height 0.5s cubic-bezier(0.165, 0.84, 0.44, 1), padding 0.5s cubic-bezier(0.165, 0.84, 0.44, 1), opacity 0.3s ease;
   display: flex;
   flex-direction: column;
+}
+
+.mobileMenuRaised {
+  bottom: 160px;
 }
 
 .mobileMenuOpen {

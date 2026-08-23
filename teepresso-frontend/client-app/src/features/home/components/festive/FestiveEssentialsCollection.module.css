@@ -19,13 +19,14 @@
 
 .grid {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 16px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
 }
 
 @media (min-width: 768px) {
   .grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
   }
 }
 
@@ -37,8 +38,8 @@
 
 .card {
   display: flex;
-  flex-direction: row;
-  align-items: center;
+  flex-direction: column;
+  align-items: stretch;
   background-color: #FAF6EE;
   border-radius: 12px;
   overflow: hidden;
@@ -54,7 +55,7 @@
 }
 
 .cardContent {
-  padding: 16px;
+  padding: 12px 16px 16px;
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -105,8 +106,8 @@
 }
 
 .cardImageWrapper {
-  width: 100px;
-  height: 100px;
+  width: 100%;
+  aspect-ratio: 1 / 1;
   background-color: #FDFDFD;
   position: relative;
   overflow: hidden;

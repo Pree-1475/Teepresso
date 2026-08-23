@@ -3,18 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { ProductItem } from '@/features/catalog/data/productsData';
 
-export interface SizeQtyMap {
-  XS: number;
-  S: number;
-  M: number;
-  L: number;
-  XL: number;
-  XXL: number;
-  XXXL: number;
-  '4XL': number;
-  '5XL': number;
-  '6XL': number;
-}
+export type SizeQtyMap = Record<string, number>;
 
 export interface ColorVariant {
   id: string;

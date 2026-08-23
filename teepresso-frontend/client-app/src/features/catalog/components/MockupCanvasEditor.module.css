@@ -162,7 +162,7 @@
 
 .contextualPopoverModal {
   position: fixed;
-  bottom: 24px;
+  bottom: 100px;
   left: 50%;
   transform: translateX(-50%);
   background: #fff;
@@ -170,10 +170,16 @@
   box-shadow: 0 10px 40px rgba(0,0,0,0.15);
   width: 90%;
   max-width: 400px;
-  z-index: 1000;
+  z-index: 1050;
   padding: 16px;
   border: 1px solid #eaeaea;
   animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (max-width: 768px) {
+  .contextualPopoverModal {
+    bottom: 160px;
+  }
 }
 
 @keyframes slideUp {

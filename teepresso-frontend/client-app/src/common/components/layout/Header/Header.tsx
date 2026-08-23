@@ -16,6 +16,7 @@ export function Header() {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
   const pathname = usePathname();
+  const isProductPage = pathname.startsWith('/product/');
   const router = useRouter();
   const { user, isAuthenticated, logout } = useAuth();
   const { cart, setIsCartDrawerOpen } = useCart();
@@ -58,11 +59,11 @@ export function Header() {
             </div>
 
             <Link 
-              href="/track-order" 
+              href="/my-orders" 
               className={styles.dropdownItem}
               onClick={() => setIsUserMenuOpen(false)}
             >
-              <PackageCheck size={16} /> Track My Orders
+              <PackageCheck size={16} /> My Orders
             </Link>
 
             <button 
@@ -99,8 +100,19 @@ export function Header() {
             </Link>
           </div>
 
-          {/* User Profile Badge (Moved to Left on Mobile Only) */}
-          {userProfileMarkup(styles.mobileOnlyProfile)}
+          {/* Mobile Hamburger Menu (Only on Product Page) */}
+          {isProductPage && (
+            <button 
+              className={styles.mobileHamburgerBtn}
+              onClick={() => setIsMobileMenuOpen(true)}
+              aria-label="Open menu"
+            >
+              <Menu size={24} strokeWidth={1.5} color="#1a1a1a" />
+            </button>
+          )}
+
+          {/* User Profile Badge (Moved to Left on Mobile Only, hidden on Product Page) */}
+          {!isProductPage && userProfileMarkup(styles.mobileOnlyProfile)}
         </nav>
 
         {/* Center Logo */}
@@ -113,8 +125,8 @@ export function Header() {
         {/* Right Nav */}
         <div className={styles.rightNav}>
           <div className={styles.desktopRightLinks}>
-            <Link href="/track-order" className={`${styles.navLink} ${pathname === '/track-order' ? styles.activeLink : ''}`}>
-              Track Order
+            <Link href="/my-orders" className={`${styles.navLink} ${pathname === '/my-orders' ? styles.activeLink : ''}`}>
+              My Orders
             </Link>
           </div>
           
@@ -144,14 +156,16 @@ export function Header() {
 
       </div>
 
-      {/* Floating Action Button (FAB) for Mobile Menu */}
-      <button 
-        className={`${styles.fabButton} ${isMobileMenuOpen ? styles.fabHidden : ''}`}
-        onClick={() => setIsMobileMenuOpen(true)}
-        aria-label="Open menu"
-      >
-        <Menu size={16} strokeWidth={2.5} /> MENU
-      </button>
+      {/* Floating Action Button (FAB) for Mobile Menu (Hidden on Product Page) */}
+      {!isProductPage && (
+        <button 
+          className={`${styles.fabButton} ${isMobileMenuOpen ? styles.fabHidden : ''}`}
+          onClick={() => setIsMobileMenuOpen(true)}
+          aria-label="Open menu"
+        >
+          <Menu size={16} strokeWidth={2.5} /> MENU
+        </button>
+      )}
 
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
@@ -159,7 +173,7 @@ export function Header() {
       )}
 
       {/* Mobile Menu Card */}
-      <div className={`${styles.mobileMenu} ${isMobileMenuOpen ? styles.mobileMenuOpen : ''}`}>
+      <div className={`${styles.mobileMenu} ${isMobileMenuOpen ? styles.mobileMenuOpen : ''} ${isProductPage ? styles.mobileMenuRaised : ''}`}>
         <nav className={styles.mobileNavWrapper}>
           <ul className={styles.mobileNavList}>
             <li>
@@ -178,8 +192,8 @@ export function Header() {
               </Link>
             </li>
             <li>
-              <Link href="/track-order" className={styles.mobileNavLink} onClick={() => setIsMobileMenuOpen(false)}>
-                <Truck size={18} style={{ marginRight: '8px' }} /> Track Orders
+              <Link href="/my-orders" className={styles.mobileNavLink} onClick={() => setIsMobileMenuOpen(false)}>
+                <Truck size={18} style={{ marginRight: '8px' }} /> My Orders
               </Link>
             </li>
             {isAuthenticated ? (

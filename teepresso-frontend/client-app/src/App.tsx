@@ -17,7 +17,7 @@ import IndustriesPage from '@/features/catalog/IndustriesPage';
 import HowItWorksPage from '@/features/support/HowItWorksPage';
 import FabricGuidePage from '@/features/catalog/FabricGuidePage';
 import FAQPage from '@/features/support/FAQPage';
-import TrackOrderPage from '@/features/tracking/TrackOrderPage';
+import MyOrdersPage from '@/features/tracking/MyOrdersPage';
 import ApproveMockupPage from '@/features/tracking/ApproveMockupPage';
 import LoginPage from '@/features/auth/LoginPage';
 import RegisterPage from '@/features/auth/RegisterPage';
@@ -42,7 +42,7 @@ export function App() {
               <Route path="/how-it-works" element={<HowItWorksPage />} />
               <Route path="/fabric-guide" element={<FabricGuidePage />} />
               <Route path="/faq" element={<FAQPage />} />
-              <Route path="/track-order" element={<TrackOrderPage />} />
+              <Route path="/my-orders" element={<MyOrdersPage />} />
               <Route path="/approve-mockup" element={<ApproveMockupPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />

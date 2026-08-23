@@ -1,0 +1,432 @@
+.wrapper {
+  position: relative;
+  width: 100%;
+  padding: 40px 0;
+  background: var(--color-background);
+}
+
+.centerContainer {
+  max-width: 600px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.quoteIntro {
+  margin-bottom: 24px;
+  max-width: 100%;
+  text-align: center;
+}
+
+.quoteTitle {
+  font-family: var(--font-heading);
+  font-size: var(--text-4xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  line-height: 1.1;
+  margin-bottom: 12px;
+}
+
+.quoteDesc {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: rgba(45, 26, 19, 0.65);
+  margin-bottom: 16px;
+}
+
+.quoteChecks {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px 24px;
+}
+
+.checkItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: var(--font-weight-medium);
+  color: #2D1A13;
+}
+
+.checkCircle {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--color-accent-teal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* --- CALCULATOR CARD --- */
+.quoteCard {
+  background: #FFFFFF;
+  border-radius: var(--radius-xl);
+  padding: 28px 28px 0;
+  box-shadow:
+    0 8px 30px rgba(0, 0, 0, 0.06),
+    0 1px 3px rgba(0, 0, 0, 0.04);
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* Calculator Body */
+.calculatorBody {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  margin-bottom: 24px;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.calcSection {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.calcLabelRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.calcLabel {
+  font-family: var(--font-heading);
+  font-size: 14px;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+
+.calcHint {
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: var(--color-primary-500);
+  font-weight: var(--font-weight-medium);
+}
+
+/* Product Chips */
+.productChips {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 4px; /* for focus ring */
+  scrollbar-width: none; /* Firefox */
+}
+.productChips::-webkit-scrollbar {
+  display: none; /* Chrome */
+}
+
+.productChip {
+  flex: 1;
+  min-width: 90px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 8px;
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  color: var(--color-text-secondary);
+  position: relative;
+}
+
+.productChip span {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: var(--font-weight-medium);
+  text-align: center;
+}
+
+.chipIcon {
+  color: var(--color-text-tertiary);
+  transition: color var(--transition-fast);
+}
+
+.productChip:hover {
+  border-color: var(--color-primary-300);
+  background: rgba(212, 195, 163, 0.05);
+}
+
+.productChip.activeChip {
+  background: var(--color-accent-teal);
+  border-color: var(--color-accent-teal);
+  color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.25);
+}
+
+.productChip.activeChip .chipIcon {
+  color: #FFFFFF;
+}
+
+/* Premium Shimmering Gold Badge for Kurta */
+.festiveBadge {
+  position: absolute;
+  top: -2px; /* Lowered from -8px */
+  right: -8px;
+  background-color: #D35400; /* Bright energetic saffron */
+  color: white;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 3px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.05em;
+  box-shadow: 0 2px 4px rgba(211, 84, 0, 0.3);
+  z-index: 10;
+}
+
+.kurtaHighlightChip {
+  position: relative;
+  border-color: #B56C4A !important;
+  background: rgba(181, 108, 74, 0.05);
+}
+
+.kurtaHighlightChip:hover {
+  background: rgba(181, 108, 74, 0.1);
+}
+
+.kurtaHighlightChip.activeChip {
+  background: #B56C4A !important;
+  border-color: #B56C4A !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 4px 12px rgba(181, 108, 74, 0.25);
+}
+
+/* Quantity Stepper */
+.qtyStepperWrapper {
+  display: flex;
+  align-items: center;
+  height: 56px;
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: border-color var(--transition-fast);
+}
+
+.qtyStepperWrapper:focus-within {
+  border-color: var(--color-primary-500);
+}
+
+.stepperBtn {
+  width: 56px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.stepperBtn:hover {
+  background: rgba(0, 0, 0, 0.03);
+  color: var(--color-text-primary);
+}
+
+.stepperInputWrap {
+  flex: 1;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  border-left: 1px solid var(--color-border);
+  border-right: 1px solid var(--color-border);
+  height: 100%;
+  gap: 4px;
+}
+
+.stepperInput {
+  width: 60px;
+  text-align: right;
+  border: none;
+  background: transparent;
+  font-family: var(--font-heading);
+  font-size: 24px;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  outline: none;
+  -moz-appearance: textfield;
+}
+
+.stepperInput::-webkit-outer-spin-button,
+.stepperInput::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.stepperSuffix {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+  padding-bottom: 4px;
+}
+
+.qtyShortcuts {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.shortcutBtn {
+  flex: 1;
+  min-width: 48px;
+  padding: 6px 0;
+  background: rgba(212, 195, 163, 0.15);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary-700);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.shortcutBtn:hover {
+  background: rgba(212, 195, 163, 0.3);
+  border-color: rgba(212, 195, 163, 0.5);
+}
+
+/* --- CARD FOOTER --- */
+.cardFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #FBF7F2;
+  border-radius: var(--radius-lg) var(--radius-lg) var(--radius-xl) var(--radius-xl);
+  padding: 20px 28px;
+  margin: 0 -28px;
+  border-top: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.priceBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.priceLabel {
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: rgba(45, 26, 19, 0.5);
+  letter-spacing: 0.03em;
+}
+
+.priceRow {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.totalPrice {
+  font-family: var(--font-serif);
+  font-size: 32px;
+  font-weight: var(--font-weight-regular);
+  color: #2D1A13;
+  line-height: 1;
+}
+
+.perPiecePrice {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: rgba(45, 26, 19, 0.55);
+  margin-right: 8px;
+  margin-bottom: 2px;
+}
+
+.savingsBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(13, 148, 136, 0.1);
+  color: var(--color-accent-teal);
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: var(--font-weight-semibold);
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+}
+
+.getQuoteBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background-color: var(--color-accent-teal);
+  color: #FFFFFF;
+  border: none;
+  border-radius: var(--radius-full);
+  padding: 14px 32px;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  white-space: nowrap;
+  box-shadow: 0 4px 14px rgba(13, 148, 136, 0.25);
+}
+
+.getQuoteBtn:hover {
+  background-color: var(--color-accent-teal-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(13, 148, 136, 0.4);
+}
+
+/* --- BOTTOM TRUST BAR --- */
+.bottomTrustBar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 28px;
+  margin-top: 36px;
+  flex-wrap: wrap;
+}
+
+.bottomTrustItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: var(--font-weight-medium);
+  color: rgba(45, 26, 19, 0.5);
+}
+
+.trustDivider {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(45, 26, 19, 0.2);
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .cardFooter {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+    margin: 0 -20px;
+    padding: 20px;
+  }
+  .quoteCard {
+    padding: 20px 20px 0;
+  }
+  .getQuoteBtn {
+    justify-content: center;
+  }
+}

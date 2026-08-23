@@ -95,8 +95,16 @@ export function ProductPage() {
 
   if (!product) return <div>Loading...</div>;
 
+  const SIZE_GROUPS: Record<string, string[]> = {
+    'Kids Sizes': ['2Y', '4Y', '6Y', '8Y', '10Y', '12Y'],
+    'Adult Standard': ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
+    'Adult Plus (Special)': ['3XL', '4XL', '5XL']
+  };
+
+  const allSizes = Object.values(SIZE_GROUPS).flat();
+
   const totalQty = product.requiresSizes 
-    ? (['S', 'M', 'L', 'XL', 'XXL'] as (keyof SizeQtyMap)[]).reduce((sum, sz) => sum + (sizes[sz] || 0), 0)
+    ? allSizes.reduce((sum, sz) => sum + (sizes[sz] || 0), 0)
     : quantity;
 
   const getEffectivePrice = (qty: number) => {
@@ -239,32 +247,45 @@ export function ProductPage() {
             <h3 className={styles.panelTitle}>{product.requiresColors ? '2. Choose Size & Quantity' : '1. Choose Size & Quantity'}</h3>
             
             {product.requiresSizes ? (
-              <div className={styles.tableWrapper}>
-                <table className={styles.sizeTable}>
-                  <thead>
-                    <tr>
-                      <th>Size</th>
-                      <th>Quantity (pieces)</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {(['S', 'M', 'L', 'XL', 'XXL'] as (keyof SizeQtyMap)[]).map(sz => {
-                      const qty = sizes[sz] || 0;
-                      return (
-                        <tr key={sz}>
-                          <td className={styles.szName}>{sz}</td>
-                          <td>
-                            <div className={styles.tableStepper}>
-                              <button onClick={() => updateSize(sz, -1)}>-</button>
-                              <input type="number" value={qty || ''} onChange={e => setSizeDirect(sz, parseInt(e.target.value))} placeholder="0"/>
-                              <button onClick={() => updateSize(sz, 1)}>+</button>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+              <div className={styles.sizeCategories}>
+                {Object.entries(SIZE_GROUPS).map(([category, categorySizes]) => {
+                  const categoryTotal = categorySizes.reduce((sum, sz) => sum + (sizes[sz] || 0), 0);
+                  return (
+                    <details key={category} className={styles.sizeCategoryDetails} open={category === 'Adult Standard'}>
+                      <summary className={styles.sizeCategorySummary}>
+                        <span>{category}</span>
+                        {categoryTotal > 0 && <span className={styles.categoryBadge}>{categoryTotal} added</span>}
+                      </summary>
+                      <div className={styles.tableWrapper}>
+                        <table className={styles.sizeTable}>
+                          <thead>
+                            <tr>
+                              <th>Size</th>
+                              <th>Quantity</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {categorySizes.map(sz => {
+                              const qty = sizes[sz] || 0;
+                              return (
+                                <tr key={sz}>
+                                  <td className={styles.szName}>{sz}</td>
+                                  <td>
+                                    <div className={styles.tableStepper}>
+                                      <button onClick={() => updateSize(sz, -1)}>-</button>
+                                      <input type="number" value={qty || ''} onChange={e => setSizeDirect(sz, parseInt(e.target.value))} placeholder="0"/>
+                                      <button onClick={() => updateSize(sz, 1)}>+</button>
+                                    </div>
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    </details>
+                  );
+                })}
               </div>
             ) : (
                <div className={styles.tableStepper} style={{ width: '150px', marginBottom: '20px' }}>
@@ -338,8 +359,9 @@ export function ProductPage() {
       </div>
 
       {/* Bottom Sticky Action Bar */}
-      <div className={styles.bottomBar}>
-        <div className={styles.bottomContainer}>
+      {totalQty > 0 && (
+        <div className={styles.bottomBar}>
+          <div className={styles.bottomContainer}>
           <div className={styles.bottomStats}>
             <ShoppingBag size={24} color="#666" />
             <div className={styles.bCol}>
@@ -363,6 +385,7 @@ export function ProductPage() {
           </div>
         </div>
       </div>
+      )}
 
     </div>
   );

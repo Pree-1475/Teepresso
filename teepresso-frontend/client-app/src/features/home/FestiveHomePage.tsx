@@ -5,6 +5,7 @@ import { IndustriesSection } from '@/features/home/components/IndustriesSection'
 import { HowItWorksSection } from '@/features/home/components/HowItWorksSection';
 import { SeasonalKurtaSection } from '@/features/home/components/SeasonalKurtaSection';
 import { FeaturedProducts } from '@/features/home/components/FeaturedProducts';
+import { InstantQuoteSection } from '@/features/home/components/InstantQuoteSection';
 import { TrustAndReviewsSection } from '@/features/home/components/TrustAndReviewsSection';
 import { GallerySection } from '@/features/home/components/GallerySection';
 import { FAQSection } from '@/features/home/components/FAQSection';
@@ -23,6 +24,8 @@ export function FestiveHomePage() {
       <SeasonalKurtaSection />
       <div className="doubleStitchDivider" />
       <FeaturedProducts />
+      <div className="doubleStitchDivider" />
+      <InstantQuoteSection />
       <div className="doubleStitchDivider" />
       <TrustAndReviewsSection />
       <div className="doubleStitchDivider" />
