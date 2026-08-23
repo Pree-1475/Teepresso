@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import '@/common/styles/globals.css';
-import { TopNavbar } from '@/common/components/layout/TopNavbar';
-import { RightNavDock } from '@/common/components/layout/RightNavDock';
-
+import { Sidebar } from '@/common/components/layout/Sidebar';
 import { LoginPage } from '@/features/auth/LoginPage';
 import { DashboardPage } from '@/features/dashboard/DashboardPage';
 import { OrdersPage } from '@/features/orders/OrdersPage';
@@ -63,17 +61,13 @@ export function App() {
 
   return (
     <BrowserRouter>
-      <div className="erp-shell">
-        {/* Left Vertical Nav Rail */}
-        <RightNavDock />
+      <div className="erp-shell" style={{ flexDirection: 'row' }}>
+        {/* Wagtail-style Left Sidebar */}
+        <Sidebar onLogout={handleLogout} />
 
-        {/* Right Main Column */}
-        <div className="erp-main-col">
-          {/* Top Header Navbar */}
-          <TopNavbar onLogout={handleLogout} />
-
-          {/* Center Main Workstation Stage */}
-          <main className="erp-workspace">
+        {/* Main Column */}
+        <div className="erp-main-col" style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+          <main className="erp-workspace" style={{ flex: 1, overflowY: 'auto' }}>
             <AnimatedRoutes />
           </main>
         </div>

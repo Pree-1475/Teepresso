@@ -1268,3 +1268,194 @@
 .fileCheckIcon {
   color: #10b981;
 }
+
+/* Empty State Select Product Card */
+.emptyStateSelectCard {
+  background: linear-gradient(145deg, #fdfaf7 0%, #f9f1ea 100%);
+  border: 2px dashed #d6bcae;
+  border-radius: 20px;
+  padding: 60px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.emptyStateSelectCard:hover {
+  border-color: #8c5b45;
+  background: linear-gradient(145deg, #fdfaf7 0%, #f5e8dd 100%);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(140, 91, 69, 0.12);
+}
+
+.emptyStateIconWrapper {
+  width: 80px;
+  height: 80px;
+  background: #ffffff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(140, 91, 69, 0.1);
+  margin-bottom: 24px;
+  color: #8c5b45;
+}
+
+.emptyStateTitle {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #1a1a1a;
+  margin: 0 0 12px 0;
+}
+
+.emptyStateDesc {
+  font-size: 1rem;
+  color: #6b7280;
+  max-width: 400px;
+  margin: 0 0 24px 0;
+  line-height: 1.5;
+}
+
+.emptyStateBtn {
+  background: #111827;
+  color: #ffffff;
+  border: none;
+  border-radius: 999px;
+  padding: 12px 28px;
+  font-size: 1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.emptyStateBtn:hover {
+  background: #374151;
+}
+
+/* Accordion and Multi-Product List */
+.productAccordionItem {
+  background: #ffffff;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 16px;
+  margin-bottom: 20px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.productAccordionItemActive {
+  border-color: #8c5b45;
+  box-shadow: 0 8px 24px rgba(140, 91, 69, 0.08);
+}
+
+.productAccordionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: #fdfaf7;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s ease;
+}
+
+.productAccordionHeader:hover {
+  background: #f5e8dd;
+}
+
+.accordionHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.accordionIndexBadge {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #8c5b45;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.accordionProductTitle {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #111827;
+  margin: 0;
+}
+
+.accordionProductSummary {
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin-top: 2px;
+}
+
+.accordionHeaderRight {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.accordionRemoveBtn {
+  background: none;
+  border: none;
+  color: #ef4444;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.2s;
+}
+
+.accordionRemoveBtn:hover {
+  background: #fee2e2;
+}
+
+.accordionToggleIcon {
+  color: #8c5b45;
+  transition: transform 0.3s ease;
+}
+
+.accordionToggleIconOpen {
+  transform: rotate(180deg);
+}
+
+.productAccordionContent {
+  padding: 20px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.addAnotherProductRoundBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 12px auto 0 auto;
+  background: #ffffff;
+  border: 2px dashed #8c5b45;
+  color: #8c5b45;
+  padding: 14px 28px;
+  border-radius: 999px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(140, 91, 69, 0.05);
+}
+
+.addAnotherProductRoundBtn:hover {
+  background: #fdfaf7;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(140, 91, 69, 0.12);
+}
+

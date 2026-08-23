@@ -125,6 +125,7 @@ interface OrderFlowContextType {
   toggleUrgentOrder: () => void;
   updateDelivery: (data: Partial<DeliveryData>) => void;
   completePayment: () => string;
+  resetOrder: (initialProduct?: ProductItem) => void;
   
   totalPieces: number;
   subtotal: number;
@@ -154,30 +155,7 @@ const defaultMockup = (): MockupState => ({
 const initialOrderState: GuidedOrderState = {
   currentStep: 1,
   customer: { name: '', phone: '', email: '', organization: '' },
-  items: [
-    {
-      id: `item-${Date.now()}`,
-      productId: 'tshirt-roundneck',
-      name: 'Classic Round Neck T-Shirt',
-      category: 'T-Shirts',
-      pricePerUnit: 199,
-      requiresSizes: true,
-      requiresColors: true,
-      requiresMockup: true,
-      applyVolumeDiscount: true,
-      quantity: 0,
-      colorVariants: [
-        {
-          id: 'var-1',
-          color: 'Warm Brown',
-          colorHex: '#8c5b45',
-          sizes: { ...initialSizesForFirst },
-        },
-      ],
-      artwork: defaultArtwork(),
-      mockup: defaultMockup(),
-    }
-  ],
+  items: [],
   isUrgentOrder: false,
   delivery: { address: '', city: '', pincode: '' },
   paymentCompleted: false,
@@ -468,6 +446,44 @@ export function OrderFlowProvider({ children }: { children: ReactNode }) {
     return generatedId;
   };
 
+  const resetOrder = (initialProduct?: ProductItem) => {
+    setState(prev => {
+      const hasDetails = prev.customer && prev.customer.name.trim() && prev.customer.phone.trim();
+      return {
+        ...prev,
+        currentStep: hasDetails ? 2 : 1,
+        items: initialProduct ? [
+          {
+            id: `item-${Date.now()}`,
+            productId: initialProduct.id,
+            name: initialProduct.name,
+            category: initialProduct.category,
+            pricePerUnit: initialProduct.startingPrice,
+            requiresSizes: initialProduct.requiresSizes,
+            requiresColors: initialProduct.requiresColors,
+            requiresMockup: initialProduct.requiresMockup,
+            applyVolumeDiscount: initialProduct.applyVolumeDiscount,
+            quantity: initialProduct.requiresSizes ? 0 : 100,
+            colorVariants: initialProduct.requiresColors ? [
+              {
+                id: `var-${Date.now()}`,
+                color: initialProduct.colors[0] || 'Black',
+                colorHex: '#000000',
+                sizes: { ...defaultSizes },
+              }
+            ] : [],
+            artwork: defaultArtwork(),
+            mockup: defaultMockup(),
+          }
+        ] : [],
+        isUrgentOrder: false,
+        delivery: { address: '', city: '', pincode: '' },
+        paymentCompleted: false,
+        orderId: '',
+      };
+    });
+  };
+
   const value = {
     state,
     nextStep,
@@ -492,6 +508,7 @@ export function OrderFlowProvider({ children }: { children: ReactNode }) {
     toggleUrgentOrder,
     updateDelivery,
     completePayment,
+    resetOrder,
     totalPieces,
     subtotal,
     urgentFee,

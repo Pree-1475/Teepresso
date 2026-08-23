@@ -28,6 +28,7 @@ export function Step4ReviewAndOrder() {
     toggleUrgentOrder,
     setStep,
     completePayment, 
+    resetOrder,
     prevStep 
   } = useOrderFlow();
 
@@ -93,12 +94,21 @@ export function Step4ReviewAndOrder() {
             We will call you at <strong>{customer.phone}</strong> within 2 hours to confirm.
           </p>
 
-          <div className={styles.actionRowCenter}>
+          <div className={styles.actionRowCenter} style={{ gap: '16px', flexWrap: 'wrap' }}>
             <button 
+              type="button"
               className={styles.primaryBtnLarge} 
               onClick={() => window.location.href = '/track-order'}
             >
               Track Order Status <ArrowLeft size={16} style={{ transform: 'rotate(180deg)' }} />
+            </button>
+            <button 
+              type="button"
+              className={styles.secondaryBtn} 
+              onClick={() => resetOrder()}
+              style={{ borderRadius: '999px', padding: '12px 28px' }}
+            >
+              Start New Order
             </button>
           </div>
         </div>

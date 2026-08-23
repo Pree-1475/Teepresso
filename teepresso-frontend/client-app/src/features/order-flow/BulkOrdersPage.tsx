@@ -9,8 +9,8 @@ import { Step4ReviewAndOrder } from '@/features/order-flow/components/steps/Step
 import { PRODUCTS_CATALOG } from '@/features/catalog/data/productsData';
 
 function StepRenderer() {
-  const { state, addOrderItem } = useOrderFlow();
-  const [searchParams] = useSearchParams();
+  const { state, addOrderItem, resetOrder } = useOrderFlow();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const prodId = searchParams.get('product');
 
@@ -19,13 +19,18 @@ function StepRenderer() {
     if (prodId) {
       const match = PRODUCTS_CATALOG.find(p => p.id === prodId);
       if (match) {
-        // Only add if not already in state
-        if (!state.items.some(item => item.productId === match.id)) {
+        if (state.paymentCompleted) {
+          // If previous order is completed, start a new one with this product
+          resetOrder(match);
+        } else if (!state.items.some(item => item.productId === match.id)) {
+          // Add to current order if not already in it
           addOrderItem(match);
         }
+        // Clear the query parameter so removing items works and it doesn't trigger again
+        setSearchParams({}, { replace: true });
       }
     }
-  }, [prodId, state.items.length]); // Add length dependency to prevent infinite loops but allow check
+  }, [prodId, state.items, state.paymentCompleted, setSearchParams, addOrderItem, resetOrder]);
 
   switch (state.currentStep) {
     case 1: return <Step1YourDetails />;
