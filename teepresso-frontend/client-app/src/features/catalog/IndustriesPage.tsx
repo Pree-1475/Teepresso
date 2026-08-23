@@ -69,7 +69,7 @@ export function IndustriesPage() {
           <p className={styles.ctaText}>
             Our printing consultants can help you choose the best fabrics, print techniques, and price brackets for your organization.
           </p>
-          <Link href="/bulk-orders">
+          <Link href="/products">
             <Button rightIcon={<ArrowRight size={16} />}>Get a Custom Quote</Button>
           </Link>
         </div>

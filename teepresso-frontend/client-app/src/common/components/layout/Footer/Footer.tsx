@@ -38,7 +38,7 @@ export function Footer() {
             <ul className={styles.linkList}>
               <li><Link href="/products">Products Catalogue</Link></li>
               <li><Link href="/custom-kurtas">✨ Custom Kurtas</Link></li>
-              <li><Link href="/bulk-orders">Bulk Order Configurator</Link></li>
+              <li><Link href="/products">Bulk Order Configurator</Link></li>
               <li><Link href="/products">T-Shirts & Oversized Tees</Link></li>
               <li><Link href="/products">Polos & Corporate Merch</Link></li>
             </ul>

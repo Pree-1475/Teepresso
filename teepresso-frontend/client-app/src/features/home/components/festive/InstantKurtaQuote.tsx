@@ -68,7 +68,7 @@ export const InstantKurtaQuote = () => {
             </div>
           </div>
 
-          <Link href={`/bulk-orders?product=custom-kurta-seasonal&qty=${qty}`} className={styles.ctaButton}>
+          <Link href={`/product/custom-kurta-seasonal`} className={styles.ctaButton}>
             ORDER NOW <ArrowRight size={18} />
           </Link>
         </div>

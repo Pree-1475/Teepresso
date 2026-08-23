@@ -15,7 +15,7 @@ export function CTASection() {
             Get a custom quote today and experience the difference.
           </p>
           <div className={styles.actions}>
-            <Link href="/bulk-orders">
+            <Link href="/products">
               <Button variant="primary" size="lg" rightIcon={<ArrowRight size={20} />} className={styles.primaryBtn}>
                 Start a Bulk Order
               </Button>

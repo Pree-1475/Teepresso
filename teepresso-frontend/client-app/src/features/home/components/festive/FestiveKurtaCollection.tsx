@@ -52,7 +52,7 @@ export const FestiveKurtaCollection = () => {
         </div>
 
         <div className={`${styles.footer} ${isVisible ? styles.visible : ''}`}>
-          <Link href="/bulk-orders?product=custom-kurta-seasonal" className={styles.ctaLink}>
+          <Link href="/product/custom-kurta-seasonal" className={styles.ctaLink}>
             Explore Bulk Pricing <ArrowRight size={18} />
           </Link>
         </div>

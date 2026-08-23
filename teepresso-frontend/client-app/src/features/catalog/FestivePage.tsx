@@ -5,9 +5,9 @@ import { ArrowRight, CheckCircle2, Search } from 'lucide-react';
 import { Button } from '@/common/components/ui/Button/Button';
 import { PRODUCTS_CATALOG } from '@/features/catalog/data/productsData';
 import { KURTA_GALLERY } from '@/features/catalog/data/kurtaData';
-import styles from './custom-kurtas.module.css';
+import styles from './festive.module.css';
 
-export function CustomKurtasPage() {
+export function FestivePage() {
   const [activeKurta, setActiveKurta] = useState<'custom-kurta-seasonal' | 'kurta-patterned' | null>(null);
 
   const plainKurta = PRODUCTS_CATALOG.find(p => p.id === 'custom-kurta-seasonal')!;
@@ -63,9 +63,9 @@ export function CustomKurtasPage() {
               </div>
               
               <div className={styles.modalActions}>
-                <Link href={`/bulk-orders?product=${product.id}`}>
+                <Link href={`/product/${product.id}`}>
                   <Button variant="primary" size="lg" className={styles.fullWidthBtn}>
-                    Start Order <ArrowRight size={18} />
+                    Customize & Order <ArrowRight size={18} />
                   </Button>
                 </Link>
                 <p className={styles.modalHelpText}>You'll be able to select precise sizes and colors in the next step.</p>
@@ -94,7 +94,7 @@ export function CustomKurtasPage() {
               Custom printed kurtas and festive apparel for communities, associations, colleges and events.
             </p>
             <div className={styles.heroActions}>
-              <Link href="/bulk-orders?product=custom-kurta-seasonal">
+              <Link href="/product/custom-kurta-seasonal">
                 <Button variant="primary" size="lg" rightIcon={<ArrowRight size={18} />}>
                   START YOUR KURTA ORDER
                 </Button>
@@ -216,8 +216,8 @@ export function CustomKurtasPage() {
                 </div>
               </div>
               
-              <Link href={`/bulk-orders?product=${khanduva.id}`}>
-                <Button variant="primary" rightIcon={<ArrowRight size={18} />}>ADD TO YOUR ORDER</Button>
+              <Link href={`/product/${khanduva.id}`}>
+                <Button variant="primary" rightIcon={<ArrowRight size={18} />}>ADD TO CART</Button>
               </Link>
             </div>
             <div className={styles.rowImages}>
@@ -242,8 +242,8 @@ export function CustomKurtasPage() {
                 </div>
               </div>
               
-              <Link href={`/bulk-orders?product=${pancha.id}`}>
-                <Button variant="primary" rightIcon={<ArrowRight size={18} />}>ADD TO YOUR ORDER</Button>
+              <Link href={`/product/${pancha.id}`}>
+                <Button variant="primary" rightIcon={<ArrowRight size={18} />}>ADD TO CART</Button>
               </Link>
             </div>
             <div className={styles.rowImages}>
@@ -268,8 +268,8 @@ export function CustomKurtasPage() {
                 </div>
               </div>
               
-              <Link href={`/bulk-orders?product=${pagdi.id}`}>
-                <Button variant="primary" rightIcon={<ArrowRight size={18} />}>ADD TO YOUR ORDER</Button>
+              <Link href={`/product/${pagdi.id}`}>
+                <Button variant="primary" rightIcon={<ArrowRight size={18} />}>ADD TO CART</Button>
               </Link>
             </div>
             <div className={styles.rowImages}>
@@ -296,7 +296,7 @@ export function CustomKurtasPage() {
             
             <p className={styles.orderNote}>Combine multiple products in a single order.</p>
             
-            <Link href="/bulk-orders?product=custom-kurta-seasonal">
+            <Link href="/product/custom-kurta-seasonal">
               <Button variant="primary" size="lg" rightIcon={<ArrowRight size={20} />} className={styles.buildOrderBtn}>
                 START YOUR ORDER
               </Button>
@@ -358,7 +358,7 @@ export function CustomKurtasPage() {
           <h2 className={styles.finalTitle}>READY TO MAKE YOUR GROUP'S KURTAS?</h2>
           <p className={styles.finalDesc}>Start with your styles and quantities. We'll take it from there.</p>
           
-          <Link href="/bulk-orders?product=custom-kurta-seasonal">
+          <Link href="/product/custom-kurta-seasonal">
             <Button variant="primary" size="lg" rightIcon={<ArrowRight size={20} />}>
               START YOUR KURTA ORDER
             </Button>
@@ -370,4 +370,4 @@ export function CustomKurtasPage() {
   );
 }
 
-export default CustomKurtasPage;
+export default FestivePage;

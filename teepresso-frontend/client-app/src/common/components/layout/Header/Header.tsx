@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/features/auth/context/AuthContext';
+import { useCart } from '@/features/cart/context/CartContext';
 import { Menu, X, ShoppingBag, User as UserIcon, LogOut, PackageCheck, Layers, Home, Sparkles, LogIn, Truck } from 'lucide-react';
 import styles from './Header.module.css';
 import { STOREFRONT_MODE } from '@/common/config/storefront';
@@ -17,6 +18,9 @@ export function Header() {
   const pathname = usePathname();
   const router = useRouter();
   const { user, isAuthenticated, logout } = useAuth();
+  const { cart, setIsCartDrawerOpen } = useCart();
+
+  const totalCartItems = cart.items.reduce((acc, item) => acc + item.totalItemQuantity, 0);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -61,14 +65,6 @@ export function Header() {
               <PackageCheck size={16} /> Track My Orders
             </Link>
 
-            <Link 
-              href="/bulk-orders" 
-              className={styles.dropdownItem}
-              onClick={() => setIsUserMenuOpen(false)}
-            >
-              <Layers size={16} /> Custom Order Builder
-            </Link>
-
             <button 
               type="button" 
               className={`${styles.dropdownItem} ${styles.logoutItem}`}
@@ -95,8 +91,8 @@ export function Header() {
             <Link href="/products" className={`${styles.navLink} ${pathname === '/products' ? styles.activeLink : ''}`}>
               Products
             </Link>
-            <Link href="/custom-kurtas" className={`${styles.navLink} ${pathname === '/custom-kurtas' ? styles.activeLink : ''}`} style={{ color: 'var(--color-primary-600)', fontWeight: 600 }}>
-              Custom Kurtas <span className={styles.newBadge}>New</span>
+            <Link href="/festive" className={`${styles.navLink} ${pathname === '/festive' ? styles.activeLink : ''}`} style={{ color: 'var(--color-primary-600)', fontWeight: 600 }}>
+              Festive <span className={styles.newBadge}>New</span>
             </Link>
             <Link href="/fabric-guide" className={`${styles.navLink} ${pathname === '/fabric-guide' ? styles.activeLink : ''}`}>
               Fabric & Printing
@@ -131,9 +127,18 @@ export function Header() {
           {/* User Profile Badge (Right on Desktop Only) */}
           {userProfileMarkup(styles.desktopOnlyProfile)}
 
-          <Link href="/bulk-orders" className={styles.bagBtn} aria-label="Order Cart">
+          <button 
+            type="button" 
+            className={styles.bagBtn} 
+            aria-label="Open Cart" 
+            onClick={() => setIsCartDrawerOpen(true)}
+            style={{ position: 'relative' }}
+          >
             <ShoppingBag size={20} strokeWidth={1.5} />
-          </Link>
+            {totalCartItems > 0 && (
+              <span className={styles.cartBadge}>{totalCartItems}</span>
+            )}
+          </button>
           
         </div>
 
@@ -168,8 +173,8 @@ export function Header() {
               </Link>
             </li>
             <li>
-              <Link href="/custom-kurtas" className={styles.mobileNavLink} onClick={() => setIsMobileMenuOpen(false)}>
-                <Sparkles size={18} style={{ marginRight: '8px' }} /> Custom Kurtas
+              <Link href="/festive" className={styles.mobileNavLink} onClick={() => setIsMobileMenuOpen(false)}>
+                <Sparkles size={18} style={{ marginRight: '8px' }} /> Festive Collection
               </Link>
             </li>
             <li>

@@ -97,7 +97,7 @@ export const FestiveHero = () => {
               and events.
             </p>
             <div className={styles.actions}>
-              <Link href="/bulk-orders?product=custom-kurta-seasonal" className={styles.primaryBtn}>
+              <Link href="/product/custom-kurta-seasonal" className={styles.primaryBtn}>
                 Start Your Kurta Order <ArrowRight size={18} />
               </Link>
             </div>

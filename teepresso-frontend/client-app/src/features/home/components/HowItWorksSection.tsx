@@ -393,7 +393,7 @@ export function HowItWorksSection() {
                       )}
                     </div>
                   </div>
-                  <Link href={`/bulk-orders?product=${encodeURIComponent(product)}&qty=${qty}`} className={styles.getQuoteBtn}>
+                  <Link href={`/product/${encodeURIComponent(product)}`} className={styles.getQuoteBtn}>
                     Continue Order <ArrowRight size={18} />
                   </Link>
                 </div>

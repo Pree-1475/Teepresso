@@ -27,7 +27,7 @@ export function HeroSection() {
           </p>
           
           <div className={styles.actions}>
-            <Link href="/bulk-orders" className={styles.btnPrimary}>
+            <Link href="/products" className={styles.btnPrimary}>
               Start Designing <ArrowRight size={16} />
             </Link>
             <Link href="/gallery" className={styles.btnOutline}>

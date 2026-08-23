@@ -151,7 +151,7 @@ export function FabricGuidePage() {
           <p className={styles.ctaText}>
             Configure your order details in our interactive bulk order configurator to see how your selected fabric affects pricing.
           </p>
-          <Link href="/bulk-orders">
+          <Link href="/products">
             <Button rightIcon={<ArrowRight size={16} />}>Configure Bulk Order</Button>
           </Link>
         </div>

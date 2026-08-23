@@ -78,7 +78,7 @@ export function ProductsPage() {
         {/* 3. Product Catalogue Grid */}
         <div className={styles.catalogGrid}>
           {filteredProducts.map(product => (
-            <Link key={product.id} href={`/bulk-orders?product=${product.id}`} className={styles.productCard}>
+            <Link key={product.id} href={`/product/${product.id}`} className={styles.productCard}>
               <div className={styles.imageWrapper}>
                 <Image
                   src={product.image}
@@ -105,7 +105,7 @@ export function ProductsPage() {
                   </div>
                 </div>
                 <span className={styles.globalOrderBtn}>
-                  Order Now <ArrowRight size={14} />
+                  Customize & Order <ArrowRight size={14} />
                 </span>
               </div>
             </Link>
@@ -119,9 +119,9 @@ export function ProductsPage() {
           <p className={styles.quoteCtaDesc}>
             Tell us your group size, budget, and event dates. Our team will guide you to the perfect fabric, print method, and quantity discounts.
           </p>
-          <Link href="/bulk-orders">
+          <Link href="/festive">
             <Button variant="primary" size="lg" rightIcon={<ArrowRight size={18} />}>
-              Get an Instant Quote
+              Explore Festive Collection
             </Button>
           </Link>
         </div>

@@ -66,7 +66,7 @@ export function HowItWorksPage() {
             Get a tailored, instant quotation with our step-by-step custom order configurator. It takes less than 2 minutes.
           </p>
           <div className={styles.ctaBtns}>
-            <Link href="/bulk-orders">
+            <Link href="/products">
               <Button rightIcon={<ArrowRight size={16} />}>Start Customizer</Button>
             </Link>
             <Link href="/products">
