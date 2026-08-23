@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { PRODUCTS_CATALOG, ProductItem } from '@/features/catalog/data/productsData';
 import { useCart, SizeQtyMap, ColorVariant, ArtworkData, MockupState } from '@/features/cart/context/CartContext';
 import styles from './ProductPage.module.css';
-import { ShoppingBag, ArrowLeft, UploadCloud } from 'lucide-react';
+import { ShoppingBag, ArrowLeft, UploadCloud, Plus, X, ShieldCheck, Box, HelpCircle, ChevronDown, ChevronUp, Bookmark } from 'lucide-react';
 import { Button } from '@/common/components/ui/Button/Button';
 import { MockupCanvasEditor } from './components/MockupCanvasEditor';
 
@@ -25,7 +25,6 @@ export function ProductPage() {
   
   const [designMode, setDesignMode] = useState<'none' | 'has_design' | 'need_help'>('none');
   const [instructions, setInstructions] = useState('');
-  const [isArtworkPopoverOpen, setIsArtworkPopoverOpen] = useState(false);
   
   const [artwork, setArtwork] = useState<ArtworkData>({
     file: null,
@@ -43,9 +42,43 @@ export function ProductPage() {
     designerAssistance: false,
   });
 
-  // Sync designMode with artwork state
+  const [isMockupOpen, setIsMockupOpen] = useState(false);
+  const [isArtworkPopoverOpen, setIsArtworkPopoverOpen] = useState(false);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleGlobalFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const previewUrl = URL.createObjectURL(file);
+      setArtwork(prev => ({
+        ...prev,
+        file,
+        previewUrl,
+        mode: 'has_design',
+        placements: {
+          ...prev.placements,
+          front: { // Default to front placement
+            placementId: 'front',
+            file,
+            previewUrl,
+            x: 0,
+            y: 0,
+            scale: 1,
+            rotation: 0
+          }
+        }
+      }));
+      setDesignMode('has_design');
+      setIsMockupOpen(true);
+    }
+  };
+
   useEffect(() => {
     setArtwork((prev: any) => ({ ...prev, mode: designMode }));
+    if (designMode === 'has_design') {
+      setIsMockupOpen(true);
+    }
   }, [designMode]);
 
   useEffect(() => {
@@ -62,14 +95,27 @@ export function ProductPage() {
 
   if (!product) return <div>Loading...</div>;
 
-  const handleAddToCart = () => {
-    let totalQty = 0;
-    if (product.requiresSizes) {
-      totalQty = Object.values(sizes).reduce((sum, val) => sum + (val || 0), 0);
-    } else {
-      totalQty = quantity;
-    }
+  const totalQty = product.requiresSizes 
+    ? (['S', 'M', 'L', 'XL', 'XXL'] as (keyof SizeQtyMap)[]).reduce((sum, sz) => sum + (sizes[sz] || 0), 0)
+    : quantity;
 
+  const getEffectivePrice = (qty: number) => {
+    let price = product.startingPrice;
+    if (product.applyVolumeDiscount) {
+      if (totalQty >= 150) {
+        price = Math.round(product.startingPrice * 0.8);
+      } else if (totalQty >= 75) {
+        price = Math.round(product.startingPrice * 0.9);
+      }
+    }
+    return price;
+  };
+
+  const calculateTotal = () => {
+    return totalQty * getEffectivePrice(totalQty);
+  };
+
+  const handleAddToCart = () => {
     if (totalQty === 0) {
       alert('Please select a quantity greater than 0.');
       return;
@@ -87,7 +133,7 @@ export function ProductPage() {
       productId: product.id,
       name: product.name,
       category: product.category,
-      pricePerUnit: product.startingPrice,
+      pricePerUnit: getEffectivePrice(totalQty),
       requiresSizes: product.requiresSizes,
       requiresColors: product.requiresColors,
       requiresMockup: product.requiresMockup,
@@ -100,153 +146,180 @@ export function ProductPage() {
     });
   };
 
-  const calculateTotal = () => {
-    let qty = 0;
-    if (product.requiresSizes) {
-      qty = Object.values(sizes).reduce((sum, val) => sum + (val || 0), 0);
-    } else {
-      qty = quantity;
-    }
-
-    let effectiveUnitPrice = product.startingPrice;
-    if (product.applyVolumeDiscount) {
-      if (qty >= 150) {
-        effectiveUnitPrice = Math.round(product.startingPrice * 0.8);
-      } else if (qty >= 75) {
-        effectiveUnitPrice = Math.round(product.startingPrice * 0.9);
-      }
-    }
-
-    return qty * effectiveUnitPrice;
+  const updateSize = (sz: keyof SizeQtyMap, delta: number) => {
+    setSizes(prev => ({...prev, [sz]: Math.max(0, (prev[sz] || 0) + delta)}));
   };
 
-  const totalQty = product.requiresSizes 
-    ? Object.values(sizes).reduce((sum, val) => sum + (val || 0), 0)
-    : quantity;
+  const setSizeDirect = (sz: keyof SizeQtyMap, val: number) => {
+    setSizes(prev => ({...prev, [sz]: Math.max(0, val || 0)}));
+  };
 
-  const hasAtLeastOneArtwork = Object.values(artwork.placements).some(p => p.previewUrl);
-  const isDesigningButNoArtwork = designMode === 'has_design' && !hasAtLeastOneArtwork;
-  const shouldShowAddToCart = totalQty > 0 && !isDesigningButNoArtwork && !isArtworkPopoverOpen;
+  const effectivePrice = getEffectivePrice(totalQty);
 
   return (
-    <div className={styles.pageContainer}>
-      <div className="container">
+    <div className={styles.pageWrapper}>
+      
+      {/* Top Navigation Stepper */}
+      <div className={styles.stepperContainer}>
+        <div className={styles.step}>
+          <div className={styles.stepNumActive}>1</div>
+          <span className={styles.stepTextActive}>Colour</span>
+        </div>
+        <div className={styles.stepLine}></div>
+        <div className={styles.step}>
+          <div className={styles.stepNum}>2</div>
+          <span className={styles.stepText}>Size & Quantity</span>
+        </div>
+        <div className={styles.stepLine}></div>
+        <div className={styles.step}>
+          <div className={styles.stepNum}>3</div>
+          <span className={styles.stepText}>Upload Design</span>
+        </div>
+        <div className={styles.stepLine}></div>
+        <div className={styles.step}>
+          <div className={styles.stepNum}>4</div>
+          <span className={styles.stepText}>Preview & Position</span>
+        </div>
+        <div className={styles.stepLine}></div>
+        <div className={styles.step}>
+          <div className={styles.stepNum}>5</div>
+          <span className={styles.stepText}>Add to Cart</span>
+        </div>
+      </div>
+
+      <div className={styles.mainGrid}>
         
-        <button className="btn-link" style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600 }} onClick={() => navigate(-1)}>
-          <ArrowLeft size={18} /> Back
-        </button>
-
-        <div className={styles.productLayout}>
-          {/* Left Column */}
-          <div className={styles.leftColumn}>
-            <div className={styles.productHeader}>
-              <h1>{product.name}</h1>
-              <div className={styles.productPrice}>{product.priceRange}</div>
-              <p className={styles.productDesc}>{product.shortDesc}</p>
-            </div>
-
-            {/* Main Image */}
-            <div className={styles.imageStickyContainer}>
-              <img 
-                src={product.image} 
-                alt={product.name} 
-                className={styles.mainImage}
-              />
+        {/* Left Column: Product Info & Images */}
+        <div className={styles.leftCol}>
+          <div className={styles.gallery}>
+            <div className={styles.mainImageWrapper}>
+              <img src={product.image} className={styles.mainImage} alt={product.name} />
             </div>
           </div>
+          
+          <div className={styles.productCard}>
+            <div className={styles.productDetails}>
+              <h1 className={styles.title}>{product.name}</h1>
+              <div className={styles.priceRow}>
+                <span className={styles.price}>₹{product.startingPrice}</span>
+                <span className={styles.priceSuffix}>/ piece</span>
+                <span className={styles.taxBadge}>Inclusive of all taxes</span>
+              </div>
+              <p className={styles.desc}>{product.shortDesc}</p>
+              
+              <div className={styles.features}>
+                <div className={styles.feature}><Box size={16} /> Premium Fabric</div>
+                <div className={styles.feature}><ShieldCheck size={16} /> Soft & Breathable</div>
+                <div className={styles.feature}><ShieldCheck size={16} /> Quality Guaranteed</div>
+                <div className={styles.feature}><Box size={16} /> Bulk Orders Welcome</div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-          {/* Right Column */}
-          <div className={styles.configContainer}>
+        {/* Middle Column: Config (Color & Sizes) */}
+        <div className={styles.middleCol}>
+          {product.requiresColors && (
+            <div className={styles.panel}>
+              <h3 className={styles.panelTitle}>1. Choose Colour</h3>
+              <div className={styles.colorGrid}>
+                {product.colors.map(c => (
+                  <div key={c} className={styles.colorItem} onClick={() => setActiveColor(c)}>
+                    <div className={`${styles.colorCircle} ${activeColor === c ? styles.colorCircleActive : ''}`} style={{ backgroundColor: c }}>
+                      {activeColor === c && <ShieldCheck size={14} color={c === '#ffffff' ? '#000' : '#fff'} />}
+                    </div>
+                    <span className={styles.colorName}>{c.startsWith('#') ? 'Color' : c}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
-            {/* Colors */}
-            {product.requiresColors && product.colors.length > 0 && (
-              <div className={styles.configSection}>
-                <h3 className={styles.sectionTitle}>1. Choose Color</h3>
-                <div className={styles.colorGrid}>
-                  {product.colors.map(color => (
-                    <button
-                      key={color}
-                      type="button"
-                      className={`${styles.colorSwatchBtn} ${activeColor === color ? styles.colorSwatchBtnActive : ''}`}
-                      style={{ backgroundColor: color.startsWith('#') ? color : '#ccc' }}
-                      title={color}
-                      onClick={() => setActiveColor(color)}
-                    >
-                      {!color.startsWith('#') && <span style={{fontSize: '10px'}}>{color}</span>}
-                    </button>
-                  ))}
+          <div className={styles.panel}>
+            <h3 className={styles.panelTitle}>{product.requiresColors ? '2. Choose Size & Quantity' : '1. Choose Size & Quantity'}</h3>
+            
+            {product.requiresSizes ? (
+              <div className={styles.tableWrapper}>
+                <table className={styles.sizeTable}>
+                  <thead>
+                    <tr>
+                      <th>Size</th>
+                      <th>Quantity (pieces)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(['S', 'M', 'L', 'XL', 'XXL'] as (keyof SizeQtyMap)[]).map(sz => {
+                      const qty = sizes[sz] || 0;
+                      return (
+                        <tr key={sz}>
+                          <td className={styles.szName}>{sz}</td>
+                          <td>
+                            <div className={styles.tableStepper}>
+                              <button onClick={() => updateSize(sz, -1)}>-</button>
+                              <input type="number" value={qty || ''} onChange={e => setSizeDirect(sz, parseInt(e.target.value))} placeholder="0"/>
+                              <button onClick={() => updateSize(sz, 1)}>+</button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+               <div className={styles.tableStepper} style={{ width: '150px', marginBottom: '20px' }}>
+                  <button onClick={() => setQuantity(Math.max(0, quantity - 1))}>-</button>
+                  <input type="number" value={quantity || ''} onChange={e => setQuantity(Math.max(0, parseInt(e.target.value)))} placeholder="0"/>
+                  <button onClick={() => setQuantity(quantity + 1)}>+</button>
+               </div>
+            )}
+          </div>
+        </div>
+
+        {/* Right Column: Design */}
+        <div className={styles.rightCol}>
+          {product.requiresMockup && (
+            <>
+              <div className={styles.panel}>
+                <h3 className={styles.panelTitle}>{product.requiresColors ? '3. Add Your Design' : '2. Add Your Design'}</h3>
+                
+                <div className={styles.uploadArea} onClick={() => fileInputRef.current?.click()}>
+                  <UploadCloud size={24} color="#6b7280" />
+                  <div className={styles.uploadTextContainer}>
+                    <h4>Upload your design</h4>
+                    <span className={styles.formats}>PNG, JPG, PDF (Max 20MB)</span>
+                  </div>
+                  <button className={styles.browseBtn} onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}>Browse</button>
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleGlobalFileUpload}
+                    accept="image/png, image/jpeg, image/svg+xml, application/pdf"
+                    style={{ display: 'none' }}
+                  />
+                </div>
+
+                <div className={styles.helpArea}>
+                  <div className={styles.helpContent}>
+                    <div className={styles.helpHeader}>
+                      <HelpCircle size={16} color="#b45309" />
+                      <h4>Need help with design?</h4>
+                    </div>
+                    <button className={styles.talkBtn} onClick={() => setDesignMode('need_help')}>Contact Us</button>
+                  </div>
                 </div>
               </div>
-            )}
 
-            {/* Sizes / Quantity */}
-            <div className={styles.configSection}>
-              <h3 className={styles.sectionTitle}>{product.requiresColors ? '2. Choose Quantities' : '1. Choose Quantity'}</h3>
-              
-              {product.requiresSizes ? (
-                <div className={styles.sizeGrid}>
-                  {(['S', 'M', 'L', 'XL', 'XXL'] as (keyof SizeQtyMap)[]).map(sz => (
-                    <div key={sz} className={styles.sizeCell}>
-                      <span className={styles.sizeLabel}>{sz}</span>
-                      <div className={styles.stepperWrapper}>
-                        <button className={styles.stepperBtn} onClick={() => setSizes(prev => ({...prev, [sz]: Math.max(0, prev[sz] - 1)}))}>-</button>
-                        <input 
-                          type="number" 
-                          className={styles.stepperInput} 
-                          value={sizes[sz] || ''}
-                          onChange={e => setSizes(prev => ({...prev, [sz]: parseInt(e.target.value) || 0}))}
-                          placeholder="0"
-                        />
-                        <button className={styles.stepperBtn} onClick={() => setSizes(prev => ({...prev, [sz]: prev[sz] + 1}))}>+</button>
-                      </div>
-                    </div>
-                  ))}
+              <div className={styles.panel}>
+                <div className={styles.accordionHeader} onClick={() => setIsMockupOpen(!isMockupOpen)}>
+                  <h3 className={styles.panelTitle} style={{marginBottom: 0}}>{product.requiresColors ? '4. Preview & Position Your Design' : '3. Preview & Position Your Design'}</h3>
+                  {isMockupOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                 </div>
-              ) : (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                  <div className={styles.stepperWrapper} style={{ width: '150px' }}>
-                    <button className={styles.stepperBtn} onClick={() => setQuantity(Math.max(0, quantity - 1))}>-</button>
-                    <input 
-                      type="number" 
-                      className={styles.stepperInput} 
-                      value={quantity || ''}
-                      onChange={e => setQuantity(parseInt(e.target.value) || 0)}
-                      placeholder="0"
-                    />
-                    <button className={styles.stepperBtn} onClick={() => setQuantity(quantity + 1)}>+</button>
-                  </div>
-                  <span style={{ fontWeight: 600, color: '#666' }}>Pieces</span>
-                </div>
-              )}
-            </div>
-            
-            {/* Design / Mockup */}
-            {product.requiresMockup && (
-              <div className={styles.configSection}>
-                <h3 className={styles.sectionTitle}>{product.requiresColors ? '3. Add Your Design' : '2. Add Your Design'}</h3>
                 
-                {designMode === 'none' && (
-                  <div className={styles.designActions}>
-                    <button className={styles.uploadDesignBtn} onClick={() => setDesignMode('has_design')}>
-                      <UploadCloud size={32} style={{ marginBottom: '12px' }} />
-                      <div>Upload Design</div>
-                    </button>
-                    <div style={{ textAlign: 'center' }}>
-                      <span style={{ color: '#666' }}>Don't have a final design?</span>
-                      <button className={styles.designHelpBtn} onClick={() => setDesignMode('need_help')}>
-                        Ask our Design Team
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                {designMode === 'has_design' && (
-                  <div style={{ marginTop: '16px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                      <p style={{ fontWeight: 600, color: '#10b981', margin: 0 }}>✓ Place Your Design</p>
-                      <button className="btn-link" onClick={() => { setDesignMode('none'); setArtwork((p:any) => ({...p, placements: {}})); }} style={{ textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer', color: '#6b7280' }}>Cancel</button>
-                    </div>
-                    
+                {!isMockupOpen && <p className={styles.accordionHint}>Appears after you upload a design</p>}
+                
+                {isMockupOpen && (
+                  <div className={styles.accordionContent}>
                     <MockupCanvasEditor 
                       productId={product.id}
                       artwork={artwork}
@@ -257,43 +330,40 @@ export function ProductPage() {
                     />
                   </div>
                 )}
-
-                {designMode === 'need_help' && (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                    <p style={{ fontWeight: 600 }}>Describe what you need printed:</p>
-                    <textarea 
-                      rows={4} 
-                      style={{ padding: '12px', borderRadius: '8px', border: '1px solid #ccc', width: '100%', resize: 'none' }}
-                      placeholder="E.g. We want our college logo on the front left chest, and our batch name 'SPARTANS' on the back."
-                      value={instructions}
-                      onChange={e => setInstructions(e.target.value)}
-                    />
-                    <button className="btn-link" onClick={() => setDesignMode('none')} style={{ textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer', color: '#6b7280', alignSelf: 'flex-start' }}>Cancel</button>
-                  </div>
-                )}
               </div>
-            )}
+            </>
+          )}
+        </div>
 
+      </div>
+
+      {/* Bottom Sticky Action Bar */}
+      <div className={styles.bottomBar}>
+        <div className={styles.bottomContainer}>
+          <div className={styles.bottomStats}>
+            <ShoppingBag size={24} color="#666" />
+            <div className={styles.bCol}>
+              <span className={styles.bLabel}>Total Pieces</span>
+              <span className={styles.bVal}>{totalQty}</span>
+            </div>
+            <div className={styles.bDivider}></div>
+            <div className={styles.bCol}>
+              <span className={styles.bLabel}>Estimated Price</span>
+              <div className={styles.bPriceRow}>
+                <span className={styles.bPrice}>₹{calculateTotal().toLocaleString('en-IN')}</span>
+                <span className={styles.bTax}>(Inclusive of all taxes)</span>
+              </div>
+            </div>
+          </div>
+          <div className={styles.bottomActions}>
+            <button className={styles.saveBtn}>
+              <Bookmark size={18} /> Continue Shopping
+            </button>
+            <button className={styles.cartBtn} onClick={handleAddToCart}><ShoppingBag size={18} /> Add to Cart • ₹{calculateTotal().toLocaleString('en-IN')}</button>
           </div>
         </div>
       </div>
 
-      {/* Sticky Add to Cart Popover */}
-      {shouldShowAddToCart && (
-        <div className={styles.addToCartPopover}>
-          <div className={styles.popoverPriceCol}>
-            <span className={styles.popoverTotalPieces}>Total ({totalQty} pieces)</span>
-            <span className={styles.popoverTotalPrice}>₹{calculateTotal().toLocaleString('en-IN')}</span>
-          </div>
-          
-          <button 
-            className={styles.popoverAddToCartBtn} 
-            onClick={handleAddToCart}
-          >
-            <ShoppingBag size={20} /> Add to Cart
-          </button>
-        </div>
-      )}
     </div>
   );
 }

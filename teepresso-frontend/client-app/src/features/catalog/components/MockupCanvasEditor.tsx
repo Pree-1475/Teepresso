@@ -8,7 +8,8 @@ import {
   Trash2, 
   RotateCw, 
   RefreshCw,
-  X
+  X,
+  Maximize
 } from 'lucide-react';
 import styles from './MockupCanvasEditor.module.css';
 
@@ -27,6 +28,7 @@ export function MockupCanvasEditor({ productId, artwork, mockup, setArtwork, set
 
   const [selectedPlacement, setSelectedPlacement] = useState<string>('front');
   const [showPopover, setShowPopover] = useState<boolean>(false);
+  const [isFullScreen, setIsFullScreen] = useState<boolean>(false);
 
   const activePlacementData = artwork.placements[selectedPlacement];
 
@@ -105,8 +107,8 @@ export function MockupCanvasEditor({ productId, artwork, mockup, setArtwork, set
     window.addEventListener('mouseup', onMouseUp);
   };
 
-  return (
-    <div className={styles.workspaceContainer}>
+  const editorContent = (
+    <div className={`${styles.workspaceContainer} ${isFullScreen ? styles.workspaceFullScreen : ''}`}>
       <input
         type="file"
         ref={fileInputRef}
@@ -115,21 +117,32 @@ export function MockupCanvasEditor({ productId, artwork, mockup, setArtwork, set
         style={{ display: 'none' }}
       />
 
-      {/* Mobile View Toggle */}
-      <div className={styles.mobileViewToggleRow}>
-        <button
-          type="button"
-          className={`${styles.viewToggleBtn} ${mockup.activeView === 'front' ? styles.viewToggleActive : ''}`}
-          onClick={() => setMockup(prev => ({ ...prev, activeView: 'front' }))}
+      {/* Mobile View Toggle & Actions */}
+      <div className={styles.topActionsRow}>
+        <div className={styles.mobileViewToggleRow}>
+          <button
+            type="button"
+            className={`${styles.viewToggleBtn} ${mockup.activeView === 'front' ? styles.viewToggleActive : ''}`}
+            onClick={() => setMockup(prev => ({ ...prev, activeView: 'front' }))}
+          >
+            Front View
+          </button>
+          <button
+            type="button"
+            className={`${styles.viewToggleBtn} ${mockup.activeView === 'back' ? styles.viewToggleActive : ''}`}
+            onClick={() => setMockup(prev => ({ ...prev, activeView: 'back' }))}
+          >
+            Back View
+          </button>
+        </div>
+        
+        <button 
+          type="button" 
+          className={styles.expandBtn} 
+          onClick={() => setIsFullScreen(!isFullScreen)}
         >
-          Front View
-        </button>
-        <button
-          type="button"
-          className={`${styles.viewToggleBtn} ${mockup.activeView === 'back' ? styles.viewToggleActive : ''}`}
-          onClick={() => setMockup(prev => ({ ...prev, activeView: 'back' }))}
-        >
-          Back View
+          {isFullScreen ? <X size={16} /> : <Maximize size={16} />}
+          <span>{isFullScreen ? "Exit Fullscreen" : "View Fullscreen"}</span>
         </button>
       </div>
 
@@ -333,6 +346,18 @@ export function MockupCanvasEditor({ productId, artwork, mockup, setArtwork, set
       )}
     </div>
   );
+
+  if (isFullScreen) {
+    return (
+      <div className={styles.fullScreenOverlay}>
+        <div className={styles.fullScreenModalContent}>
+          {editorContent}
+        </div>
+      </div>
+    );
+  }
+
+  return editorContent;
 }
 
 export default MockupCanvasEditor;

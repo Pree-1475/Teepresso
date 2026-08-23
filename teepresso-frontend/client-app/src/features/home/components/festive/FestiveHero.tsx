@@ -10,36 +10,11 @@ export const FestiveHero = () => {
   const desktopVideoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
+    // Both videos are set to autoPlay in JSX, this is a fallback for Safari/mobile policies
     const desktopVideo = desktopVideoRef.current;
     if (desktopVideo) {
-      const initVideo = () => {
-        desktopVideo.currentTime = 4;
-        desktopVideo.play().catch(e => console.log("Desktop auto-play prevented", e));
-      };
-
-      if (desktopVideo.readyState >= 1) {
-        initVideo();
-      } else {
-        desktopVideo.addEventListener('loadedmetadata', initVideo);
-      }
-
-      const handleTimeUpdate = () => {
-        if (desktopVideo.currentTime >= 10) {
-          desktopVideo.currentTime = 4;
-          desktopVideo.play().catch(e => console.log("Play prevented on loop", e));
-        }
-      };
-
-      desktopVideo.addEventListener('timeupdate', handleTimeUpdate);
-      return () => {
-        desktopVideo.removeEventListener('loadedmetadata', initVideo);
-        desktopVideo.removeEventListener('timeupdate', handleTimeUpdate);
-      };
+      desktopVideo.play().catch(e => console.log("Desktop auto-play prevented", e));
     }
-  }, []);
-
-  // Ensure mobile video attempts autoplay as well
-  useEffect(() => {
     const mobileVideo = mobileVideoRef.current;
     if (mobileVideo) {
       mobileVideo.play().catch(e => console.log("Mobile auto-play prevented", e));
@@ -52,22 +27,23 @@ export const FestiveHero = () => {
       {/* Mobile Background Video */}
       <video 
         ref={mobileVideoRef}
-        src="/images/festive/0821 (2).mp4" 
+        src="/images/festive/mobile-hero.mp4" 
         className={styles.mobileVideoBackground}
         autoPlay
         muted 
         loop
         playsInline
-        onEnded={(e) => { e.currentTarget.play().catch(() => {}); }}
       />
 
       {/* Desktop Background Video */}
       <video 
         ref={desktopVideoRef}
-        src="/images/hero-desktop.mp4" 
+        src="/images/festive/hero-laptop.mp4" 
         className={styles.desktopVideoBackground}
+        autoPlay
         muted 
-        playsInline /* Looping is handled by JS from 4s to 10s */
+        loop
+        playsInline
       />
       
       {/* Gradient Overlay to ensure text readability */}

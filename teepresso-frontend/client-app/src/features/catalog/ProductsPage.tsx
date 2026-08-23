@@ -60,20 +60,7 @@ export function ProductsPage() {
       <div className="container">
         
 
-        {/* 4. Quantity / Bulk Context Banner */}
-        <div className={styles.bulkContextBanner}>
-          <div className={styles.bulkBannerText}>
-            <Sparkles size={20} color="var(--color-primary-600)" />
-            <span>
-              <strong>Volume Pricing Applies:</strong> Higher quantities unlock lower per-piece rates!
-            </span>
-          </div>
-          <div className={styles.bulkTiers}>
-            <span className={styles.tierPill}>25–50 Pcs</span>
-            <span className={styles.tierPill}>51–150 Pcs</span>
-            <span className={styles.tierPill}>151+ Pcs (Best Value)</span>
-          </div>
-        </div>
+
 
         {/* 3. Product Catalogue Grid */}
         <div className={styles.catalogGrid}>

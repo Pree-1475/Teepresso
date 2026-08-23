@@ -69,7 +69,7 @@ export const PRODUCTS_CATALOG: ProductItem[] = [
     startingPrice: 90,
     priceRange: '₹90 / pc',
     colors: [],
-    image: '/images/products/hoodie.png', // Fallback
+    image: '/images/products/pagdi-mockup.jpg',
     popularFor: 'Festive Groups',
     requiresSizes: false,
     requiresColors: false,
@@ -84,7 +84,7 @@ export const PRODUCTS_CATALOG: ProductItem[] = [
     startingPrice: 400,
     priceRange: '₹400 / pc',
     colors: [],
-    image: '/images/products/tshirt.png', // Fallback
+    image: '/images/products/pancha-mockup.jpg',
     popularFor: 'Festive Groups',
     requiresSizes: false, // Maybe requires some size config, but instructions said keep simple
     requiresColors: false,
@@ -99,7 +99,7 @@ export const PRODUCTS_CATALOG: ProductItem[] = [
     startingPrice: 50,
     priceRange: '₹50 / pc',
     colors: [],
-    image: '/images/products/tshirt.png', // Fallback
+    image: 'https://images.unsplash.com/photo-1610996843657-3f82fc464c17?auto=format&fit=crop&q=80&w=800', // Better fallback
     popularFor: 'Festive Groups',
     requiresSizes: false,
     requiresColors: false,
@@ -114,7 +114,7 @@ export const PRODUCTS_CATALOG: ProductItem[] = [
     startingPrice: 70,
     priceRange: '₹70 / pc',
     colors: [],
-    image: '/images/products/tshirt.png', // Fallback
+    image: 'https://images.unsplash.com/photo-1610996843657-3f82fc464c17?auto=format&fit=crop&q=80&w=800', // Better fallback
     popularFor: 'Festive Groups',
     requiresSizes: false,
     requiresColors: false,

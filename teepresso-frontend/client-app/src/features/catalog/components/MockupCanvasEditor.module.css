@@ -3,12 +3,20 @@
   flex-direction: column;
   gap: 16px;
   width: 100%;
+  position: relative;
+}
+
+.topActionsRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  width: 100%;
 }
 
 .mobileViewToggleRow {
   display: flex;
   gap: 8px;
-  margin-bottom: 8px;
 }
 
 .viewToggleBtn {
@@ -27,6 +35,12 @@
   background: #1a1a1a;
   color: #fff;
   border-color: #1a1a1a;
+}
+
+@media (min-width: 769px) {
+  .mobileViewToggleRow {
+    display: none;
+  }
 }
 
 .dualGarmentCanvasRow {
@@ -254,4 +268,67 @@
   font-size: 0.85rem;
   font-weight: 600;
   color: #6b7280;
+}
+
+.expandBtn {
+  background: #fff;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 6px 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  color: #374151;
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  margin-left: auto; /* Pushes to right when alone */
+}
+
+.expandBtn:hover {
+  background: #f3f4f6;
+}
+
+.fullScreenOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+.fullScreenModalContent {
+  background: #fff;
+  width: 100%;
+  max-width: 1200px;
+  height: 90vh;
+  border-radius: 16px;
+  padding: 24px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 24px 48px rgba(0,0,0,0.2);
+}
+
+.workspaceFullScreen {
+  height: 100%;
+}
+
+.workspaceFullScreen .dualGarmentCanvasRow {
+  height: calc(100% - 60px);
+}
+
+.workspaceFullScreen .garmentStage {
+  max-width: 600px;
+  height: 100%;
+}
+
+.workspaceFullScreen .garmentWorkspaceCard {
+  border: none;
+  background: transparent;
+  justify-content: center;
 }

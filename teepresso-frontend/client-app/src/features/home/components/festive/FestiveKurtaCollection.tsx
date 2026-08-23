@@ -1,60 +1,81 @@
 import React from 'react';
 import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
-import { useScrollReveal } from '@/common/hooks/useScrollReveal';
+import { ArrowRight, Shirt, Grip, Layers } from 'lucide-react';
 import styles from './FestiveKurtaCollection.module.css';
 
-const collection = [
-  {
-    id: 1,
-    name: "Classic Saffron",
-    hex: "#D35400",
-    desc: "A bright, energetic tone designed to stand out in morning processions."
-  },
-  {
-    id: 2,
-    name: "Festive Maroon",
-    hex: "#800000",
-    desc: "Deep and incredibly rich. The perfect shade for evening aarti."
-  },
-  {
-    id: 3,
-    name: "Warm Beige",
-    hex: "#D9CDBF",
-    desc: "An elegant, understated neutral tailored for committee organizers."
-  }
-];
-
 export const FestiveKurtaCollection = () => {
-  const { ref, isVisible } = useScrollReveal({ threshold: 0.1 });
-
   return (
-    <section className={styles.section} ref={ref}>
-      <div className={`container ${styles.container}`}>
-        
-        <div className={`${styles.header} ${isVisible ? styles.visible : ''}`}>
-          <h2 className={styles.title}>The Collection</h2>
-          <p className={styles.subtitle}>Premium slub cotton. Three signature shades.</p>
+    <section className={styles.section} id="kurtas">
+      <div className="container">
+        <div className={styles.header}>
+          <h2 className={styles.title} style={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'}}>
+            <span style={{color: '#E67E22', fontSize: '18px'}}>✦</span>
+            Kurta Collections
+            <span style={{color: '#E67E22', fontSize: '18px'}}>✦</span>
+          </h2>
         </div>
 
         <div className={styles.grid}>
-          {collection.map((item, index) => (
-            <div 
-              key={item.id} 
-              className={`${styles.card} ${isVisible ? styles.visible : ''}`}
-              style={{ transitionDelay: `${index * 150}ms` }}
-            >
-              <div className={styles.colorSwatch} style={{ backgroundColor: item.hex }}></div>
-              <h3 className={styles.productName}>{item.name}</h3>
-              <p className={styles.productDesc}>{item.desc}</p>
+          {/* Card 1 */}
+          <Link href="/product/custom-kurta-seasonal" className={styles.card}>
+            <div className={styles.cardImageWrapper}>
+              <img 
+                src="/images/products/plain-kurta-model.png" 
+                alt="Plain Kurtas" 
+                className={styles.cardImage} 
+                style={{ mixBlendMode: 'multiply', objectFit: 'contain' }}
+              />
             </div>
-          ))}
-        </div>
-
-        <div className={`${styles.footer} ${isVisible ? styles.visible : ''}`}>
-          <Link href="/product/custom-kurta-seasonal" className={styles.ctaLink}>
-            Explore Bulk Pricing <ArrowRight size={18} />
+            <div className={styles.cardContent}>
+              <div className={styles.icon}>
+                <Shirt size={20} color="#8C5940" strokeWidth={1.5} />
+              </div>
+              <h3 className={styles.cardTitle}>Plain Kurtas</h3>
+              <div className={styles.price}>From ₹150 / piece</div>
+              <div className={styles.shopBtn}>Shop Now <ArrowRight size={14} /></div>
+            </div>
           </Link>
+
+          {/* Card 2 */}
+          <Link href="/product/kurta-patterned" className={styles.card}>
+            <div className={styles.cardImageWrapper}>
+              <img 
+                src="/images/products/custom-kurta-model.png" 
+                alt="Custom Print Kurtas" 
+                className={styles.cardImage} 
+                style={{ mixBlendMode: 'multiply', objectFit: 'contain' }}
+              />
+            </div>
+            <div className={styles.cardContent}>
+              <div className={styles.icon}>
+                <Grip size={20} color="#8C5940" strokeWidth={1.5} />
+              </div>
+              <h3 className={styles.cardTitle}>Plain Kurtas with Custom Prints</h3>
+              <div className={styles.price}>From ₹180 / piece</div>
+              <div className={styles.shopBtn}>Shop Now <ArrowRight size={14} /></div>
+            </div>
+          </Link>
+
+          {/* Card 3 */}
+          <Link href="/product/kurta-patterned" className={styles.card}>
+            <div className={styles.cardImageWrapper}>
+              <img 
+                src="/images/products/textured-kurta-model.png" 
+                alt="Textured Kurtas" 
+                className={styles.cardImage} 
+                style={{ mixBlendMode: 'multiply', objectFit: 'contain' }}
+              />
+            </div>
+            <div className={styles.cardContent}>
+              <div className={styles.icon}>
+                <Layers size={20} color="#8C5940" strokeWidth={1.5} />
+              </div>
+              <h3 className={styles.cardTitle}>Textured Kurtas</h3>
+              <div className={styles.price}>From ₹250 / piece</div>
+              <div className={styles.shopBtn}>Shop Now <ArrowRight size={14} /></div>
+            </div>
+          </Link>
+
         </div>
       </div>
     </section>
