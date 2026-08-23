@@ -3,10 +3,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { PRODUCTS_CATALOG, ProductItem } from '@/features/catalog/data/productsData';
-import { useCart, SizeQtyMap, ColorVariant } from '@/features/cart/context/CartContext';
+import { useCart, SizeQtyMap, ColorVariant, ArtworkData, MockupState } from '@/features/cart/context/CartContext';
 import styles from './ProductPage.module.css';
 import { ShoppingBag, ArrowLeft, UploadCloud } from 'lucide-react';
 import { Button } from '@/common/components/ui/Button/Button';
+import { MockupCanvasEditor } from './components/MockupCanvasEditor';
 
 const defaultSizes: SizeQtyMap = { XS: 0, S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, '4XL': 0, '5XL': 0, '6XL': 0 };
 
@@ -22,9 +23,30 @@ export function ProductPage() {
   const [sizes, setSizes] = useState<SizeQtyMap>({ ...defaultSizes });
   const [quantity, setQuantity] = useState<number>(0);
   
-  // Design state
   const [designMode, setDesignMode] = useState<'none' | 'has_design' | 'need_help'>('none');
   const [instructions, setInstructions] = useState('');
+  const [isArtworkPopoverOpen, setIsArtworkPopoverOpen] = useState(false);
+  
+  const [artwork, setArtwork] = useState<ArtworkData>({
+    file: null,
+    previewUrl: '',
+    mode: 'none',
+    instructions: '',
+    placements: {}
+  });
+
+  const [mockup, setMockup] = useState<MockupState>({
+    activeView: 'front',
+    activePlacementId: 'front',
+    frontTransform: { x: 0, y: 0, scale: 1, rotation: 0 },
+    backTransform: { x: 0, y: 0, scale: 1, rotation: 0 },
+    designerAssistance: false,
+  });
+
+  // Sync designMode with artwork state
+  useEffect(() => {
+    setArtwork((prev: any) => ({ ...prev, mode: designMode }));
+  }, [designMode]);
 
   useEffect(() => {
     if (id) {
@@ -72,11 +94,8 @@ export function ProductPage() {
       applyVolumeDiscount: product.applyVolumeDiscount,
       colorVariants: [colorVariant],
       artwork: {
-        file: null,
-        previewUrl: '',
-        mode: designMode,
-        instructions,
-        placements: {}
+        ...artwork,
+        instructions
       }
     });
   };
@@ -105,6 +124,10 @@ export function ProductPage() {
     ? Object.values(sizes).reduce((sum, val) => sum + (val || 0), 0)
     : quantity;
 
+  const hasAtLeastOneArtwork = Object.values(artwork.placements).some(p => p.previewUrl);
+  const isDesigningButNoArtwork = designMode === 'has_design' && !hasAtLeastOneArtwork;
+  const shouldShowAddToCart = totalQty > 0 && !isDesigningButNoArtwork && !isArtworkPopoverOpen;
+
   return (
     <div className={styles.pageContainer}>
       <div className="container">
@@ -114,23 +137,26 @@ export function ProductPage() {
         </button>
 
         <div className={styles.productLayout}>
-          {/* Left: Sticky Image */}
-          <div className={styles.imageStickyContainer}>
-            <img 
-              src={product.image} 
-              alt={product.name} 
-              className={styles.mainImage}
-            />
-          </div>
-
-          {/* Right: Configuration */}
-          <div className={styles.configContainer}>
-            
+          {/* Left Column */}
+          <div className={styles.leftColumn}>
             <div className={styles.productHeader}>
               <h1>{product.name}</h1>
               <div className={styles.productPrice}>{product.priceRange}</div>
               <p className={styles.productDesc}>{product.shortDesc}</p>
             </div>
+
+            {/* Main Image */}
+            <div className={styles.imageStickyContainer}>
+              <img 
+                src={product.image} 
+                alt={product.name} 
+                className={styles.mainImage}
+              />
+            </div>
+          </div>
+
+          {/* Right Column */}
+          <div className={styles.configContainer}>
 
             {/* Colors */}
             {product.requiresColors && product.colors.length > 0 && (
@@ -193,7 +219,7 @@ export function ProductPage() {
                 </div>
               )}
             </div>
-
+            
             {/* Design / Mockup */}
             {product.requiresMockup && (
               <div className={styles.configSection}>
@@ -215,10 +241,20 @@ export function ProductPage() {
                 )}
 
                 {designMode === 'has_design' && (
-                  <div style={{ padding: '20px', background: '#f9fafb', borderRadius: '8px', border: '1px solid #eaeaea', textAlign: 'center' }}>
-                    <p style={{ fontWeight: 600, marginBottom: '12px', color: '#10b981' }}>✓ Design capability selected.</p>
-                    <p style={{ color: '#6b7280', fontSize: '0.9rem', marginBottom: '16px' }}>Upload your print files directly from the cart after adding this product.</p>
-                    <button className="btn-link" onClick={() => setDesignMode('none')} style={{ textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer', color: '#6b7280' }}>Cancel</button>
+                  <div style={{ marginTop: '16px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                      <p style={{ fontWeight: 600, color: '#10b981', margin: 0 }}>✓ Place Your Design</p>
+                      <button className="btn-link" onClick={() => { setDesignMode('none'); setArtwork((p:any) => ({...p, placements: {}})); }} style={{ textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer', color: '#6b7280' }}>Cancel</button>
+                    </div>
+                    
+                    <MockupCanvasEditor 
+                      productId={product.id}
+                      artwork={artwork}
+                      mockup={mockup}
+                      setArtwork={setArtwork}
+                      setMockup={setMockup}
+                      onPopoverStateChange={setIsArtworkPopoverOpen}
+                    />
                   </div>
                 )}
 
@@ -238,25 +274,26 @@ export function ProductPage() {
               </div>
             )}
 
-            {/* Add to Cart CTA */}
-            <div className={styles.configSection} style={{ border: '2px solid #1a1a1a', background: '#faf9f6' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                <span style={{ fontSize: '1.2rem', fontWeight: 600 }}>Total ({totalQty} pieces)</span>
-                <span style={{ fontSize: '1.5rem', fontWeight: 800 }}>₹{calculateTotal().toLocaleString('en-IN')}</span>
-              </div>
-              
-              <button 
-                className={styles.addToCartBtn} 
-                onClick={handleAddToCart}
-                disabled={totalQty === 0}
-              >
-                <ShoppingBag size={20} /> Add to Cart
-              </button>
-            </div>
-
           </div>
         </div>
       </div>
+
+      {/* Sticky Add to Cart Popover */}
+      {shouldShowAddToCart && (
+        <div className={styles.addToCartPopover}>
+          <div className={styles.popoverPriceCol}>
+            <span className={styles.popoverTotalPieces}>Total ({totalQty} pieces)</span>
+            <span className={styles.popoverTotalPrice}>₹{calculateTotal().toLocaleString('en-IN')}</span>
+          </div>
+          
+          <button 
+            className={styles.popoverAddToCartBtn} 
+            onClick={handleAddToCart}
+          >
+            <ShoppingBag size={20} /> Add to Cart
+          </button>
+        </div>
+      )}
     </div>
   );
 }

@@ -194,3 +194,70 @@
   background: #f5f5f5;
   border-color: #1a1a1a;
 }
+
+.recommendationBox {
+  margin-top: 16px;
+  border: 1px solid #10b981;
+  border-radius: 12px;
+  background: #f0fdf4;
+  overflow: hidden;
+}
+
+.recommendationHeader {
+  background: #d1fae5;
+  color: #065f46;
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.recommendationContent {
+  display: flex;
+  padding: 16px;
+  gap: 16px;
+  align-items: center;
+}
+
+.recommendationImg {
+  width: 64px;
+  height: 64px;
+  border-radius: 8px;
+  background: #fff;
+  object-fit: cover;
+  border: 1px solid #d1fae5;
+}
+
+.recommendationInfo {
+  flex: 1;
+}
+
+.recommendationInfo h4 {
+  margin: 0 0 4px 0;
+  font-size: 1.05rem;
+  color: #1a1a1a;
+  font-weight: 700;
+}
+
+.recommendationInfo p {
+  margin: 0 0 12px 0;
+  font-size: 0.85rem;
+  color: #4b5563;
+  line-height: 1.4;
+}
+
+.recommendationBtn {
+  background: #10b981;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.recommendationBtn:hover {
+  background: #059669;
+}

@@ -23,6 +23,10 @@ export function CartDrawer() {
     return p?.image || '';
   };
 
+  const hasKurta = cart.items.some(item => item.category === 'Kurtas' || item.id === 'custom-kurta-seasonal');
+  const hasPagdi = cart.items.some(item => item.productId === 'festive-pagdi');
+  const shouldRecommendPagdi = hasKurta && !hasPagdi;
+
   return (
     <>
       <div className={styles.drawerOverlay} onClick={() => setIsCartDrawerOpen(false)} />
@@ -71,6 +75,28 @@ export function CartDrawer() {
                 </div>
               </div>
             ))
+          )}
+
+          {cart.items.length > 0 && shouldRecommendPagdi && (
+            <div className={styles.recommendationBox}>
+              <div className={styles.recommendationHeader}>✨ Perfect match for your Kurta!</div>
+              <div className={styles.recommendationContent}>
+                <img src={getProductImage('festive-pagdi')} alt="Festive Pagdi" className={styles.recommendationImg} />
+                <div className={styles.recommendationInfo}>
+                  <h4>Festive Pagdi</h4>
+                  <p>Complete your traditional look with our premium pagdi.</p>
+                  <button 
+                    className={styles.recommendationBtn}
+                    onClick={() => {
+                      setIsCartDrawerOpen(false);
+                      navigate('/product/festive-pagdi');
+                    }}
+                  >
+                    View Details
+                  </button>
+                </div>
+              </div>
+            </div>
           )}
         </div>
 

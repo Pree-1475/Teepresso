@@ -24,12 +24,37 @@ export interface ColorVariant {
   quantity?: number; // Used if requiresSizes is false
 }
 
+export interface PlacementArtworkData {
+  placementId: string;
+  file: File | null;
+  previewUrl: string;
+  x: number;
+  y: number;
+  scale: number;
+  rotation: number;
+}
+
+export interface MockupTransform {
+  x: number;
+  y: number;
+  scale: number;
+  rotation: number;
+}
+
+export interface MockupState {
+  activeView: 'front' | 'back';
+  activePlacementId: string;
+  frontTransform: MockupTransform;
+  backTransform: MockupTransform;
+  designerAssistance: boolean;
+}
+
 export interface ArtworkData {
   file: File | null;
   previewUrl: string;
   mode: 'has_design' | 'need_help' | 'none';
   instructions: string;
-  placements: Record<string, any>; // Simplified for now
+  placements: Record<string, PlacementArtworkData>;
 }
 
 export interface CartItem {

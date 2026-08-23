@@ -1,0 +1,257 @@
+.workspaceContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.mobileViewToggleRow {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.viewToggleBtn {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #eaeaea;
+  background: #faf9f6;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  color: #666;
+  transition: all 0.2s;
+}
+
+.viewToggleActive {
+  background: #1a1a1a;
+  color: #fff;
+  border-color: #1a1a1a;
+}
+
+.dualGarmentCanvasRow {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+}
+
+.garmentWorkspaceCard {
+  flex: 1;
+  position: relative;
+  background: #f9fafb;
+  border: 1px solid #eaeaea;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .garmentWorkspaceCard {
+    display: none;
+  }
+  .garmentWorkspaceCard:not(.hideMobileView) {
+    display: flex;
+  }
+}
+
+.garmentLabelBadge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  z-index: 10;
+}
+
+.garmentStage {
+  position: relative;
+  width: 100%;
+  max-width: 300px;
+  aspect-ratio: 3 / 4;
+}
+
+.garmentBaseImg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  color: transparent;
+  font-size: 0;
+}
+
+.hotspotZone {
+  position: absolute;
+  border: 2px dashed rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  overflow: hidden;
+}
+
+.hotspotSelected {
+  border-color: #3b82f6;
+  background: rgba(59, 130, 246, 0.05);
+}
+
+.hotspotHasArtwork {
+  border-style: solid;
+  border-color: transparent;
+  background: none;
+}
+
+.hotspotHasArtwork.hotspotSelected {
+  border-color: #3b82f6;
+}
+
+.hotspotDotMarker {
+  width: 12px;
+  height: 12px;
+  background: #fff;
+  border: 2px solid #3b82f6;
+  border-radius: 50%;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+}
+
+.renderedArtworkContainer {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+}
+
+.renderedArtworkContainer:active {
+  cursor: grabbing;
+}
+
+.placedLogoImg {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+  opacity: 0.9;
+  filter: contrast(1.1);
+}
+
+.contextualPopoverModal {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+  width: 90%;
+  max-width: 400px;
+  z-index: 1000;
+  padding: 16px;
+  border: 1px solid #eaeaea;
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUp {
+  from { transform: translate(-50%, 20px); opacity: 0; }
+  to { transform: translate(-50%, 0); opacity: 1; }
+}
+
+.contextualHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  font-size: 0.95rem;
+  color: #4b5563;
+}
+
+.closePopoverBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #9ca3af;
+  padding: 4px;
+}
+
+.contextualActions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.popoverActionBtnPrimary {
+  background: #1a1a1a;
+  color: #fff;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.popoverActionBtnDanger {
+  background: #fee2e2;
+  color: #dc2626;
+  border: none;
+  padding: 10px;
+  border-radius: 8px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.popoverControlsRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f9fafb;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid #eaeaea;
+}
+
+.iconCtrlBtn {
+  background: #fff;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #4b5563;
+  font-weight: bold;
+}
+
+.iconCtrlBtnReset {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #6b7280;
+  padding: 4px;
+}
+
+.ctrlLabel {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #6b7280;
+}
