@@ -319,6 +319,10 @@ export function ProductPage() {
 
     const effectivePrice = getEffectivePrice(totalQty);
 
+  const phoneStr = String(contactPhone || '919390771123').replace(/[^0-9]/g, '');
+  const formattedWaPhone = phoneStr.length === 10 ? `91${phoneStr}` : (phoneStr || '919390771123');
+  const waHelpUrl = `https://wa.me/${formattedWaPhone}?text=${encodeURIComponent(`Hi Teepresso Team! I need help with design for ${product?.name || 'custom apparel'}`)}`;
+
   return (
     <div className={styles.pageWrapper}>
       
@@ -482,7 +486,7 @@ export function ProductPage() {
                       <h4>Need help with design?</h4>
                     </div>
                     <a 
-                      href={`https://wa.me/${(contactPhone || '919390771123').replace(/[^0-9]/g, '').length === 10 ? '91' + (contactPhone || '919390771123').replace(/[^0-9]/g, '') : (contactPhone || '919390771123').replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hi Teepresso Team! I need help with design for ${product?.name || 'custom apparel'}`)}`}
+                      href={waHelpUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       className={styles.talkBtn}

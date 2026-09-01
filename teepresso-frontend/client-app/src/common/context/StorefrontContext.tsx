@@ -55,8 +55,8 @@ export const StorefrontProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         if (data.settings.upiVpa) setUpiVpa(data.settings.upiVpa);
         if (data.settings.payeeName) setPayeeName(data.settings.payeeName);
         if (data.settings.contactPhone) {
-          setContactPhone(data.settings.contactPhone);
-          localStorage.setItem('teepresso_contact_phone', data.settings.contactPhone);
+          setContactPhone(String(data.settings.contactPhone));
+          localStorage.setItem('teepresso_contact_phone', String(data.settings.contactPhone));
         }
       }
     } catch (err) {
