@@ -1,4 +1,4 @@
-import { neon, neonConfig } from '@neondatabase/serverless';
+import { neon } from '@neondatabase/serverless';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -32,7 +32,6 @@ export const initNeonDatabase = async () => {
     
     await sql`
       ALTER TABLE users ADD COLUMN IF NOT EXISTS password VARCHAR(255);
-
     `;
 
     // 2. Products Table
@@ -180,7 +179,7 @@ export const initNeonDatabase = async () => {
       );
     `;
 
-    console.log('✅ Neon PostgreSQL Database Tables Initialized Cleanly!');
+    console.log('✅ Neon PostgreSQL Database Schema Verified Cleanly!');
   } catch (error) {
     console.error('❌ Error initializing Neon PostgreSQL tables:', error);
   }

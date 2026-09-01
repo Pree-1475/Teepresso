@@ -17,18 +17,27 @@ import settingsRoutes from './features/settings/routes/settingsRoutes.js';
 
 const app = express();
 
-app.use(cors());
-app.use(express.json());
+// Explicit Permissive CORS Configuration for Vercel & Production Frontends
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+  credentials: true
+}));
 
-// Initialize Neon Database Schema on startup
-initNeonDatabase().catch(err => console.error('Database initialization error:', err));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-// Health Check Endpoint
+// 1. Health Check Endpoint (Responds INSTANTLY for Cloud Run Health Probes)
 app.get('/health', (_req, res) => {
-  res.json({ status: 'ok', service: 'Teepresso Modular Backend API' });
+  res.status(200).json({ status: 'ok', service: 'Teepresso Modular Backend API', timestamp: new Date().toISOString() });
 });
 
-// Register Feature Routes
+app.get('/', (_req, res) => {
+  res.status(200).json({ status: 'ok', service: 'Teepresso Modular Backend API Root', timestamp: new Date().toISOString() });
+});
+
+// 2. Register Feature Routes
 app.use(`${config.apiPrefix}/auth`, authRoutes);
 app.get(`${config.apiPrefix}/customers`, getCustomersController);
 app.use(`${config.apiPrefix}/orders`, orderRoutes);
@@ -42,6 +51,12 @@ app.use(`${config.apiPrefix}/sizes`, sizeRoutes);
 app.use(`${config.apiPrefix}/patterns`, patternRoutes);
 app.use(`${config.apiPrefix}/settings`, settingsRoutes);
 
-app.listen(config.port, () => {
+// 3. Start Server IMMEDIATELY on process.env.PORT
+const server = app.listen(config.port, () => {
   console.log(`🚀 Teepresso Backend API listening on port ${config.port}`);
+  
+  // Asynchronously initialize database in background so port binding is instant!
+  setTimeout(() => {
+    initNeonDatabase().catch(err => console.error('Background DB initialization error:', err));
+  }, 100);
 });
