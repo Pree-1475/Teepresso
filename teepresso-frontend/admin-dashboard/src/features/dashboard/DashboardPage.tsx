@@ -54,7 +54,7 @@ export function DashboardPage() {
   return (
     <div className={styles.workspace}>
       {/* Header */}
-      <div className={styles.header}>
+      <div className={styles.header} style={{ marginBottom: '32px' }}>
         <div>
           <h1 className={styles.title}>Teepresso Operations Console</h1>
           <p className={styles.subtitle}>Real-time overview of orders, inventory, and business metrics.</p>
