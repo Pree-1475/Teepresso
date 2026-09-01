@@ -134,13 +134,29 @@ export function ProductPage() {
         const res = await fetch(`${API_BASE_URL}/products/${id}`);
         const data = await res.json();
         if (data.success && data.product && isMounted) {
-          setProduct(data.product);
-          if (Array.isArray(data.product.colors) && data.product.colors.length > 0) {
-            setActiveColor(data.product.colors[0]);
+          const prod = data.product;
+          let parsedColors: string[] = [];
+          if (Array.isArray(prod.colors)) parsedColors = prod.colors;
+          else if (typeof prod.colors === 'string') {
+            try { parsedColors = JSON.parse(prod.colors); } catch(e) {}
           }
-          if (Array.isArray(data.product.patterns) && data.product.patterns.length > 0) {
-            setActivePattern(data.product.patterns[0]);
+
+          let parsedPatterns: string[] = [];
+          if (Array.isArray(prod.patterns)) parsedPatterns = prod.patterns;
+          else if (typeof prod.patterns === 'string') {
+            try { parsedPatterns = JSON.parse(prod.patterns); } catch(e) {}
           }
+
+          const safeProduct = {
+            ...prod,
+            colors: parsedColors,
+            patterns: parsedPatterns,
+            startingPrice: Number(prod.startingPrice || 0)
+          };
+
+          setProduct(safeProduct);
+          if (parsedColors.length > 0) setActiveColor(parsedColors[0]);
+          if (parsedPatterns.length > 0) setActivePattern(parsedPatterns[0]);
           setLoading(false);
           return;
         }
@@ -337,7 +353,7 @@ export function ProductPage() {
         <div className={styles.leftCol}>
           <div className={styles.gallery}>
             <div className={styles.mainImageWrapper}>
-              <img src={product.image} className={styles.mainImage} alt={product.name} />
+              <img src={product?.image || '/images/mockups/tshirt-blank.svg'} className={styles.mainImage} alt={product.name} />
             </div>
           </div>
           
@@ -367,7 +383,7 @@ export function ProductPage() {
             <div className={styles.panel}>
               <h3 className={styles.panelTitle}>1. Choose Colour</h3>
               <div className={styles.colorGrid}>
-                {product.colors.map(c => (
+                {(Array.isArray(product?.colors) ? product.colors : []).map(c => (
                   <div key={c} className={styles.colorItem} onClick={() => setActiveColor(c)}>
                     <div className={`${styles.colorCircle} ${activeColor === c ? styles.colorCircleActive : ''}`} style={{ backgroundColor: c }}>
                       {activeColor === c && <ShieldCheck size={14} color={c === '#ffffff' ? '#000' : '#fff'} />}
