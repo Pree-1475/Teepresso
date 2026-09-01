@@ -161,56 +161,56 @@ export function ProductPage() {
     ? Object.values(matrixSizes).reduce((tot, map) => tot + Object.values(map).reduce((s, v) => s + (v || 0), 0), 0)
     : quantity;
 
+
+
   const getEffectivePrice = (qty: number) => {
-    let price = product.startingPrice;
-    if (product.applyVolumeDiscount) {
-      if (totalQty >= 150) {
-        price = Math.round(product.startingPrice * 0.8);
-      } else if (totalQty >= 75) {
-        price = Math.round(product.startingPrice * 0.9);
-      }
+    const base = product?.startingPrice || 0;
+    if (product?.applyVolumeDiscount) {
+      if (qty >= 150) return Math.round(base * 0.8);
+      if (qty >= 75) return Math.round(base * 0.9);
     }
-    return price;
+    return base;
   };
 
   const calculateTotal = () => {
-    return totalQty * getEffectivePrice(totalQty);
+    const unitPrice = getEffectivePrice(totalQty);
+    return totalQty * unitPrice;
   };
 
   const handleAddToCart = () => {
-    if (totalQty === 0) {
-      alert('Please select a quantity greater than 0.');
-      return;
-    }
-
-    const colorVariant: ColorVariant = {
-      id: `var-${Date.now()}`,
-      color: activeColor,
-      colorHex: activeColor.startsWith('#') ? activeColor : '#000000',
-      sizes: currentSizes,
-      quantity: product.requiresSizes ? 0 : quantity
-    };
+    if (!product || totalQty <= 0) return;
+    const unitPrice = getEffectivePrice(totalQty);
 
     addToCart({
       productId: product.id,
       name: product.name,
-      category: product.category,
-      pricePerUnit: getEffectivePrice(totalQty),
-      requiresSizes: product.requiresSizes,
-      requiresColors: product.requiresColors,
-      requiresMockup: product.requiresMockup,
-      applyVolumeDiscount: product.applyVolumeDiscount,
-      colorVariants: [colorVariant],
+      category: product.category || 'Apparel',
+      pricePerUnit: unitPrice,
+      requiresSizes: !!product.requiresSizes,
+      requiresColors: !!product.requiresColors,
+      requiresMockup: !!product.requiresMockup,
+      applyVolumeDiscount: !!product.applyVolumeDiscount,
+      colorVariants: [
+        {
+          id: `cv_${Date.now()}`,
+          color: activeColor || 'Default',
+          colorHex: activeColor || '#000000',
+          sizes: currentSizes
+        }
+      ],
       artwork: {
-        ...artwork,
-        instructions
+        file: artwork.file || null,
+        previewUrl: artwork.previewUrl || '',
+        mode: designMode,
+        instructions,
+        placements: artwork.placements || {}
       }
     });
+
+    navigate('/cart');
   };
 
-
-
-  const effectivePrice = getEffectivePrice(totalQty);
+    const effectivePrice = getEffectivePrice(totalQty);
 
   return (
     <div className={styles.pageWrapper}>

@@ -69,12 +69,36 @@ export const getUsersController = async (_req: Request, res: Response): Promise<
 
 export const getCustomersController = async (_req: Request, res: Response): Promise<void> => {
   try {
-    const customers = await sql`
+    const users = await sql`
       SELECT * FROM users WHERE role = 'customer' OR role IS NULL ORDER BY "createdAt" DESC
     `;
-    res.json({ success: true, customers });
+    const orders = await sql`SELECT * FROM orders`;
+
+    const enrichedCustomers = users.map((u: any) => {
+      const userEmail = (u.email || '').toLowerCase();
+      const userPhone = u.phone || '';
+
+      const matchedOrders = orders.filter((o: any) => {
+        const orderEmail = (o.email || '').toLowerCase();
+        const orderPhone = o.phone || '';
+        return (userEmail && orderEmail === userEmail) || (userPhone && orderPhone === userPhone);
+      });
+
+      const totalOrders = matchedOrders.length;
+      const totalSpent = matchedOrders.reduce((sum: number, o: any) => sum + Number(o.totalAmount || 0), 0);
+      const lastOrder = matchedOrders.sort((a: any, b: any) => new Date(b.createdAt || b.orderDate || 0).getTime() - new Date(a.createdAt || a.orderDate || 0).getTime())[0];
+
+      return {
+        ...u,
+        totalOrders,
+        totalSpent,
+        lastOrderDate: lastOrder ? (lastOrder.orderDate || 'Recent') : 'No orders yet'
+      };
+    });
+
+    res.json({ success: true, customers: enrichedCustomers });
   } catch (err) {
-    console.error(err);
+    console.error('Error fetching dynamic customers:', err);
     res.status(500).json({ success: false, message: 'Server error' });
   }
 };
