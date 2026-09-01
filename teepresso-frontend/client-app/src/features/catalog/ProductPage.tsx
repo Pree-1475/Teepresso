@@ -262,8 +262,11 @@ export function ProductPage() {
   const allSizes = Object.values(SIZE_GROUPS).flat();
 
   const totalQty = product?.requiresSizes
-    ? Object.values(matrixSizes).reduce((tot, map) => tot + Object.values(map).reduce((s, v) => s + (v || 0), 0), 0)
-    : quantity;
+    ? Object.values(matrixSizes || {}).reduce((tot, map) => {
+        if (!map || typeof map !== 'object') return tot;
+        return tot + Object.values(map).reduce((s, v) => s + (v || 0), 0);
+      }, 0)
+    : (quantity || 0);
 
 
 
@@ -551,4 +554,50 @@ export function ProductPage() {
   );
 }
 
-export default ProductPage;
+class ProductErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { hasError: boolean; error: Error | null; errorInfo: React.ErrorInfo | null }
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false, error: null, errorInfo: null };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error('ProductPage ErrorBoundary caught error:', error, errorInfo);
+    this.setState({ errorInfo });
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ padding: '60px 20px', textAlign: 'center', backgroundColor: '#fff', minHeight: '80vh' }}>
+          <div style={{ maxWidth: '600px', margin: '0 auto', border: '1px solid #fee2e2', padding: '32px', borderRadius: '12px', backgroundColor: '#fef2f2' }}>
+            <h2 style={{ color: '#991b1b', marginBottom: '12px' }}>Product Configuration Warning</h2>
+            <p style={{ color: '#7f1d1d', fontSize: '14px', marginBottom: '20px' }}>
+              {this.state.error?.message || 'A temporary rendering error occurred.'}
+            </p>
+            <button onClick={() => window.location.reload()} className="btn-primary" style={{ padding: '10px 20px', borderRadius: '6px', cursor: 'pointer' }}>
+              Reload Page
+            </button>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+export function ProductPageWithErrorBoundary() {
+  return (
+    <ProductErrorBoundary>
+      <ProductPage />
+    </ProductErrorBoundary>
+  );
+}
+
+export default ProductPageWithErrorBoundary;
