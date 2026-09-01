@@ -3,8 +3,18 @@ import { sql } from '../../../config/db.js';
 
 export const getSettingsController = async (_req: Request, res: Response): Promise<void> => {
   try {
-    const settings = await sql`SELECT * FROM settings`;
-    res.json({ success: true, settings });
+    const rows = await sql`SELECT * FROM settings`;
+    const settingsMap: Record<string, any> = {};
+
+    rows.forEach((s: any) => {
+      let val = s.value;
+      if (typeof val === 'string') {
+        try { val = JSON.parse(val); } catch (e) {}
+      }
+      settingsMap[s.key] = val;
+    });
+
+    res.json({ success: true, settings: settingsMap, raw: rows });
   } catch (err) {
     console.error('Error fetching settings:', err);
     res.status(500).json({ success: false, message: 'Server error fetching settings' });
@@ -29,8 +39,17 @@ export const updateSettingController = async (req: Request, res: Response): Prom
         value = EXCLUDED.value
     `;
 
-    const updated = await sql`SELECT * FROM settings WHERE key = ${key}`;
-    res.json({ success: true, setting: updated[0] });
+    const rows = await sql`SELECT * FROM settings`;
+    const settingsMap: Record<string, any> = {};
+    rows.forEach((s: any) => {
+      let val = s.value;
+      if (typeof val === 'string') {
+        try { val = JSON.parse(val); } catch (e) {}
+      }
+      settingsMap[s.key] = val;
+    });
+
+    res.json({ success: true, message: `Setting '${key}' updated successfully`, settings: settingsMap });
   } catch (err) {
     console.error('Error updating setting:', err);
     res.status(500).json({ success: false, message: (err as Error).message || 'Server error' });

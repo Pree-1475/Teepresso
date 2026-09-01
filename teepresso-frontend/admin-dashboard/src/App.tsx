@@ -1,3 +1,4 @@
+import { SettingsPage } from '@/features/settings/SettingsPage';
 import React, { useState } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import '@/common/styles/globals.css';
@@ -49,6 +50,7 @@ function AnimatedRoutes() {
         <Route path="/reports" element={<ReportsPage />} />
         <Route path="/analytics" element={<AnalyticsPage />} />
         <Route path="/users" element={<UsersPage />} />
+        <Route path="/settings" element={<SettingsPage />} />
         <Route path="*" element={<DashboardPage />} />
       </Routes>
     </div>

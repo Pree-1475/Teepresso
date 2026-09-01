@@ -85,6 +85,7 @@ export function Sidebar({ onLogout }: SidebarProps) {
     { label: 'Offline POS', path: '/offline-orders', icon: ClipboardList },
     { label: 'Reports', path: '/reports', icon: TrendingUp },
     { label: 'Snippets', path: '/snippets', icon: Sliders },
+    { label: 'Settings', path: '/settings', icon: Settings },
   ];
 
   if (user.role === 'admin') {
