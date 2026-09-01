@@ -61,52 +61,7 @@ export function DashboardPage() {
         </div>
       </div>
 
-      {/* Primary KPI Metrics Strip */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px', marginBottom: '28px' }}>
-        
-        <div style={{ backgroundColor: 'var(--color-surface-white)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', padding: '20px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{ width: '44px', height: '44px', borderRadius: '8px', backgroundColor: 'rgba(59, 130, 246, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#2563eb' }}>
-            <ShoppingBag size={22} />
-          </div>
-          <div>
-            <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Orders</div>
-            <div style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--color-text-title)', marginTop: '2px' }}>{stats.totalOrders}</div>
-          </div>
-        </div>
-
-        <div style={{ backgroundColor: 'var(--color-surface-white)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', padding: '20px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{ width: '44px', height: '44px', borderRadius: '8px', backgroundColor: 'rgba(16, 185, 129, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#10b981' }}>
-            <TrendingUp size={22} />
-          </div>
-          <div>
-            <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Gross Revenue</div>
-            <div style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--color-text-title)', marginTop: '2px' }}>₹{stats.totalRevenue.toLocaleString('en-IN')}</div>
-          </div>
-        </div>
-
-        <div style={{ backgroundColor: 'var(--color-surface-white)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', padding: '20px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{ width: '44px', height: '44px', borderRadius: '8px', backgroundColor: 'rgba(245, 158, 11, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#d97706' }}>
-            <Box size={22} />
-          </div>
-          <div>
-            <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Active Products</div>
-            <div style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--color-text-title)', marginTop: '2px' }}>{stats.totalProducts}</div>
-          </div>
-        </div>
-
-        <div style={{ backgroundColor: 'var(--color-surface-white)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', padding: '20px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{ width: '44px', height: '44px', borderRadius: '8px', backgroundColor: 'rgba(139, 92, 246, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#8b5cf6' }}>
-            <Users size={22} />
-          </div>
-          <div>
-            <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Registered Accounts</div>
-            <div style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--color-text-title)', marginTop: '2px' }}>{stats.totalCustomers}</div>
-          </div>
-        </div>
-
-      </div>
-
-      {/* Quick Navigation Cards */}
+            {/* Quick Navigation Cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px', marginBottom: '28px' }}>
         <div 
           onClick={() => navigate('/orders')}

@@ -1,5 +1,6 @@
-import { useStorefront } from '@/common/context/StorefrontContext';
+import { API_BASE_URL } from '@/common/config/api';
 'use client';
+import { useStorefront } from '@/common/context/StorefrontContext';
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -85,13 +86,31 @@ export function ProductPage() {
 
   useEffect(() => {
     if (id) {
-      const p = PRODUCTS_CATALOG.find(x => x.id === id);
-      if (p) {
-        setProduct(p);
-        if (p.colors && p.colors.length > 0) {
-          setActiveColor(p.colors[0]);
-        }
-      }
+      fetch(`${API_BASE_URL}/products/${id}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success && data.product) {
+            setProduct(data.product);
+            if (data.product.colors && data.product.colors.length > 0) {
+              setActiveColor(data.product.colors[0]);
+            }
+          } else {
+            fetch(`${API_BASE_URL}/products`)
+              .then(r => r.json())
+              .then(allData => {
+                if (allData.success && Array.isArray(allData.products)) {
+                  const found = allData.products.find((x: any) => x.id === id);
+                  if (found) {
+                    setProduct(found);
+                    if (found.colors && found.colors.length > 0) {
+                      setActiveColor(found.colors[0]);
+                    }
+                  }
+                }
+              });
+          }
+        })
+        .catch(err => console.error('Error loading live product details:', err));
     }
   }, [id]);
 
