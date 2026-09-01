@@ -4,6 +4,8 @@ import { useAuth } from '@/features/auth/context/AuthContext';
 import { PackageCheck, Clock, CheckCircle2, RefreshCw } from 'lucide-react';
 import { Button } from '@/common/components/ui/Button/Button';
 import styles from './track-order.module.css';
+import { API_BASE_URL } from '@/common/config/api';
+
 
 interface CustomerOrder {
   id: string;
@@ -26,7 +28,7 @@ export function MyOrdersPage() {
     setLoading(true);
     try {
       const queryParam = user?.phone ? `phone=${encodeURIComponent(user.phone)}` : '';
-      const res = await fetch(`http://localhost:5000/api/v1/orders?${queryParam}`);
+      const res = await fetch(`${API_BASE_URL}/orders?${queryParam}`);
       const data = await res.json();
       if (data.success && Array.isArray(data.orders)) {
         setOrders(data.orders);

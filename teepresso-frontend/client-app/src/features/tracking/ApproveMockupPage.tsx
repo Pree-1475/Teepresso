@@ -3,6 +3,8 @@ import { useSearchParams } from 'react-router-dom';
 import { Check, Edit3, Send, Loader2 } from 'lucide-react';
 import { Button } from '@/common/components/ui/Button/Button';
 import styles from './approval.module.css';
+import { API_BASE_URL } from '@/common/config/api';
+
 
 function ApprovalFlowContent() {
   const [searchParams] = useSearchParams();
@@ -25,7 +27,7 @@ function ApprovalFlowContent() {
     setLoading(true);
     setErrorMsg(null);
     try {
-      const response = await fetch(`http://localhost:5000/api/v1/orders/track?orderId=${encodeURIComponent(orderId)}`);
+      const response = await fetch(`${API_BASE_URL}/orders/track?orderId=${encodeURIComponent(orderId)}`);
       const data = await response.json();
       if (data.success && data.order) {
         setOrder(data.order);
@@ -52,7 +54,7 @@ function ApprovalFlowContent() {
     if (!order) return;
     setSubmitting(true);
     try {
-      const response = await fetch(`http://localhost:5000/api/v1/orders/${order.id}/mockup`, {
+      const response = await fetch(`${API_BASE_URL}/orders/${order.id}/mockup`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'Approved' })
@@ -75,7 +77,7 @@ function ApprovalFlowContent() {
     if (!order) return;
     setSubmitting(true);
     try {
-      const response = await fetch(`http://localhost:5000/api/v1/orders/${order.id}/mockup`, {
+      const response = await fetch(`${API_BASE_URL}/orders/${order.id}/mockup`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

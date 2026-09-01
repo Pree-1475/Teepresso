@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Plus, Edit2, Trash2, Save, X, GripVertical, ChevronUp, ChevronDown, Upload } from 'lucide-react';
 import styles from '../products/ProductsAdminPage.module.css';
+import { API_BASE_URL } from '@/common/config/api';
+
 
 interface PatternSnippet {
   id: string;
@@ -31,7 +33,7 @@ export function PatternsSnippetPage() {
 
   const fetchPatterns = () => {
     setLoading(true);
-    fetch('http://localhost:5000/api/v1/patterns')
+    fetch(`${API_BASE_URL}/patterns`)
       .then(res => res.json())
       .then(data => {
         if (data.success && Array.isArray(data.patterns)) {
@@ -72,8 +74,8 @@ export function PatternsSnippetPage() {
     try {
       const isEdit = !!editId;
       const url = isEdit 
-        ? `http://localhost:5000/api/v1/patterns/${editId}` 
-        : 'http://localhost:5000/api/v1/patterns';
+        ? `${API_BASE_URL}/patterns/${editId}` 
+        : `${API_BASE_URL}/patterns`;
       const method = isEdit ? 'PUT' : 'POST';
 
       const res = await fetch(url, {
@@ -120,7 +122,7 @@ export function PatternsSnippetPage() {
     if (!deleteTarget) return;
 
     try {
-      const res = await fetch(`http://localhost:5000/api/v1/patterns/${deleteTarget.id}`, {
+      const res = await fetch(`${API_BASE_URL}/patterns/${deleteTarget.id}`, {
         method: 'DELETE'
       });
       const data = await res.json();
@@ -182,7 +184,7 @@ export function PatternsSnippetPage() {
   const saveOrder = async (orderedList: PatternSnippet[]) => {
     try {
       const orderedIds = orderedList.map(p => p.id);
-      await fetch('http://localhost:5000/api/v1/patterns/reorder', {
+      await fetch(`${API_BASE_URL}/patterns/reorder`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ orderedIds })

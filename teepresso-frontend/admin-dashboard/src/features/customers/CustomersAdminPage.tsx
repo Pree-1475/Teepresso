@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Mail, Phone, Search, Download, Plus, MoreHorizontal, X, User, Building } from 'lucide-react';
 import styles from './CustomersAdminPage.module.css';
+import { API_BASE_URL } from '@/common/config/api';
+
 
 interface CustomerItem {
   id: string;
@@ -22,7 +24,7 @@ export function CustomersAdminPage() {
 
   // Load live customer database from backend
   useEffect(() => {
-    fetch('http://localhost:5000/api/v1/customers')
+    fetch(`${API_BASE_URL}/customers`)
       .then(res => res.json())
       .then(data => {
         if (data.success && Array.isArray(data.customers)) {

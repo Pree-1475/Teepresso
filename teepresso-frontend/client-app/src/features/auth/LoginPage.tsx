@@ -5,6 +5,8 @@ import { Button } from '@/common/components/ui/Button/Button';
 import { Input } from '@/common/components/ui/Input/Input';
 import { Phone, KeyRound, LogIn, Lock } from 'lucide-react';
 import styles from './login.module.css';
+import { API_BASE_URL } from '@/common/config/api';
+
 
 export function LoginPage() {
   const [phone, setPhone] = useState<string>('');
@@ -36,7 +38,7 @@ export function LoginPage() {
     }
     setIsLoading(true);
     try {
-      await fetch('http://localhost:5000/api/v1/auth/otp-login', {
+      await fetch(`${API_BASE_URL}/auth/otp-login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone })

@@ -9,6 +9,8 @@ import {
   X
 } from 'lucide-react';
 import styles from './OrdersPage.module.css';
+import { API_BASE_URL } from '@/common/config/api';
+
 
 interface Order {
   id: string;
@@ -57,7 +59,7 @@ export function OrdersPage() {
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:5000/api/v1/orders');
+      const res = await fetch(`${API_BASE_URL}/orders`);
       const data = await res.json();
       if (data.success) {
         setOrders(data.orders);
@@ -76,7 +78,7 @@ export function OrdersPage() {
   const handleUpdateStage = async (orderId: string, newStage: string) => {
     setUpdatingStage(true);
     try {
-      const res = await fetch(`http://localhost:5000/api/v1/orders/${orderId}/stage`, {
+      const res = await fetch(`${API_BASE_URL}/orders/${orderId}/stage`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ stage: newStage })

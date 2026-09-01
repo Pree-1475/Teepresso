@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { STOREFRONT_MODE as DEFAULT_MODE } from '@/common/config/storefront';
+import { API_BASE_URL } from '@/common/config/api';
+
 
 interface StorefrontContextType {
   storefrontMode: 'STANDARD' | 'FESTIVE';
@@ -22,7 +24,7 @@ export const StorefrontProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
   const fetchSettings = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/v1/settings');
+      const res = await fetch(`${API_BASE_URL}/settings`);
       const data = await res.json();
       if (data.success && data.settings) {
         if (data.settings.storefrontMode) setStorefrontMode(data.settings.storefrontMode);

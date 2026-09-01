@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Save, Trash2, Plus, Upload, X, Check } from 'lucide-react';
 import styles from './ProductsAdminPage.module.css';
+import { API_BASE_URL } from '@/common/config/api';
+
 
 interface PriceTier {
   minQty: number;
@@ -88,7 +90,7 @@ export function AddEditProductPage() {
       
       try {
         // 1. Fetch Categories Snippet list
-        const catRes = await fetch('http://localhost:5000/api/v1/categories');
+        const catRes = await fetch(`${API_BASE_URL}/categories`);
         const catData = await catRes.json();
         let loadedCats: Category[] = [];
         if (catData.success && Array.isArray(catData.categories)) {
@@ -97,14 +99,14 @@ export function AddEditProductPage() {
         }
 
         // 2. Fetch Colors Snippet list
-        const colRes = await fetch('http://localhost:5000/api/v1/colors');
+        const colRes = await fetch(`${API_BASE_URL}/colors`);
         const colData = await colRes.json();
         if (colData.success && Array.isArray(colData.colors)) {
           setAvailableColors(colData.colors);
         }
 
         // 3. Fetch Sizes Snippet list
-        const sizeRes = await fetch('http://localhost:5000/api/v1/sizes');
+        const sizeRes = await fetch(`${API_BASE_URL}/sizes`);
         const sizeData = await sizeRes.json();
         if (sizeData.success && Array.isArray(sizeData.sizes)) {
           setAvailableSizes(sizeData.sizes);
@@ -112,7 +114,7 @@ export function AddEditProductPage() {
 
         // 4. Fetch Patterns Snippet list
         try {
-          const patRes = await fetch('http://localhost:5000/api/v1/patterns');
+          const patRes = await fetch(`${API_BASE_URL}/patterns`);
           const patData = await patRes.json();
           if (patData.success && Array.isArray(patData.patterns)) {
             setAvailablePatterns(patData.patterns);
@@ -123,7 +125,7 @@ export function AddEditProductPage() {
 
         // 5. Fetch Product details (if edit mode)
         if (isEditMode && id) {
-          const prodRes = await fetch(`http://localhost:5000/api/v1/products/${id}`);
+          const prodRes = await fetch(`${API_BASE_URL}/products/${id}`);
           const prodData = await prodRes.json();
           if (prodData.success && prodData.product) {
             const prod = prodData.product;
@@ -363,8 +365,8 @@ export function AddEditProductPage() {
 
     try {
       const url = isEditMode 
-        ? `http://localhost:5000/api/v1/products/${id}` 
-        : 'http://localhost:5000/api/v1/products';
+        ? `${API_BASE_URL}/products/${id}` 
+        : `${API_BASE_URL}/products`;
       const method = isEditMode ? 'PUT' : 'POST';
 
       const res = await fetch(url, {
@@ -391,7 +393,7 @@ export function AddEditProductPage() {
     setShowDeleteModal(false);
     setLoading(true);
     try {
-      const res = await fetch(`http://localhost:5000/api/v1/products/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/products/${id}`, {
         method: 'DELETE'
       });
       const data = await res.json();

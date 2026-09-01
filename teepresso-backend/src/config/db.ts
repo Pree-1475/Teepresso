@@ -19,6 +19,7 @@ export const initNeonDatabase = async () => {
         name VARCHAR(255) NOT NULL,
         email VARCHAR(255) UNIQUE NOT NULL,
         phone VARCHAR(50),
+        password VARCHAR(255),
         "orgName" VARCHAR(255),
         "orgType" VARCHAR(100),
         "totalOrders" INT DEFAULT 0,
@@ -27,6 +28,11 @@ export const initNeonDatabase = async () => {
         role VARCHAR(50) DEFAULT 'customer',
         "createdAt" TIMESTAMP DEFAULT NOW()
       );
+    `;
+    
+    await sql`
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS password VARCHAR(255);
+
     `;
 
     // 2. Products Table

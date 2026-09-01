@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, Save, X, GripVertical, ChevronUp, ChevronDown, Check } from 'lucide-react';
 import styles from '../products/ProductsAdminPage.module.css';
+import { API_BASE_URL } from '@/common/config/api';
+
 
 interface SizeSnippet {
   id: string;
@@ -43,7 +45,7 @@ export function SizesSnippetPage() {
     setLoading(true);
     try {
       // Fetch dynamic categories
-      const settingsRes = await fetch('http://localhost:5000/api/v1/settings');
+      const settingsRes = await fetch(`${API_BASE_URL}/settings`);
       const settingsData = await settingsRes.json();
       if (settingsData.success && settingsData.settings && Array.isArray(settingsData.settings.sizeCategories)) {
         setSizeCategories(settingsData.settings.sizeCategories);
@@ -53,7 +55,7 @@ export function SizesSnippetPage() {
       }
 
       // Fetch size list
-      const sizesRes = await fetch('http://localhost:5000/api/v1/sizes');
+      const sizesRes = await fetch(`${API_BASE_URL}/sizes`);
       const sizesData = await sizesRes.json();
       if (sizesData.success && Array.isArray(sizesData.sizes)) {
         setSizes(sizesData.sizes);
@@ -78,8 +80,8 @@ export function SizesSnippetPage() {
     try {
       const isEdit = !!editId;
       const url = isEdit 
-        ? `http://localhost:5000/api/v1/sizes/${editId}` 
-        : 'http://localhost:5000/api/v1/sizes';
+        ? `${API_BASE_URL}/sizes/${editId}` 
+        : `${API_BASE_URL}/sizes`;
       const method = isEdit ? 'PUT' : 'POST';
 
       const res = await fetch(url, {
@@ -97,7 +99,7 @@ export function SizesSnippetPage() {
           setInputCategory(sizeCategories[0]);
         }
         // Refresh sizes
-        const sizesRes = await fetch('http://localhost:5000/api/v1/sizes');
+        const sizesRes = await fetch(`${API_BASE_URL}/sizes`);
         const sizesData = await sizesRes.json();
         if (sizesData.success && Array.isArray(sizesData.sizes)) {
           setSizes(sizesData.sizes);
@@ -135,14 +137,14 @@ export function SizesSnippetPage() {
 
     if (deleteTarget.type === 'size') {
       try {
-        const res = await fetch(`http://localhost:5000/api/v1/sizes/${deleteTarget.payload.id}`, {
+        const res = await fetch(`${API_BASE_URL}/sizes/${deleteTarget.payload.id}`, {
           method: 'DELETE'
         });
         const data = await res.json();
         if (data.success) {
           setDeleteTarget(null);
           // Refresh sizes
-          const sizesRes = await fetch('http://localhost:5000/api/v1/sizes');
+          const sizesRes = await fetch(`${API_BASE_URL}/sizes`);
           const sizesData = await sizesRes.json();
           if (sizesData.success && Array.isArray(sizesData.sizes)) {
             setSizes(sizesData.sizes);
@@ -164,7 +166,7 @@ export function SizesSnippetPage() {
   // CATEGORY ACTIONS
   const handleSaveCategories = async (updatedList: string[]) => {
     try {
-      const res = await fetch('http://localhost:5000/api/v1/settings', {
+      const res = await fetch(`${API_BASE_URL}/settings`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sizeCategories: updatedList })
@@ -214,7 +216,7 @@ export function SizesSnippetPage() {
     // Update category for any sizes currently using oldName
     const sizesToUpdate = sizes.filter(s => s.category === oldName);
     for (const sz of sizesToUpdate) {
-      await fetch(`http://localhost:5000/api/v1/sizes/${sz.id}`, {
+      await fetch(`${API_BASE_URL}/sizes/${sz.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ category: trimmed })
@@ -222,7 +224,7 @@ export function SizesSnippetPage() {
     }
 
     // Refresh size list
-    const sizesRes = await fetch('http://localhost:5000/api/v1/sizes');
+    const sizesRes = await fetch(`${API_BASE_URL}/sizes`);
     const sizesData = await sizesRes.json();
     if (sizesData.success && Array.isArray(sizesData.sizes)) {
       setSizes(sizesData.sizes);
@@ -278,7 +280,7 @@ export function SizesSnippetPage() {
   const saveNewOrder = async (orderedList: SizeSnippet[]) => {
     try {
       const orderedIds = orderedList.map(s => s.id);
-      await fetch('http://localhost:5000/api/v1/sizes/reorder', {
+      await fetch(`${API_BASE_URL}/sizes/reorder`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ orderedIds })

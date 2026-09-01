@@ -6,6 +6,8 @@ import { useCart } from '@/features/cart/context/CartContext';
 import { useAuth } from '@/features/auth/context/AuthContext';
 import styles from './CheckoutPage.module.css';
 import { ArrowLeft, CheckCircle, ShieldCheck } from 'lucide-react';
+import { API_BASE_URL } from '@/common/config/api';
+
 
 export function CheckoutPage() {
   const { cart, clearCart } = useCart();
@@ -71,7 +73,7 @@ export function CheckoutPage() {
         notes: `Delivery to: ${deliveryInfo.address}, ${deliveryInfo.city}, ${deliveryInfo.pincode}`
       };
 
-      await fetch('http://localhost:5000/api/v1/orders', {
+      await fetch(`${API_BASE_URL}/orders`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(orderPayload)

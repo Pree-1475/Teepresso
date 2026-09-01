@@ -13,6 +13,8 @@ import {
   Save
 } from 'lucide-react';
 import styles from './DashboardPage.module.css';
+import { API_BASE_URL } from '@/common/config/api';
+
 
 export function DashboardPage() {
   const navigate = useNavigate();
@@ -42,7 +44,7 @@ export function DashboardPage() {
   });
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/v1/settings')
+    fetch(`${API_BASE_URL}/settings`)
       .then(res => res.json())
       .then(data => {
         if (data.success && data.settings) {
@@ -60,9 +62,9 @@ export function DashboardPage() {
       .catch(err => console.error('Failed to load settings:', err));
 
     Promise.all([
-      fetch('http://localhost:5000/api/v1/orders').then(r => r.json()).catch(() => ({})),
-      fetch('http://localhost:5000/api/v1/products').then(r => r.json()).catch(() => ({})),
-      fetch('http://localhost:5000/api/v1/customers').then(r => r.json()).catch(() => ({}))
+      fetch(`${API_BASE_URL}/orders`).then(r => r.json()).catch(() => ({})),
+      fetch(`${API_BASE_URL}/products`).then(r => r.json()).catch(() => ({})),
+      fetch(`${API_BASE_URL}/customers`).then(r => r.json()).catch(() => ({}))
     ]).then(([orderData, productData, customerData]) => {
       const orders = orderData.success && Array.isArray(orderData.orders) ? orderData.orders : [];
       const products = productData.success && Array.isArray(productData.products) ? productData.products : [];
@@ -93,7 +95,7 @@ export function DashboardPage() {
     setShowConfirmModal(false);
     setUpdatingMode(true);
     try {
-      const res = await fetch('http://localhost:5000/api/v1/settings', {
+      const res = await fetch(`${API_BASE_URL}/settings`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ storefrontMode: targetMode })
@@ -117,7 +119,7 @@ export function DashboardPage() {
     setUpiSavedMsg(false);
 
     try {
-      const res = await fetch('http://localhost:5000/api/v1/settings', {
+      const res = await fetch(`${API_BASE_URL}/settings`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 

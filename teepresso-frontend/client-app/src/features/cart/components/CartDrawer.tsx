@@ -5,7 +5,6 @@ import { useCart } from '../context/CartContext';
 import styles from './CartDrawer.module.css';
 import { X, ShoppingBag, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { PRODUCTS_CATALOG } from '@/features/catalog/data/productsData';
 
 export function CartDrawer() {
   const { cart, isCartDrawerOpen, setIsCartDrawerOpen, removeFromCart } = useCart();
@@ -18,10 +17,7 @@ export function CartDrawer() {
     navigate('/checkout');
   };
 
-  const getProductImage = (productId: string) => {
-    const p = PRODUCTS_CATALOG.find(x => x.id === productId);
-    return p?.image || '';
-  };
+
 
   const hasKurta = cart.items.some(item => item.category === 'Kurtas' || item.id === 'custom-kurta-seasonal');
   const hasPagdi = cart.items.some(item => item.productId === 'festive-pagdi');
@@ -49,7 +45,7 @@ export function CartDrawer() {
           ) : (
             cart.items.map(item => (
               <div key={item.id} className={styles.cartItem}>
-                <img src={getProductImage(item.productId)} alt={item.name} className={styles.itemImage} />
+                <img src={item.image || 'https://images.unsplash.com/photo-1610996843657-3f82fc464c17?auto=format&fit=crop&q=80&w=800'} alt={item.name} className={styles.itemImage} />
                 
                 <div className={styles.itemDetails}>
                   <div className={styles.itemName}>{item.name}</div>
@@ -113,7 +109,7 @@ export function CartDrawer() {
             <div className={styles.recommendationBox}>
               <div className={styles.recommendationHeader}>✨ Perfect match for your Kurta!</div>
               <div className={styles.recommendationContent}>
-                <img src={getProductImage('festive-pagdi')} alt="Festive Pagdi" className={styles.recommendationImg} />
+                <img src={'/images/products/pagdi-mockup.jpg'} alt="Festive Pagdi" className={styles.recommendationImg} />
                 <div className={styles.recommendationInfo}>
                   <h4>Festive Pagdi</h4>
                   <p>Complete your traditional look with our premium pagdi.</p>

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Save, AlertTriangle, Check, RefreshCw, Package, Zap, AlertCircle, CheckCircle2, ArrowUpRight } from 'lucide-react';
 import styles from './ProductsAdminPage.module.css';
+import { API_BASE_URL } from '@/common/config/api';
+
 
 interface PriceTier {
   minQty: number;
@@ -58,7 +60,7 @@ export function StockOverviewPage() {
     try {
       // Fetch colors dictionary
       try {
-        const colRes = await fetch('http://localhost:5000/api/v1/colors');
+        const colRes = await fetch(`${API_BASE_URL}/colors`);
         const colData = await colRes.json();
         if (colData.success && Array.isArray(colData.colors)) {
           setDbColors(colData.colors);
@@ -69,7 +71,7 @@ export function StockOverviewPage() {
 
       // Fetch categories snippet list
       try {
-        const catRes = await fetch('http://localhost:5000/api/v1/categories');
+        const catRes = await fetch(`${API_BASE_URL}/categories`);
         const catData = await catRes.json();
         if (catData.success && Array.isArray(catData.categories)) {
           const names = catData.categories.map((c: any) => c.name);
@@ -80,7 +82,7 @@ export function StockOverviewPage() {
       }
 
       // Fetch products list
-      const res = await fetch('http://localhost:5000/api/v1/products');
+      const res = await fetch(`${API_BASE_URL}/products`);
       const data = await res.json();
       if (data.success && Array.isArray(data.products)) {
         setProducts(data.products);
@@ -128,7 +130,7 @@ export function StockOverviewPage() {
     };
 
     try {
-      const res = await fetch(`http://localhost:5000/api/v1/products/${p.id}`, {
+      const res = await fetch(`${API_BASE_URL}/products/${p.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updatedPayload)

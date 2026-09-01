@@ -2,13 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Box } from 'lucide-react';
 import styles from './FestiveEssentialsCollection.module.css';
-import { PRODUCTS_CATALOG } from '@/features/catalog/data/productsData';
+import { API_BASE_URL } from '@/common/config/api';
+import { ProductItem } from '@/types/catalog';
+
 
 export const FestiveEssentialsCollection = () => {
-  const [productsList, setProductsList] = useState(PRODUCTS_CATALOG);
+  const [productsList, setProductsList] = useState<ProductItem[]>([]);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/v1/products')
+    fetch(`${API_BASE_URL}/products`)
       .then(res => res.json())
       .then(data => {
         if (data.success && Array.isArray(data.products)) {

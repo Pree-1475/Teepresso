@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { QrCode, FileText, Printer, Plus, RefreshCw, CheckCircle2, Trash2, X, ShoppingBag, CreditCard, Check, Banknote, Package, Search, AlertTriangle, Grid, ChevronRight } from 'lucide-react';
 import styles from './OfflineOrdersPage.module.css';
+import { API_BASE_URL } from '@/common/config/api';
+
 
 interface ProductItem {
   id: string;
@@ -106,9 +108,9 @@ export function OfflineOrdersPage() {
   const fetchBackendCatalogAndSettings = async () => {
     try {
       const [prodRes, patRes, setRes] = await Promise.all([
-        fetch('http://localhost:5000/api/v1/products').then(r => r.json()).catch(() => ({})),
-        fetch('http://localhost:5000/api/v1/patterns').then(r => r.json()).catch(() => ({})),
-        fetch('http://localhost:5000/api/v1/settings').then(r => r.json()).catch(() => ({}))
+        fetch(`${API_BASE_URL}/products`).then(r => r.json()).catch(() => ({})),
+        fetch(`${API_BASE_URL}/patterns`).then(r => r.json()).catch(() => ({})),
+        fetch(`${API_BASE_URL}/settings`).then(r => r.json()).catch(() => ({}))
       ]);
 
       if (prodRes.success && Array.isArray(prodRes.products) && prodRes.products.length > 0) {
@@ -166,7 +168,7 @@ export function OfflineOrdersPage() {
   const fetchOfflineOrders = async () => {
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:5000/api/v1/orders');
+      const res = await fetch(`${API_BASE_URL}/orders`);
       const data = await res.json();
       if (data.success && Array.isArray(data.orders)) {
         const offline = data.orders.filter((o: any) => o.orgType === 'Offline');
@@ -185,7 +187,7 @@ export function OfflineOrdersPage() {
     let activePayee = merchantPayeeName;
 
     try {
-      const res = await fetch('http://localhost:5000/api/v1/settings');
+      const res = await fetch(`${API_BASE_URL}/settings`);
       const data = await res.json();
       if (data.success && data.settings) {
         if (data.settings.upiVpa) {
@@ -281,7 +283,7 @@ export function OfflineOrdersPage() {
     let activePayee = merchantPayeeName;
 
     try {
-      const res = await fetch('http://localhost:5000/api/v1/settings');
+      const res = await fetch(`${API_BASE_URL}/settings`);
       const data = await res.json();
       if (data.success && data.settings) {
         if (data.settings.upiVpa) {
@@ -318,7 +320,7 @@ export function OfflineOrdersPage() {
     // Case A: Confirming payment for an existing pending order from QR Popup Modal
     if (currentBillQr?.pendingOrderId && isPaid) {
       try {
-        const res = await fetch(`http://localhost:5000/api/v1/orders/${currentBillQr.pendingOrderId}/confirm-payment`, {
+        const res = await fetch(`${API_BASE_URL}/orders/${currentBillQr.pendingOrderId}/confirm-payment`, {
           method: 'POST'
         });
         const data = await res.json();
@@ -347,7 +349,7 @@ export function OfflineOrdersPage() {
     const primaryCategory = cartItems[0]?.productName.includes('Kurta') ? 'Kurtas' : cartItems[0]?.productName.includes('Polo') ? 'Polos' : 'T-Shirts';
 
     try {
-      const res = await fetch('http://localhost:5000/api/v1/orders/offline', {
+      const res = await fetch(`${API_BASE_URL}/orders/offline`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

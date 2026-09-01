@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, Save, X, GripVertical, ChevronUp, ChevronDown } from 'lucide-react';
 import styles from '../products/ProductsAdminPage.module.css';
+import { API_BASE_URL } from '@/common/config/api';
+
 
 interface Category {
   id: string;
@@ -27,7 +29,7 @@ export function CategoriesSnippetPage() {
 
   const fetchCategories = () => {
     setLoading(true);
-    fetch('http://localhost:5000/api/v1/categories')
+    fetch(`${API_BASE_URL}/categories`)
       .then(res => res.json())
       .then(data => {
         if (data.success && Array.isArray(data.categories)) {
@@ -53,8 +55,8 @@ export function CategoriesSnippetPage() {
     try {
       const isEdit = !!editId;
       const url = isEdit 
-        ? `http://localhost:5000/api/v1/categories/${editId}` 
-        : 'http://localhost:5000/api/v1/categories';
+        ? `${API_BASE_URL}/categories/${editId}` 
+        : `${API_BASE_URL}/categories`;
       const method = isEdit ? 'PUT' : 'POST';
 
       const res = await fetch(url, {
@@ -96,7 +98,7 @@ export function CategoriesSnippetPage() {
     if (!deleteTarget) return;
 
     try {
-      const res = await fetch(`http://localhost:5000/api/v1/categories/${deleteTarget.id}`, {
+      const res = await fetch(`${API_BASE_URL}/categories/${deleteTarget.id}`, {
         method: 'DELETE'
       });
       const data = await res.json();
@@ -159,7 +161,7 @@ export function CategoriesSnippetPage() {
   const saveNewOrder = async (orderedList: Category[]) => {
     try {
       const orderedIds = orderedList.map(c => c.id);
-      await fetch('http://localhost:5000/api/v1/categories/reorder', {
+      await fetch(`${API_BASE_URL}/categories/reorder`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ orderedIds })

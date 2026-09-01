@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Search, Plus, Download, MoreHorizontal, Edit2 } from 'lucide-react';
 import styles from './ProductsAdminPage.module.css';
+import { API_BASE_URL } from '@/common/config/api';
+
 
 interface Product {
   id: string;
@@ -31,7 +33,7 @@ export function ProductsAdminPage() {
 
   // Load products from backend on mount
   useEffect(() => {
-    fetch('http://localhost:5000/api/v1/products')
+    fetch(`${API_BASE_URL}/products`)
       .then(res => res.json())
       .then(data => {
         if (data.success && Array.isArray(data.products)) {

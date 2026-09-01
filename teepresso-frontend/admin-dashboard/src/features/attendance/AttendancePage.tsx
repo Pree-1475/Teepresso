@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Clock, RefreshCw, UserCheck, UserMinus, Users, Plus, UserX, DollarSign, Calendar, Mail, Phone, Trash2, CheckCircle2 } from 'lucide-react';
 import styles from './AttendancePage.module.css';
+import { API_BASE_URL } from '@/common/config/api';
+
 
 interface Employee {
   id: string;
@@ -52,7 +54,7 @@ export function AttendancePage() {
   const fetchAttendance = async () => {
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:5000/api/v1/attendance');
+      const res = await fetch(`${API_BASE_URL}/attendance`);
       const data = await res.json();
       if (data.success) {
         setRecords(data.attendance);
@@ -82,7 +84,7 @@ export function AttendancePage() {
         ? { employeeName: selectedEmpName, role: empRole }
         : { employeeName: selectedEmpName };
 
-      const res = await fetch(`http://localhost:5000/api/v1/attendance/${endpoint}`, {
+      const res = await fetch(`${API_BASE_URL}/attendance/${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)

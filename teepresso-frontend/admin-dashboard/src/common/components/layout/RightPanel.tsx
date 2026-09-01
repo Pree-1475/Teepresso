@@ -14,6 +14,8 @@ import {
   Sparkles
 } from 'lucide-react';
 import styles from './RightPanel.module.css';
+import { API_BASE_URL } from '@/common/config/api';
+
 
 interface RightPanelProps {
   isOpen: boolean;
@@ -43,7 +45,7 @@ export function RightPanel({ isOpen, onToggle }: RightPanelProps) {
       const endpoint = type === 'in' ? 'check-in' : 'check-out';
       const body = type === 'in' ? { employeeName: empName, role: 'Editing Team' } : { employeeName: empName };
 
-      const res = await fetch(`http://localhost:5000/api/v1/attendance/${endpoint}`, {
+      const res = await fetch(`${API_BASE_URL}/attendance/${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)

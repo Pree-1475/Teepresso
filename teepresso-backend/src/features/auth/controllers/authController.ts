@@ -1,157 +1,195 @@
 import { Request, Response } from 'express';
-import { usersDatabase } from '../models/userModel.js';
-import { saveDb } from '../../../config/jsonDb.js';
+import { sql } from '../../../config/db.js';
 
-export const loginController = (req: Request, res: Response): void => {
-  const { emailOrPhone, password, role } = req.body;
-  const user = usersDatabase.find(
-    u => u.email === emailOrPhone || u.phone === emailOrPhone
-  );
+export const loginController = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { emailOrPhone, password } = req.body;
+    const users = await sql`
+      SELECT * FROM users 
+      WHERE email = ${emailOrPhone} OR phone = ${emailOrPhone}
+      LIMIT 1
+    `;
 
-  if (!user) {
-    res.status(404).json({ success: false, message: 'User not found' });
-    return;
+    if (users.length === 0) {
+      res.status(404).json({ success: false, message: 'User not found' });
+      return;
+    }
+
+    const user = users[0];
+
+    // Basic plaintext password check (production should use bcrypt)
+    if (password && user.password && user.password !== password) {
+      res.status(401).json({ success: false, message: 'Invalid password' });
+      return;
+    }
+
+    res.json({
+      success: true,
+      message: 'Authentication successful',
+      user,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: 'Server error' });
   }
+};
 
-  if (password && user.password && user.password !== password) {
-    res.status(401).json({ success: false, message: 'Invalid password' });
-    return;
+export const registerController = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { name, email, phone, password } = req.body;
+    const id = `usr_${Date.now()}`;
+    const role = 'customer';
+    const pass = password || 'customer123';
+
+    await sql`
+      INSERT INTO users (id, name, email, phone, role, password)
+      VALUES (${id}, ${name}, ${email}, ${phone}, ${role}, ${pass})
+    `;
+
+    res.status(201).json({
+      success: true,
+      message: 'User registered successfully',
+      user: { id, name, email, phone, role, createdAt: new Date() },
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: 'Server error' });
   }
-
-  res.json({
-    success: true,
-    message: 'Authentication successful',
-    user,
-  });
 };
 
-export const registerController = (req: Request, res: Response): void => {
-  const { name, email, phone, password } = req.body;
-  const newUser = {
-    id: `usr_${Date.now()}`,
-    name,
-    email,
-    phone,
-    role: 'customer' as const,
-    password: password || 'customer123',
-    createdAt: new Date(),
-  };
-
-  usersDatabase.push(newUser);
-  saveDb();
-  res.status(201).json({
-    success: true,
-    message: 'User registered successfully',
-    user: newUser,
-  });
-};
-
-export const getUsersController = (_req: Request, res: Response): void => {
-  res.json({
-    success: true,
-    users: usersDatabase
-  });
-};
-
-export const getCustomersController = (_req: Request, res: Response): void => {
-  const customers = usersDatabase.filter(u => u.role === 'customer' || !u.role);
-  res.json({
-    success: true,
-    customers
-  });
-};
-
-export const otpLoginController = (req: Request, res: Response): void => {
-  const { phone } = req.body;
-  if (!phone) {
-    res.status(400).json({ success: false, message: 'Phone number is required' });
-    return;
+export const getUsersController = async (_req: Request, res: Response): Promise<void> => {
+  try {
+    const users = await sql`SELECT * FROM users ORDER BY "createdAt" DESC`;
+    res.json({ success: true, users });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: 'Server error' });
   }
+};
 
-  let user = usersDatabase.find(u => u.phone === phone);
-  if (!user) {
-    user = {
-      id: `c_${Date.now()}`,
-      name: '',
-      email: '',
-      phone,
-      orgName: '',
-      orgType: '',
-      totalOrders: 0,
-      totalSpent: 0,
-      lastOrderDate: 'Registered via OTP',
-      role: 'customer',
-      createdAt: new Date()
-    };
-    usersDatabase.push(user);
-    saveDb();
+export const getCustomersController = async (_req: Request, res: Response): Promise<void> => {
+  try {
+    const customers = await sql`
+      SELECT * FROM users WHERE role = 'customer' OR role IS NULL ORDER BY "createdAt" DESC
+    `;
+    res.json({ success: true, customers });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: 'Server error' });
   }
-
-  res.json({
-    success: true,
-    message: 'OTP Login successful',
-    user
-  });
 };
 
-export const createUserController = (req: Request, res: Response): void => {
-  const { name, email, phone, role, password } = req.body;
-  const newUser = {
-    id: `usr_${Date.now()}`,
-    name,
-    email,
-    phone,
-    role: role || 'editor',
-    password: password || 'teepresso123',
-    createdAt: new Date()
-  };
+export const otpLoginController = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { phone } = req.body;
+    if (!phone) {
+      res.status(400).json({ success: false, message: 'Phone number is required' });
+      return;
+    }
 
-  usersDatabase.push(newUser);
-  saveDb();
-  res.status(201).json({
-    success: true,
-    message: 'Staff user created successfully',
-    user: newUser
-  });
-};
+    let users = await sql`SELECT * FROM users WHERE phone = ${phone} LIMIT 1`;
+    let user = users[0];
 
-export const updateUserController = (req: Request, res: Response): void => {
-  const { id } = req.params;
-  const { name, email, phone, role, password } = req.body;
+    if (!user) {
+      const id = `c_${Date.now()}`;
+      await sql`
+        INSERT INTO users (id, name, email, phone, role)
+        VALUES (${id}, '', '', ${phone}, 'customer')
+      `;
+      const newUsers = await sql`SELECT * FROM users WHERE id = ${id}`;
+      user = newUsers[0];
+    }
 
-  const user = usersDatabase.find(u => u.id === id);
-  if (!user) {
-    res.status(404).json({ success: false, message: 'User not found' });
-    return;
+    res.json({
+      success: true,
+      message: 'OTP Login successful',
+      user
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: 'Server error' });
   }
-
-  if (name !== undefined) user.name = name;
-  if (email !== undefined) user.email = email;
-  if (phone !== undefined) user.phone = phone;
-  if (role !== undefined) user.role = role;
-  if (password !== undefined) user.password = password;
-
-  saveDb();
-  res.json({
-    success: true,
-    message: 'User updated successfully',
-    user
-  });
 };
 
-export const deleteUserController = (req: Request, res: Response): void => {
-  const { id } = req.params;
-  const index = usersDatabase.findIndex(u => u.id === id);
-  if (index === -1) {
-    res.status(404).json({ success: false, message: 'User not found' });
-    return;
+export const createUserController = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { name, email, phone, role, password } = req.body;
+    const id = `usr_${Date.now()}`;
+    const userRole = role || 'editor';
+    const pass = password || 'teepresso123';
+
+    await sql`
+      INSERT INTO users (id, name, email, phone, role, password)
+      VALUES (${id}, ${name}, ${email}, ${phone || null}, ${userRole}, ${pass})
+    `;
+
+    const users = await sql`SELECT * FROM users WHERE id = ${id}`;
+    res.status(201).json({
+      success: true,
+      message: 'Staff user created successfully',
+      user: users[0]
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: (err as Error).message || 'Server error' });
   }
-
-  usersDatabase.splice(index, 1);
-  saveDb();
-  res.json({
-    success: true,
-    message: 'User deleted successfully'
-  });
 };
 
+export const updateUserController = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const { name, email, role, password } = req.body;
+
+    const existing = await sql`SELECT * FROM users WHERE id = ${id}`;
+    if (existing.length === 0) {
+      res.status(404).json({ success: false, message: 'User not found' });
+      return;
+    }
+
+    if (password) {
+      await sql`
+        UPDATE users 
+        SET name = COALESCE(${name}, name), 
+            email = COALESCE(${email}, email), 
+            role = COALESCE(${role}, role),
+            password = ${password}
+        WHERE id = ${id}
+      `;
+    } else {
+      await sql`
+        UPDATE users 
+        SET name = COALESCE(${name}, name), 
+            email = COALESCE(${email}, email), 
+            role = COALESCE(${role}, role)
+        WHERE id = ${id}
+      `;
+    }
+
+    const users = await sql`SELECT * FROM users WHERE id = ${id}`;
+    res.json({
+      success: true,
+      message: 'User updated successfully',
+      user: users[0]
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
+export const deleteUserController = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const result = await sql`DELETE FROM users WHERE id = ${id} RETURNING id`;
+    
+    if (result.length === 0) {
+      res.status(404).json({ success: false, message: 'User not found' });
+      return;
+    }
+
+    res.json({ success: true, message: 'User deleted successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};

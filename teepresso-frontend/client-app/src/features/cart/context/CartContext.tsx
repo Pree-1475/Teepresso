@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { ProductItem } from '@/features/catalog/data/productsData';
+import { ProductItem } from '@/types/catalog';
 
 export type SizeQtyMap = Record<string, number>;
 
@@ -52,6 +52,7 @@ export interface CartItem {
   name: string;
   category: string;
   pricePerUnit: number;
+  image: string;
   
   requiresSizes: boolean;
   requiresColors: boolean;

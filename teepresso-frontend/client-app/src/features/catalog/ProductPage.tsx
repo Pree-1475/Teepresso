@@ -2,12 +2,14 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { PRODUCTS_CATALOG, ProductItem } from '@/features/catalog/data/productsData';
+import { ProductItem } from '@/types/catalog';
 import { useCart, SizeQtyMap, ColorVariant, ArtworkData, MockupState } from '@/features/cart/context/CartContext';
 import styles from './ProductPage.module.css';
 import { ShoppingBag, ArrowLeft, UploadCloud, Plus, X, ShieldCheck, Box, HelpCircle, ChevronDown, ChevronUp, Bookmark } from 'lucide-react';
 import { Button } from '@/common/components/ui/Button/Button';
 import { MockupCanvasEditor } from './components/MockupCanvasEditor';
+import { API_BASE_URL } from '@/common/config/api';
+
 
 const defaultSizes: SizeQtyMap = { XS: 0, S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, '4XL': 0, '5XL': 0, '6XL': 0 };
 
@@ -89,7 +91,7 @@ export function ProductPage() {
   useEffect(() => {
     const loadProduct = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/v1/products/${id}`);
+        const res = await fetch(`${API_BASE_URL}/products/${id}`);
         const data = await res.json();
         if (data.success && data.product) {
           setProduct(data.product);
@@ -100,26 +102,15 @@ export function ProductPage() {
             setActivePattern(data.product.patterns[0]);
           }
         } else {
-          const p = PRODUCTS_CATALOG.find(x => x.id === id);
-          if (p) {
-            setProduct(p);
-            if (Array.isArray(p.colors) && p.colors.length > 0) setActiveColor(p.colors[0]);
-            if (Array.isArray((p as any).patterns) && (p as any).patterns.length > 0) setActivePattern((p as any).patterns[0]);
-          }
+          console.error("Product not found");
         }
       } catch (err) {
-        console.error(err);
-        const p = PRODUCTS_CATALOG.find(x => x.id === id);
-        if (p) {
-          setProduct(p);
-          if (Array.isArray(p.colors) && p.colors.length > 0) setActiveColor(p.colors[0]);
-          if (Array.isArray((p as any).patterns) && (p as any).patterns.length > 0) setActivePattern((p as any).patterns[0]);
-        }
+        console.error("Error fetching product", err);
       }
 
       // Fetch dynamic sizes list
       try {
-        const sizesRes = await fetch('http://localhost:5000/api/v1/sizes');
+        const sizesRes = await fetch(`${API_BASE_URL}/sizes`);
         const sizesData = await sizesRes.json();
         if (sizesData.success && Array.isArray(sizesData.sizes)) {
           const groups: Record<string, string[]> = {};
@@ -136,7 +127,7 @@ export function ProductPage() {
 
       // Fetch dynamic colors list
       try {
-        const colorsRes = await fetch('http://localhost:5000/api/v1/colors');
+        const colorsRes = await fetch(`${API_BASE_URL}/colors`);
         const colorsData = await colorsRes.json();
         if (colorsData.success && Array.isArray(colorsData.colors)) {
           setDbColors(colorsData.colors);
@@ -147,7 +138,7 @@ export function ProductPage() {
 
       // Fetch dynamic patterns list
       try {
-        const patRes = await fetch('http://localhost:5000/api/v1/patterns');
+        const patRes = await fetch(`${API_BASE_URL}/patterns`);
         const patData = await patRes.json();
         if (patData.success && Array.isArray(patData.patterns)) {
           setDbPatterns(patData.patterns);
@@ -235,7 +226,7 @@ export function ProductPage() {
     }
 
     addToCart({
-      productId: product.id,
+      productId: product.id, image: product.image,
       name: product.name,
       category: product.category,
       pricePerUnit: getEffectivePrice(totalQty),

@@ -2,15 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/common/components/ui/Button/Button';
-import { PRODUCTS_CATALOG } from '@/features/catalog/data/productsData';
 import styles from './FestiveTabbedShowcase.module.css';
+import { API_BASE_URL } from '@/common/config/api';
+import { ProductItem } from '@/types/catalog';
+
 
 export function FestiveTabbedShowcase() {
   const [activeTab, setActiveTab] = useState<'kurtas' | 'khanduva' | 'pancha' | 'pagdi'>('kurtas');
-  const [productsList, setProductsList] = useState(PRODUCTS_CATALOG);
+  const [productsList, setProductsList] = useState<ProductItem[]>([]);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/v1/products')
+    fetch(`${API_BASE_URL}/products`)
       .then(res => res.json())
       .then(data => {
         if (data.success && Array.isArray(data.products)) {
@@ -20,11 +22,11 @@ export function FestiveTabbedShowcase() {
       .catch(err => console.error('Failed to load showcase products:', err));
   }, []);
 
-  const kurta = productsList.find(p => p.id === 'custom-kurta-seasonal') || PRODUCTS_CATALOG.find(p => p.id === 'custom-kurta-seasonal')!;
-  const khanduva = productsList.find(p => p.id === 'festive-khanduva') || PRODUCTS_CATALOG.find(p => p.id === 'festive-khanduva')!;
-  const zariKhanduva = productsList.find(p => p.id === 'festive-zari-khanduva') || PRODUCTS_CATALOG.find(p => p.id === 'festive-zari-khanduva')!;
-  const pancha = productsList.find(p => p.id === 'festive-pancha') || PRODUCTS_CATALOG.find(p => p.id === 'festive-pancha')!;
-  const pagdi = productsList.find(p => p.id === 'festive-pagdi') || PRODUCTS_CATALOG.find(p => p.id === 'festive-pagdi')!;
+  const kurta = productsList.find(p => p.id === 'custom-kurta-seasonal');
+  const khanduva = productsList.find(p => p.id === 'festive-khanduva');
+  const zariKhanduva = productsList.find(p => p.id === 'festive-zari-khanduva');
+  const pancha = productsList.find(p => p.id === 'festive-pancha');
+  const pagdi = productsList.find(p => p.id === 'festive-pagdi');
 
   const tabs = [
     { id: 'kurtas', label: '1. Kurtas' },
@@ -36,6 +38,7 @@ export function FestiveTabbedShowcase() {
   const renderContent = () => {
     switch (activeTab) {
       case 'kurtas':
+        if (!kurta) return null;
         return (
           <div className={styles.contentGrid} key="kurtas">
             <div className={styles.imageCol}>
@@ -71,6 +74,7 @@ export function FestiveTabbedShowcase() {
         );
       
       case 'khanduva':
+        if (!khanduva || !zariKhanduva) return null;
         return (
           <div className={styles.contentGrid} key="khanduva">
             <div className={styles.imageCol}>
@@ -106,6 +110,7 @@ export function FestiveTabbedShowcase() {
         );
 
       case 'pancha':
+        if (!pancha) return null;
         return (
           <div className={styles.contentGrid} key="pancha">
             <div className={styles.imageCol}>
@@ -137,6 +142,7 @@ export function FestiveTabbedShowcase() {
         );
 
       case 'pagdi':
+        if (!pagdi) return null;
         return (
           <div className={styles.contentGrid} key="pagdi">
             <div className={styles.imageCol}>

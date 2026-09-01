@@ -2,21 +2,28 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, CheckCircle2, ShieldCheck, Sparkles, Truck } from 'lucide-react';
 import { Button } from '@/common/components/ui/Button/Button';
-import { PRODUCTS_CATALOG } from '@/features/catalog/data/productsData';
 import styles from './products.module.css';
+import { API_BASE_URL } from '@/common/config/api';
+import { ProductItem } from '@/types/catalog';
+
 
 export function ProductsPage() {
-  const [productsList, setProductsList] = useState(PRODUCTS_CATALOG);
+  const [productsList, setProductsList] = useState<ProductItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/v1/products')
+    fetch(`${API_BASE_URL}/products`)
       .then(res => res.json())
       .then(data => {
         if (data.success && Array.isArray(data.products)) {
           setProductsList(data.products);
         }
+        setLoading(false);
       })
-      .catch(err => console.error('Failed to load products from backend:', err));
+      .catch(err => {
+        console.error('Failed to load products from backend:', err);
+        setLoading(false);
+      });
   }, []);
 
   return (
@@ -45,6 +52,7 @@ export function ProductsPage() {
       <div className="container" style={{ paddingTop: '32px' }}>
         
         {/* 2. Product Catalogue Grid */}
+        {loading && <div style={{ textAlign: 'center', padding: '40px' }}>Loading products...</div>}
         <div className={styles.catalogGrid}>
           {productsList.map(product => (
             <Link key={product.id} to={`/product/${product.id}`} className={styles.productCard}>

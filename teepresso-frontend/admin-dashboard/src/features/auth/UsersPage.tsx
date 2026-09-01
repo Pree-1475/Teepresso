@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { UserCheck, Plus, Trash2, Edit2, ShieldAlert, X } from 'lucide-react';
+import { API_BASE_URL } from '@/common/config/api';
+
 
 interface User {
   id: string;
@@ -36,7 +38,7 @@ export function UsersPage() {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:5000/api/v1/auth/users');
+      const res = await fetch(`${API_BASE_URL}/auth/users`);
       const data = await res.json();
       if (data.success) {
         setUsers(data.users.filter((u: any) => u.role !== 'customer'));
@@ -79,7 +81,7 @@ export function UsersPage() {
     setErrorMsg('');
 
     try {
-      const res = await fetch('http://localhost:5000/api/v1/auth/users', {
+      const res = await fetch(`${API_BASE_URL}/auth/users`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, role, password, phone: '0000000000' }) // Default phone backend fallback
@@ -120,7 +122,7 @@ export function UsersPage() {
     setErrorMsg('');
 
     try {
-      const res = await fetch(`http://localhost:5000/api/v1/auth/users/${editingUser.id}`, {
+      const res = await fetch(`${API_BASE_URL}/auth/users/${editingUser.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, role, password })
@@ -148,7 +150,7 @@ export function UsersPage() {
   const handleDeleteUser = async (id: string) => {
     if (!confirm('Are you sure you want to revoke staff access for this user?')) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/v1/auth/users/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/auth/users/${id}`, {
         method: 'DELETE'
       });
       const data = await res.json();
