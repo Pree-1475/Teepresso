@@ -8,6 +8,7 @@ import { useCart } from '@/features/cart/context/CartContext';
 import { Menu, X, ShoppingBag, User as UserIcon, LogOut, PackageCheck, Layers, Home, Sparkles, LogIn, Truck } from 'lucide-react';
 import styles from './Header.module.css';
 import { FestiveHeader } from './FestiveHeader';
+import { API_BASE_URL } from '@/common/config/api';
 
 const getInitialMode = (): 'STANDARD' | 'FESTIVE' => {
   if (typeof window !== 'undefined') {
@@ -39,7 +40,7 @@ export function Header() {
     window.addEventListener('scroll', handleScroll);
 
     const fetchSettings = () => {
-      fetch('http://localhost:5000/api/v1/settings')
+      fetch(`${API_BASE_URL}/settings`)
         .then(res => res.json())
         .then(data => {
           if (data.success && data.settings && data.settings.storefrontMode) {

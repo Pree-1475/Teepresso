@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styles from './AnnouncementBar.module.css';
+import { API_BASE_URL } from '@/common/config/api';
 
 const getInitialMode = (): 'STANDARD' | 'FESTIVE' => {
   if (typeof window !== 'undefined') {
@@ -16,7 +17,7 @@ export function AnnouncementBar() {
 
   useEffect(() => {
     const fetchSettings = () => {
-      fetch('http://localhost:5000/api/v1/settings')
+      fetch(`${API_BASE_URL}/settings`)
         .then(res => res.json())
         .then(data => {
           if (data.success && data.settings && data.settings.storefrontMode) {
