@@ -15,7 +15,7 @@ const checkmarks = [
   'Bulk discounts auto-applied',
 ];
 
-export function InstantQuoteSection() {
+export function InstantQuoteSection({ embedded = false }: { embedded?: boolean }) {
   const [product, setProduct] = useState('Kurta');
   const [quantity, setQuantity] = useState('50');
 
@@ -50,12 +50,10 @@ export function InstantQuoteSection() {
   const pricePerPiece = Math.round(base * (1 - discount));
   const estimatedTotal = pricePerPiece * qty;
 
-  return (
-    <section className={styles.wrapper}>
-      <div className="container">
-        <div className={styles.centerContainer}>
-          <div className={styles.quoteIntro}>
-            <h2 className={styles.quoteTitle}>
+  const content = (
+    <div className={embedded ? '' : styles.centerContainer}>
+      <div className={styles.quoteIntro}>
+        <h2 className={styles.quoteTitle}>
               Get an Instant Quote
             </h2>
             <p className={styles.quoteDesc}>
@@ -188,8 +186,18 @@ export function InstantQuoteSection() {
             <div className={styles.bottomTrustItem}>
               <CheckCircle2 size={14} /> Quick & Easy
             </div>
-          </div>
-        </div>
+      </div>
+    </div>
+  );
+
+  if (embedded) {
+    return content;
+  }
+
+  return (
+    <section className={styles.wrapper}>
+      <div className="container">
+        {content}
       </div>
     </section>
   );

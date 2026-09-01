@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { useScrollReveal } from '@/common/hooks/useScrollReveal';
 import styles from './HowItWorksSection.module.css';
+import { InstantQuoteSection } from './InstantQuoteSection';
 
 /* ──────────────────────────────────────────────
    DATA
@@ -228,6 +229,15 @@ export function HowItWorksSection() {
               </div>
             </div>
 
+          </div>
+
+          {/* ═══════════════════════════════════════════
+              RIGHT COLUMN — INSTANT QUOTE CALCULATOR
+              ═══════════════════════════════════════════ */}
+          <div className={styles.rightColumn}>
+            <div className={styles.stickyCalculator}>
+              <InstantQuoteSection embedded={true} />
+            </div>
           </div>
 
         </div>
