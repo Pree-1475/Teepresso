@@ -20,6 +20,8 @@ export function ProductPage() {
   const { addToCart } = useCart();
   
   const [product, setProduct] = useState<ProductItem | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [activeColor, setActiveColor] = useState<string>('');
   
   // Config state
@@ -118,36 +120,122 @@ export function ProductPage() {
   }, [designMode]);
 
   useEffect(() => {
-    if (id) {
-      fetch(`${API_BASE_URL}/products/${id}`)
-        .then(res => res.json())
-        .then(data => {
-          if (data.success && data.product) {
-            setProduct(data.product);
-            if (data.product.colors && data.product.colors.length > 0) {
-              setActiveColor(data.product.colors[0]);
-            }
-          } else {
-            fetch(`${API_BASE_URL}/products`)
-              .then(r => r.json())
-              .then(allData => {
-                if (allData.success && Array.isArray(allData.products)) {
-                  const found = allData.products.find((x: any) => x.id === id);
-                  if (found) {
-                    setProduct(found);
-                    if (found.colors && found.colors.length > 0) {
-                      setActiveColor(found.colors[0]);
-                    }
-                  }
-                }
-              });
+    if (!id) return;
+    let isMounted = true;
+
+    const loadProductData = async () => {
+      setLoading(true);
+      setError(null);
+
+      const targetId = id.toLowerCase().trim();
+
+      try {
+        // 1. Try direct fetch by ID
+        const res = await fetch(`${API_BASE_URL}/products/${id}`);
+        const data = await res.json();
+        if (data.success && data.product && isMounted) {
+          setProduct(data.product);
+          if (Array.isArray(data.product.colors) && data.product.colors.length > 0) {
+            setActiveColor(data.product.colors[0]);
           }
-        })
-        .catch(err => console.error('Error loading live product details:', err));
-    }
+          if (Array.isArray(data.product.patterns) && data.product.patterns.length > 0) {
+            setActivePattern(data.product.patterns[0]);
+          }
+          setLoading(false);
+          return;
+        }
+      } catch (e) {
+        console.error('Direct fetch failed, trying full catalog fallback...', e);
+      }
+
+      // 2. Fallback: Fetch full products catalog and match by ID or slug
+      try {
+        const allRes = await fetch(`${API_BASE_URL}/products`);
+        const allData = await allRes.json();
+        if (allData.success && Array.isArray(allData.products) && allData.products.length > 0 && isMounted) {
+          const matched = allData.products.find((p: any) => {
+            const pId = (p.id || '').toLowerCase();
+            const pName = (p.name || '').toLowerCase().replace(/[^a-z0-9]/g, '-');
+            return pId === targetId || pName.includes(targetId) || targetId.includes(pId);
+          }) || allData.products[0];
+
+          setProduct(matched);
+          if (Array.isArray(matched.colors) && matched.colors.length > 0) {
+            setActiveColor(matched.colors[0]);
+          }
+          if (Array.isArray(matched.patterns) && matched.patterns.length > 0) {
+            setActivePattern(matched.patterns[0]);
+          }
+        } else if (isMounted) {
+          setError('Product not found in database catalog.');
+        }
+      } catch (err) {
+        console.error('Catalog fallback fetch failed:', err);
+        if (isMounted) setError('Network error: unable to load product specs.');
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+
+    loadProductData();
+    return () => { isMounted = false; };
   }, [id]);
 
-  if (!product) return <div>Loading...</div>;
+  if (loading) {
+    return (
+      <div className={styles.pageWrapper} style={{ padding: '40px 0', minHeight: '80vh' }}>
+        <div className="container" style={{ maxWidth: '1100px', margin: '0 auto' }}>
+          
+          {/* Animated Header Skeleton */}
+          <div style={{ width: '200px', height: '24px', backgroundColor: '#e5e7eb', borderRadius: '4px', marginBottom: '32px', animation: 'pulse 1.5s infinite' }}></div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '32px' }}>
+            
+            {/* Left Box Skeleton */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div style={{ width: '100%', height: '380px', backgroundColor: '#f3f4f6', borderRadius: '12px', animation: 'pulse 1.5s infinite' }}></div>
+              <div style={{ width: '70%', height: '24px', backgroundColor: '#e5e7eb', borderRadius: '4px' }}></div>
+              <div style={{ width: '40%', height: '20px', backgroundColor: '#e5e7eb', borderRadius: '4px' }}></div>
+            </div>
+
+            {/* Middle Config Skeleton */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <div style={{ width: '100%', height: '120px', backgroundColor: '#f3f4f6', borderRadius: '8px' }}></div>
+              <div style={{ width: '100%', height: '220px', backgroundColor: '#f3f4f6', borderRadius: '8px' }}></div>
+            </div>
+
+            {/* Right Panel Skeleton */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <div style={{ width: '100%', height: '180px', backgroundColor: '#f3f4f6', borderRadius: '8px' }}></div>
+              <div style={{ width: '100%', height: '140px', backgroundColor: '#f3f4f6', borderRadius: '8px' }}></div>
+            </div>
+
+          </div>
+
+          <div style={{ textAlign: 'center', marginTop: '40px', color: '#6b7280', fontWeight: 600, fontSize: '14px' }}>
+            Fetching product specs & pricing live from database...
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !product) {
+    return (
+      <div className={styles.pageWrapper} style={{ padding: '80px 0', textAlign: 'center' }}>
+        <div className="container" style={{ maxWidth: '600px', margin: '0 auto', backgroundColor: '#ffffff', border: '1px solid #e5e7eb', padding: '40px', borderRadius: '12px' }}>
+          <ShoppingBag size={48} color="#9ca3af" style={{ margin: '0 auto 16px auto' }} />
+          <h2 style={{ fontSize: '1.5rem', marginBottom: '8px', color: '#111827' }}>Product Unavailable</h2>
+          <p style={{ color: '#6b7280', marginBottom: '24px' }}>
+            {error || 'The requested product could not be found in our database catalog.'}
+          </p>
+          <button onClick={() => navigate('/products')} className="btn-primary" style={{ padding: '10px 20px', borderRadius: '6px', cursor: 'pointer' }}>
+            Return to Products Catalog
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const SIZE_GROUPS: Record<string, string[]> = {
     'Kids Sizes': ['2Y', '4Y', '6Y', '8Y', '10Y', '12Y'],
