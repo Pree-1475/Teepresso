@@ -1,26 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import React from 'react';
+import Link from 'next/link';
 import { ArrowRight, Box } from 'lucide-react';
 import styles from './FestiveEssentialsCollection.module.css';
-import { API_BASE_URL } from '@/common/config/api';
-import { ProductItem } from '@/types/catalog';
-
+import { PRODUCTS_CATALOG } from '@/features/catalog/data/productsData';
 
 export const FestiveEssentialsCollection = () => {
-  const [productsList, setProductsList] = useState<ProductItem[]>([]);
-
-  useEffect(() => {
-    fetch(`${API_BASE_URL}/products`)
-      .then(res => res.json())
-      .then(data => {
-        if (data.success && Array.isArray(data.products)) {
-          setProductsList(data.products);
-        }
-      })
-      .catch(err => console.error('Failed to load essentials products:', err));
-  }, []);
-
-  const essentials = productsList.filter(p => ['festive-pagdi', 'festive-pancha', 'festive-khanduva', 'festive-zari-khanduva'].includes(p.id));
+  const essentials = PRODUCTS_CATALOG.filter(p => ['festive-pagdi', 'festive-pancha', 'festive-khanduva', 'festive-zari-khanduva'].includes(p.id));
 
   if (essentials.length === 0) return null;
 
@@ -37,7 +22,7 @@ export const FestiveEssentialsCollection = () => {
 
         <div className={styles.grid}>
           {essentials.map(product => (
-            <Link key={product.id} to={`/product/${product.id}`} className={styles.card}>
+            <Link key={product.id} href={`/product/${product.id}`} className={styles.card}>
               <div className={styles.cardImageWrapper}>
                 <img src={product.image} alt={product.name} className={styles.cardImage} />
               </div>

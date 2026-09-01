@@ -1,32 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { ArrowRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { Button } from '@/common/components/ui/Button/Button';
+import { PRODUCTS_CATALOG } from '@/features/catalog/data/productsData';
 import styles from './FestiveTabbedShowcase.module.css';
-import { API_BASE_URL } from '@/common/config/api';
-import { ProductItem } from '@/types/catalog';
-
 
 export function FestiveTabbedShowcase() {
   const [activeTab, setActiveTab] = useState<'kurtas' | 'khanduva' | 'pancha' | 'pagdi'>('kurtas');
-  const [productsList, setProductsList] = useState<ProductItem[]>([]);
 
-  useEffect(() => {
-    fetch(`${API_BASE_URL}/products`)
-      .then(res => res.json())
-      .then(data => {
-        if (data.success && Array.isArray(data.products)) {
-          setProductsList(data.products);
-        }
-      })
-      .catch(err => console.error('Failed to load showcase products:', err));
-  }, []);
-
-  const kurta = productsList.find(p => p.id === 'custom-kurta-seasonal');
-  const khanduva = productsList.find(p => p.id === 'festive-khanduva');
-  const zariKhanduva = productsList.find(p => p.id === 'festive-zari-khanduva');
-  const pancha = productsList.find(p => p.id === 'festive-pancha');
-  const pagdi = productsList.find(p => p.id === 'festive-pagdi');
+  const kurta = PRODUCTS_CATALOG.find(p => p.id === 'custom-kurta-seasonal')!;
+  const khanduva = PRODUCTS_CATALOG.find(p => p.id === 'festive-khanduva')!;
+  const zariKhanduva = PRODUCTS_CATALOG.find(p => p.id === 'festive-zari-khanduva')!;
+  const pancha = PRODUCTS_CATALOG.find(p => p.id === 'festive-pancha')!;
+  const pagdi = PRODUCTS_CATALOG.find(p => p.id === 'festive-pagdi')!;
 
   const tabs = [
     { id: 'kurtas', label: '1. Kurtas' },
@@ -38,7 +24,6 @@ export function FestiveTabbedShowcase() {
   const renderContent = () => {
     switch (activeTab) {
       case 'kurtas':
-        if (!kurta) return null;
         return (
           <div className={styles.contentGrid} key="kurtas">
             <div className={styles.imageCol}>
@@ -63,7 +48,7 @@ export function FestiveTabbedShowcase() {
               </div>
 
               <div className={styles.actionRow}>
-                <Link to={`/product/${kurta.id}`}>
+                <Link href={`/product/${kurta.id}`}>
                   <Button variant="primary" size="lg" rightIcon={<ArrowRight size={18} />}>
                     CUSTOMIZE & ORDER
                   </Button>
@@ -74,7 +59,6 @@ export function FestiveTabbedShowcase() {
         );
       
       case 'khanduva':
-        if (!khanduva || !zariKhanduva) return null;
         return (
           <div className={styles.contentGrid} key="khanduva">
             <div className={styles.imageCol}>
@@ -99,7 +83,7 @@ export function FestiveTabbedShowcase() {
               </div>
 
               <div className={styles.actionRow}>
-                <Link to={`/product/${khanduva.id}`}>
+                <Link href={`/product/${khanduva.id}`}>
                   <Button variant="primary" size="lg" rightIcon={<ArrowRight size={18} />}>
                     ADD TO CART
                   </Button>
@@ -110,7 +94,6 @@ export function FestiveTabbedShowcase() {
         );
 
       case 'pancha':
-        if (!pancha) return null;
         return (
           <div className={styles.contentGrid} key="pancha">
             <div className={styles.imageCol}>
@@ -131,7 +114,7 @@ export function FestiveTabbedShowcase() {
               </div>
 
               <div className={styles.actionRow}>
-                <Link to={`/product/${pancha.id}`}>
+                <Link href={`/product/${pancha.id}`}>
                   <Button variant="primary" size="lg" rightIcon={<ArrowRight size={18} />}>
                     ADD TO CART
                   </Button>
@@ -142,7 +125,6 @@ export function FestiveTabbedShowcase() {
         );
 
       case 'pagdi':
-        if (!pagdi) return null;
         return (
           <div className={styles.contentGrid} key="pagdi">
             <div className={styles.imageCol}>
@@ -163,7 +145,7 @@ export function FestiveTabbedShowcase() {
               </div>
 
               <div className={styles.actionRow}>
-                <Link to={`/product/${pagdi.id}`}>
+                <Link href={`/product/${pagdi.id}`}>
                   <Button variant="primary" size="lg" rightIcon={<ArrowRight size={18} />}>
                     ADD TO CART
                   </Button>

@@ -5,8 +5,6 @@ import { Button } from '@/common/components/ui/Button/Button';
 import { Input } from '@/common/components/ui/Input/Input';
 import { Phone, KeyRound, LogIn, Lock } from 'lucide-react';
 import styles from './login.module.css';
-import { API_BASE_URL } from '@/common/config/api';
-
 
 export function LoginPage() {
   const [phone, setPhone] = useState<string>('');
@@ -30,26 +28,18 @@ export function LoginPage() {
     }, 800);
   };
 
-  const handleVerifyOTP = async (e: React.FormEvent) => {
+  const handleVerifyOTP = (e: React.FormEvent) => {
     e.preventDefault();
     if (otp.length < 4) {
       alert("Please enter a valid OTP");
       return;
     }
     setIsLoading(true);
-    try {
-      await fetch(`${API_BASE_URL}/auth/otp-login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone })
-      });
-    } catch (err) {
-      console.error('Failed to sync OTP login to backend:', err);
-    } finally {
-      setIsLoading(false);
+    // Simulate verifying OTP
+    setTimeout(() => {
       login(phone, 'customer');
       navigate('/my-orders');
-    }
+    }, 800);
   };
 
   const handleDemoLogin = (role: UserRole) => {

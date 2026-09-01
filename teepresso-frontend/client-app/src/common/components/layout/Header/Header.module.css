@@ -111,28 +111,37 @@
 }
 
 /* Center Logo */
-.logoWrapper {
-  justify-self: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 .logo {
-  font-family: 'Playfair Display', Georgia, serif;
-  font-size: 34px;
-  font-weight: 800;
-  color: #2D1A13;
-  letter-spacing: 0.12em;
-  text-decoration: none;
-  text-transform: uppercase;
-  line-height: 1;
-  transition: transform 0.2s ease, color 0.2s ease;
+  justify-self: center;
 }
 
-.logo:hover {
-  color: #000000;
-  transform: scale(1.03);
+.newBadge {
+  background: linear-gradient(135deg, #D4AF37 0%, #FFF5D1 50%, #D4AF37 100%);
+  background-size: 200% auto;
+  color: #4A3500;
+  font-size: 9px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 12px;
+  margin-left: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  animation: goldShimmer 3s infinite linear;
+  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.4);
+}
+
+@keyframes goldShimmer {
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
+}
+
+.logoText {
+  font-family: var(--font-heading);
+  font-size: 28px;
+  font-weight: 800;
+  color: #2D1A13; /* Dark brown matching inside shirt */
+  letter-spacing: -0.05em;
+  text-decoration: none;
 }
 
 /* Right Navigation */
@@ -202,82 +211,15 @@
   box-shadow: 0 8px 25px rgba(45, 26, 19, 0.4);
 }
 
-.actionGroup {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.loginBtn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-family: var(--font-heading);
-  font-size: 13px;
-  font-weight: 600;
-  color: #2D1A13;
-  text-decoration: none;
-  padding: 6px 14px;
-  border-radius: 20px;
-  border: 1px solid rgba(45, 26, 19, 0.25);
-  background-color: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(4px);
-  transition: all 0.2s ease;
-  white-space: nowrap;
-}
-
-.loginBtn:hover {
-  background-color: rgba(45, 26, 19, 0.08);
-}
-
-.cartBtn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  border: none;
-  color: #2D1A13;
-  cursor: pointer;
-  padding: 6px;
-  position: relative;
-  transition: transform 0.2s ease;
-}
-
-.cartBtn:hover {
-  transform: scale(1.08);
-}
-
-.cartBadge {
-  position: absolute;
-  top: -2px;
-  right: -4px;
-  background-color: #2D1A13;
-  color: #ffffff;
-  font-size: 10px;
-  font-weight: 700;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
+.bagBtn {
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.mobileMenuToggle {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
+  background: none;
   border: none;
-  color: #2D1A13;
+  color: #1A1A1A;
   cursor: pointer;
   padding: 4px;
-}
-
-@media (min-width: 992px) {
-  .mobileMenuToggle {
-    display: none;
-  }
 }
 
 /* User Profile Badge */

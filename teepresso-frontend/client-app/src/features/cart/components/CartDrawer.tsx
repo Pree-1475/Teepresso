@@ -5,6 +5,7 @@ import { useCart } from '../context/CartContext';
 import styles from './CartDrawer.module.css';
 import { X, ShoppingBag, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { PRODUCTS_CATALOG } from '@/features/catalog/data/productsData';
 
 export function CartDrawer() {
   const { cart, isCartDrawerOpen, setIsCartDrawerOpen, removeFromCart } = useCart();
@@ -17,7 +18,10 @@ export function CartDrawer() {
     navigate('/checkout');
   };
 
-
+  const getProductImage = (productId: string) => {
+    const p = PRODUCTS_CATALOG.find(x => x.id === productId);
+    return p?.image || '';
+  };
 
   const hasKurta = cart.items.some(item => item.category === 'Kurtas' || item.id === 'custom-kurta-seasonal');
   const hasPagdi = cart.items.some(item => item.productId === 'festive-pagdi');
@@ -45,51 +49,19 @@ export function CartDrawer() {
           ) : (
             cart.items.map(item => (
               <div key={item.id} className={styles.cartItem}>
-                <img src={item.image || 'https://images.unsplash.com/photo-1610996843657-3f82fc464c17?auto=format&fit=crop&q=80&w=800'} alt={item.name} className={styles.itemImage} />
+                <img src={getProductImage(item.productId)} alt={item.name} className={styles.itemImage} />
                 
                 <div className={styles.itemDetails}>
                   <div className={styles.itemName}>{item.name}</div>
                   
-                  {(() => {
-                    const getColorName = (hexOrName: string) => {
-                      const mapping: Record<string, string> = {
-                        '#8c5b45': 'Brown',
-                        '#d2c4b4': 'Beige',
-                        '#d35400': 'Saffron Orange',
-                        '#27ae60': 'Emerald Green',
-                        '#8e44ad': 'Royal Purple',
-                        '#1f1d1c': 'Charcoal Black',
-                        '#ffffff': 'Classic White',
-                      };
-                      return mapping[hexOrName.toLowerCase()] || hexOrName;
-                    };
-
-                    return item.colorVariants.map((variant, idx) => {
-                      const qty = item.requiresSizes
-                        ? Object.values(variant.sizes).reduce((sum, q) => sum + (q || 0), 0)
-                        : variant.quantity;
-                      
-                      const sizesList = item.requiresSizes
-                        ? Object.entries(variant.sizes)
-                            .filter(([_, q]) => q > 0)
-                            .map(([sz, q]) => `${sz} (${q})`)
-                            .join(', ')
-                        : '';
-
-                      return (
-                        <div key={idx} className={styles.itemMeta} style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px' }}>
-                          {item.requiresColors && (
-                            <div>Color: <strong>{getColorName(variant.color)}</strong></div>
-                          )}
-                          {item.requiresSizes ? (
-                            <div>Sizes: <strong>{sizesList || 'None Selected'}</strong></div>
-                          ) : (
-                            <div>Quantity: <strong>{qty}</strong></div>
-                          )}
-                        </div>
-                      );
-                    });
-                  })()}
+                  {item.colorVariants.map((variant, idx) => (
+                    <div key={idx} className={styles.itemMeta}>
+                      {item.requiresColors && (
+                        <span>Color: <strong>{variant.color}</strong><br/></span>
+                      )}
+                      <span>Quantity: {item.totalItemQuantity}</span>
+                    </div>
+                  ))}
 
                   <div className={styles.itemMeta}>
                     {item.artwork.mode === 'has_design' && <span style={{ color: '#10b981' }}>✓ Design selected</span>}
@@ -109,7 +81,7 @@ export function CartDrawer() {
             <div className={styles.recommendationBox}>
               <div className={styles.recommendationHeader}>✨ Perfect match for your Kurta!</div>
               <div className={styles.recommendationContent}>
-                <img src={'/images/products/pagdi-mockup.jpg'} alt="Festive Pagdi" className={styles.recommendationImg} />
+                <img src={getProductImage('festive-pagdi')} alt="Festive Pagdi" className={styles.recommendationImg} />
                 <div className={styles.recommendationInfo}>
                   <h4>Festive Pagdi</h4>
                   <p>Complete your traditional look with our premium pagdi.</p>

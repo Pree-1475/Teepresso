@@ -2,22 +2,21 @@
   position: sticky; 
   top: 0;
   width: 100%;
-  background-color: #FDFAF7;
+  background-color: transparent;
   z-index: 100;
-  padding: 16px 0;
-  margin-bottom: 0;
-  border-bottom: 1px solid rgba(45, 26, 19, 0.08);
-  transition: all 0.3s ease;
+  padding: 24px 0;
+  margin-bottom: -84px; /* Pulls the hero section up underneath */
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
   will-change: padding, background-color, backdrop-filter, box-shadow;
 }
 
 .scrolled {
-  background: rgba(253, 250, 247, 0.95);
+  background: rgba(253, 250, 247, 0.85); /* FDFAF7 with opacity */
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   padding: 12px 0;
   box-shadow: 0 8px 32px rgba(45, 26, 19, 0.08);
-  border-bottom: 1px solid rgba(45, 26, 19, 0.1);
+  border-bottom: 1px solid rgba(45, 26, 19, 0.06);
 }
 
 .container {
@@ -46,12 +45,11 @@
 
 .logoTitle {
   font-family: var(--font-heading);
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 800;
   line-height: 1;
   color: #2D1A13;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
+  letter-spacing: -0.02em;
 }
 
 .logoSubtitle {
@@ -64,53 +62,85 @@
 
 /* Center Nav */
 .centerNav {
-  display: flex;
+  display: none;
   align-items: center;
-  gap: 24px;
+  gap: 32px;
 }
 
-.navLink {
-  font-family: var(--font-heading);
+@media (min-width: 992px) {
+  .centerNav {
+    display: flex;
+  }
+}
+
+.navLink, .navLinkActive {
+  font-family: var(--font-body);
   font-size: 14px;
   font-weight: 500;
-  color: #5C3D2E;
-  text-decoration: none;
-  transition: color 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.navLink:hover {
-  color: #2D1A13;
-}
-
-.navLinkActive {
-  font-family: var(--font-heading);
-  font-size: 14px;
-  font-weight: 700;
   color: #2D1A13;
   text-decoration: none;
   display: flex;
   align-items: center;
   gap: 4px;
+  transition: color 0.3s ease;
   position: relative;
 }
 
-.newBadge {
-  background: #B56C4A;
-  color: #FFFFFF;
-  font-size: 9px;
+.navLink::after, .navLinkActive::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background-color: #B56C4A;
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  transform: translateX(-50%);
+  border-radius: 2px;
+}
+
+.navLink:hover::after {
+  width: 100%;
+}
+
+.navLink:hover {
+  color: #B56C4A;
+}
+
+.navLinkActive {
   font-weight: 700;
-  padding: 2px 6px;
-  border-radius: 10px;
-  text-transform: uppercase;
+  color: #B56C4A;
+}
+
+.navLinkActive::after {
+  width: 100%;
 }
 
 .chevron {
   font-size: 10px;
+  transform: scaleX(1.5);
+  display: inline-block;
   margin-left: 2px;
-  opacity: 0.7;
+}
+
+.newBadge {
+  background: linear-gradient(135deg, #D4AF37 0%, #FFF5D1 50%, #D4AF37 100%);
+  background-size: 200% auto;
+  color: #4A3500;
+  font-size: 9px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 12px;
+  margin-left: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  animation: goldShimmer 3s infinite linear;
+  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.4);
+}
+
+@keyframes goldShimmer {
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
 }
 
 /* Right Nav */
@@ -121,44 +151,68 @@
 }
 
 .phoneBtn {
-  font-family: var(--font-body);
-  font-size: 13px;
-  font-weight: 600;
-  color: #2D1A13;
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: rgba(45, 26, 19, 0.04);
-  padding: 8px 14px;
-  border-radius: 20px;
-  border: 1px solid rgba(45, 26, 19, 0.1);
-  transition: all 0.2s ease;
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .phoneBtn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: transparent;
+    color: #2D1A13;
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 1px solid #D9CDBF;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
 }
 
 .phoneBtn:hover {
-  background: rgba(45, 26, 19, 0.08);
+  background-color: #F0E6D8;
 }
 
 .whatsappIcon {
-  color: #25D366;
+  color: #4CAF50;
   display: flex;
   align-items: center;
 }
 
 .quoteBtn {
+  background: linear-gradient(90deg, #2D1A13, #4A2B20);
+  color: #FFF;
   font-family: var(--font-body);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
-  color: #FFFFFF;
-  background: #2D1A13;
+  padding: 10px 24px;
+  border-radius: 24px;
   text-decoration: none;
-  padding: 8px 18px;
-  border-radius: 20px;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  box-shadow: 0 4px 15px rgba(45, 26, 19, 0.25);
+  position: relative;
+  overflow: hidden;
+}
+
+.quoteBtn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.6s ease;
+}
+
+.quoteBtn:hover::before {
+  left: 100%;
 }
 
 .quoteBtn:hover {
-  background: #42281D;
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(45, 26, 19, 0.4);
 }

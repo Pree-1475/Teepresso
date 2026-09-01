@@ -22,10 +22,13 @@ import ApproveMockupPage from '@/features/tracking/ApproveMockupPage';
 import LoginPage from '@/features/auth/LoginPage';
 import RegisterPage from '@/features/auth/RegisterPage';
 
+import { StorefrontProvider } from '@/common/context/StorefrontContext';
+
 export function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
+      <StorefrontProvider>
+        <AuthProvider>
         <CartProvider>
           <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
             <AnnouncementBar />
@@ -52,7 +55,8 @@ export function App() {
           <Footer />
           </div>
         </CartProvider>
-      </AuthProvider>
+        </AuthProvider>
+      </StorefrontProvider>
     </BrowserRouter>
   );
 }

@@ -1,68 +1,53 @@
 .bar {
-  background-color: #1a1512;
-  color: #fcfbfa;
+  background-color: #2D1A13; /* Dark brown */
+  color: #FDF9F1; /* Warm beige */
   width: 100%;
-  height: 38px;
   position: relative;
   z-index: 60;
   overflow: hidden;
-  display: flex;
-  align-items: center;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .festiveBar {
-  background-color: #221612;
-  color: #fff8f2;
-  border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+  background-color: #2D1A13;
 }
 
 .marqueeContainer {
-  display: flex;
   width: 100%;
+  display: flex;
   overflow: hidden;
-  user-select: none;
+  padding: 8px 0;
 }
 
 .marqueeTrack {
-  flex-shrink: 0;
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  min-width: 100%;
-  animation: scrollMarquee 28s linear infinite;
-  white-space: nowrap;
+  width: max-content;
+  will-change: transform;
+  animation: scrollLeft 30s linear infinite;
 }
 
-.marqueeContainer:hover .marqueeTrack {
+.marqueeTrack:hover {
   animation-play-state: paused;
 }
 
-@keyframes scrollMarquee {
-  from {
-    transform: translateX(0%);
-  }
-  to {
-    transform: translateX(-100%);
-  }
+@keyframes scrollLeft {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); } /* Shifts exactly half the track width, ensuring a seamless loop if content is repeated enough */
 }
 
-.marqueeTrack span {
-  font-family: var(--font-heading, 'Outfit', 'Inter', sans-serif);
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: inherit;
+.text {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  margin: 0;
+  color: #FDF9F1;
   white-space: nowrap;
-  padding: 0 20px;
-  display: inline-flex;
-  align-items: center;
+  padding-right: 40px; /* Space between repeated text */
 }
 
-.bulletSeparator {
-  color: #D4AF37;
-  font-size: 11px;
-  margin: 0 10px;
-  display: inline-block;
+.diamond {
+  color: #B56C4A; /* Terracotta/Rust color */
+  font-size: 14px;
+  margin: 0 4px;
 }

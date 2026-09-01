@@ -1,6 +1,5 @@
 export interface PlacementConfig {
   id: string;
-  name: string;
   view: 'front' | 'back';
   xPercent: number;
   yPercent: number;
@@ -16,17 +15,21 @@ export interface MockupConfig {
   availablePlacements: PlacementConfig[];
 }
 
-const DEFAULT_PLACEMENTS: PlacementConfig[] = [
-  { id: 'front', name: 'Front Chest', view: 'front', xPercent: 30, yPercent: 25, maxWidthPercent: 40, maxHeightPercent: 50 },
-  { id: 'back', name: 'Back Full', view: 'back', xPercent: 25, yPercent: 20, maxWidthPercent: 50, maxHeightPercent: 60 }
+const defaultPlacements: PlacementConfig[] = [
+  { id: 'front', view: 'front', xPercent: 50, yPercent: 55, maxWidthPercent: 45, maxHeightPercent: 50 },
+  { id: 'left_chest', view: 'front', xPercent: 64, yPercent: 30, maxWidthPercent: 15, maxHeightPercent: 15 },
+  { id: 'right_chest', view: 'front', xPercent: 36, yPercent: 30, maxWidthPercent: 15, maxHeightPercent: 15 },
+  { id: 'left_sleeve', view: 'front', xPercent: 86.5, yPercent: 30, maxWidthPercent: 12, maxHeightPercent: 15 },
+  { id: 'right_sleeve', view: 'front', xPercent: 13.5, yPercent: 30, maxWidthPercent: 12, maxHeightPercent: 15 },
+  { id: 'back', view: 'back', xPercent: 50, yPercent: 55, maxWidthPercent: 45, maxHeightPercent: 50 }
 ];
 
-export function getMockupConfig(productId: string): MockupConfig {
+export const getMockupConfig = (productId: string): MockupConfig => {
   return {
     productId,
-    name: 'Product Mockup',
-    frontImage: '/images/mockups/tshirt-front-base.png',
-    backImage: '/images/mockups/tshirt-back-base.png',
-    availablePlacements: DEFAULT_PLACEMENTS
+    name: 'Generic Mockup',
+    frontImage: '/images/mockups/tshirt-blank.svg',
+    backImage: '/images/mockups/tshirt-blank-back.svg',
+    availablePlacements: defaultPlacements
   };
-}
+};

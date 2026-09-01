@@ -1,30 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
 import { ArrowRight, CheckCircle2, ShieldCheck, Sparkles, Truck } from 'lucide-react';
 import { Button } from '@/common/components/ui/Button/Button';
+import { PRODUCTS_CATALOG, CATEGORIES } from '@/features/catalog/data/productsData';
 import styles from './products.module.css';
-import { API_BASE_URL } from '@/common/config/api';
-import { ProductItem } from '@/types/catalog';
-
 
 export function ProductsPage() {
-  const [productsList, setProductsList] = useState<ProductItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState<string>('All');
 
-  useEffect(() => {
-    fetch(`${API_BASE_URL}/products`)
-      .then(res => res.json())
-      .then(data => {
-        if (data.success && Array.isArray(data.products)) {
-          setProductsList(data.products);
-        }
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error('Failed to load products from backend:', err);
-        setLoading(false);
-      });
-  }, []);
+  const filteredProducts = selectedCategory === 'All'
+    ? PRODUCTS_CATALOG
+    : PRODUCTS_CATALOG.filter(p => p.category === selectedCategory);
 
   return (
     <div className={styles.pageContainer}>
@@ -49,18 +36,44 @@ export function ProductsPage() {
         </div>
       </section>
 
-      <div className="container" style={{ paddingTop: '32px' }}>
+      {/* 2. Product Category Navigation */}
+      <div className={styles.categoryNavWrapper}>
+        <div className="container">
+          <nav className={styles.categoryNav} aria-label="Product categories">
+            {CATEGORIES.map(category => {
+              const isActive = selectedCategory === category;
+              const isKurta = category === 'Kurtas';
+              return (
+                <button
+                  key={category}
+                  className={`${styles.chipBtn} ${isActive ? styles.chipBtnActive : ''} ${isKurta && !isActive ? styles.chipKurta : ''}`}
+                  onClick={() => setSelectedCategory(category)}
+                >
+                  {isKurta ? '✨ Custom Kurtas' : category}
+                </button>
+              );
+            })}
+          </nav>
+        </div>
+      </div>
+
+      <div className="container">
         
-        {/* 2. Product Catalogue Grid */}
-        {loading && <div style={{ textAlign: 'center', padding: '40px' }}>Loading products...</div>}
+
+
+
+        {/* 3. Product Catalogue Grid */}
         <div className={styles.catalogGrid}>
-          {productsList.map(product => (
-            <Link key={product.id} to={`/product/${product.id}`} className={styles.productCard}>
+          {filteredProducts.map(product => (
+            <Link key={product.id} href={`/product/${product.id}`} className={styles.productCard}>
               <div className={styles.imageWrapper}>
-                <img
-                  src={product.image || 'https://images.unsplash.com/photo-1610996843657-3f82fc464c17?auto=format&fit=crop&q=80&w=800'}
+                <Image
+                  src={product.image}
                   alt={product.name}
+                  width={400}
+                  height={500}
                   className={styles.productImg}
+                  unoptimized
                 />
               </div>
 
@@ -69,7 +82,7 @@ export function ProductsPage() {
                 <div className={styles.priceRow}>
                   <span className={styles.productPriceText}>{product.priceRange}</span>
                   <div className={styles.swatchGroup} title="Available colors">
-                    {(product.colors || []).map((colorHex, idx) => (
+                    {product.colors.map((colorHex, idx) => (
                       <span
                         key={idx}
                         className={styles.swatchDot}
@@ -86,19 +99,22 @@ export function ProductsPage() {
           ))}
         </div>
 
+
         {/* 6. Simple CTA near the end */}
         <div className={styles.quoteCtaSection}>
           <h2 className={styles.quoteCtaTitle}>Not sure what you need?</h2>
           <p className={styles.quoteCtaDesc}>
             Tell us your group size, budget, and event dates. Our team will guide you to the perfect fabric, print method, and quantity discounts.
           </p>
-          <Link to="/festive">
+          <Link href="/festive">
             <Button variant="primary" size="lg" rightIcon={<ArrowRight size={18} />}>
               Explore Festive Collection
             </Button>
           </Link>
         </div>
+
       </div>
+
     </div>
   );
 }

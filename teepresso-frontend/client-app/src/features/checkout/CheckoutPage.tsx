@@ -6,8 +6,6 @@ import { useCart } from '@/features/cart/context/CartContext';
 import { useAuth } from '@/features/auth/context/AuthContext';
 import styles from './CheckoutPage.module.css';
 import { ArrowLeft, CheckCircle, ShieldCheck } from 'lucide-react';
-import { API_BASE_URL } from '@/common/config/api';
-
 
 export function CheckoutPage() {
   const { cart, clearCart } = useCart();
@@ -58,33 +56,12 @@ export function CheckoutPage() {
     e.preventDefault();
     setIsSubmitting(true);
     
-    try {
-      const orderPayload = {
-        customerName: customerInfo.name,
-        email: customerInfo.email,
-        phone: customerInfo.phone,
-        orgName: customerInfo.organization || 'Personal Order',
-        orgType: 'Corporate',
-        productName: cart.items.length > 0 ? cart.items[0].name : 'Custom Order',
-        category: cart.items.length > 0 ? cart.items[0].category : 'Apparel',
-        totalPieces: cart.items.reduce((sum, item) => sum + (item.totalItemQuantity || 1), 0),
-        totalAmount: grandTotal,
-        isUrgent: isUrgent,
-        notes: `Delivery to: ${deliveryInfo.address}, ${deliveryInfo.city}, ${deliveryInfo.pincode}`
-      };
-
-      await fetch(`${API_BASE_URL}/orders`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(orderPayload)
-      });
-    } catch (err) {
-      console.error('Failed to submit order to backend:', err);
-    } finally {
+    // Simulate API call
+    setTimeout(() => {
       setIsSubmitting(false);
       setOrderComplete(true);
       clearCart();
-    }
+    }, 1500);
   };
 
   if (orderComplete) {
@@ -187,54 +164,12 @@ export function CheckoutPage() {
             
             <div style={{ marginBottom: '24px' }}>
               {cart.items.map(item => (
-                <div key={item.id} className={styles.summaryItem} style={{ flexDirection: 'column', gap: '4px', borderBottom: '1px solid #eee', paddingBottom: '12px', marginBottom: '12px' }}>
+                <div key={item.id} className={styles.summaryItem} style={{ flexDirection: 'column', gap: '4px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <strong>{item.totalItemQuantity}x {item.name}</strong>
                     <span>₹{item.totalItemPrice.toLocaleString('en-IN')}</span>
                   </div>
-                  
-                  {(() => {
-                    const getColorName = (hexOrName: string) => {
-                      const mapping: Record<string, string> = {
-                        '#8c5b45': 'Brown',
-                        '#d2c4b4': 'Beige',
-                        '#d35400': 'Saffron Orange',
-                        '#27ae60': 'Emerald Green',
-                        '#8e44ad': 'Royal Purple',
-                        '#1f1d1c': 'Charcoal Black',
-                        '#ffffff': 'Classic White',
-                      };
-                      return mapping[hexOrName.toLowerCase()] || hexOrName;
-                    };
-
-                    return item.colorVariants.map((variant, idx) => {
-                      const qty = item.requiresSizes
-                        ? Object.values(variant.sizes).reduce((sum, q) => sum + (q || 0), 0)
-                        : variant.quantity;
-                      
-                      const sizesList = item.requiresSizes
-                        ? Object.entries(variant.sizes)
-                            .filter(([_, q]) => q > 0)
-                            .map(([sz, q]) => `${sz} (${q})`)
-                            .join(', ')
-                        : '';
-
-                      return (
-                        <div key={idx} style={{ fontSize: '0.8rem', color: '#6b7280', paddingLeft: '8px' }}>
-                          {item.requiresColors && (
-                            <span>Color: <strong>{getColorName(variant.color)}</strong></span>
-                          )}
-                          {item.requiresSizes ? (
-                            <span> | Sizes: <strong>{sizesList || 'None'}</strong></span>
-                          ) : (
-                            <span> | Qty: <strong>{qty}</strong></span>
-                          )}
-                        </div>
-                      );
-                    });
-                  })()}
-
-                  <span style={{ fontSize: '0.8rem', color: '#10b981', paddingLeft: '8px', marginTop: '2px' }}>
+                  <span style={{ fontSize: '0.85rem', color: '#6b7280' }}>
                     {item.artwork.mode === 'has_design' ? '✓ Design Attached' : item.artwork.mode === 'need_help' ? '✓ Design Help Requested' : 'No Design'}
                   </span>
                 </div>

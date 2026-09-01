@@ -52,6 +52,10 @@ export const FestiveHero = () => {
         <div className={styles.grid}>
           {/* Text Content */}
           <div className={`${styles.textContent} ${isVisible ? 'fade-in' : ''}`}>
+            <div className={styles.modeLabel}>
+              <span className={styles.modeIcon}>✦</span> FESTIVE MODE
+            </div>
+            
             <h1 className={styles.title}>
               YOUR GROUP.<br/>
               YOUR IDENTITY.<br/>
