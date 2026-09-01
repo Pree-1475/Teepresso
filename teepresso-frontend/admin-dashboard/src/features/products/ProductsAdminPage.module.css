@@ -87,3 +87,131 @@
   border-radius: 50%;
   border: 1px solid var(--color-border);
 }
+
+/* Wagtail-style Form Elements */
+.formPanel {
+  background: var(--color-surface-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+
+.formPanelHeader {
+  padding: 16px 24px;
+  background: rgba(255, 255, 255, 0.01);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.formPanelTitle {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-title);
+}
+
+.formPanelBody {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.formRow {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+  padding-left: 12px;
+  border-left: 3px solid transparent;
+  transition: border-color 0.15s ease;
+}
+
+.formRow:focus-within {
+  border-left-color: var(--color-primary);
+}
+
+.formLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-title);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.formHelp {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+.formInput {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-beige);
+  color: var(--color-text-title);
+  font-size: 13px;
+  outline: none;
+  transition: all 0.15s ease;
+}
+
+.formInput:focus {
+  border-color: var(--color-primary);
+  background: #111111;
+  box-shadow: 0 0 0 2px rgba(5, 122, 120, 0.2);
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 600px) {
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.formCheckboxGroup {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.formCheckboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-beige);
+  border: 1px solid var(--color-border);
+  transition: all 0.15s ease;
+}
+
+.formCheckboxLabel:hover {
+  background: var(--color-surface-hover);
+  border-color: var(--color-border-hover);
+}
+
+.formCheckboxInput {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--color-primary);
+}
+
+.stickyFooter {
+  margin-top: 32px;
+  padding-top: 20px;
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}

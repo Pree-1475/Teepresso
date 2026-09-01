@@ -28,18 +28,26 @@ export function LoginPage() {
     }, 800);
   };
 
-  const handleVerifyOTP = (e: React.FormEvent) => {
+  const handleVerifyOTP = async (e: React.FormEvent) => {
     e.preventDefault();
     if (otp.length < 4) {
       alert("Please enter a valid OTP");
       return;
     }
     setIsLoading(true);
-    // Simulate verifying OTP
-    setTimeout(() => {
+    try {
+      await fetch('http://localhost:5000/api/v1/auth/otp-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone })
+      });
+    } catch (err) {
+      console.error('Failed to sync OTP login to backend:', err);
+    } finally {
+      setIsLoading(false);
       login(phone, 'customer');
       navigate('/my-orders');
-    }, 800);
+    }
   };
 
   const handleDemoLogin = (role: UserRole) => {

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Phone } from 'lucide-react';
 import styles from './FestiveHeader.module.css';
 
 export function FestiveHeader() {
@@ -23,7 +22,6 @@ export function FestiveHeader() {
         <div className={styles.logo}>
           <Link href="/">
             <div className={styles.logoWrapper}>
-              {/* Fake logo icon for mockup purposes */}
               <div className={styles.logoIcon}>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M4 4h16v4H4z" />
@@ -40,25 +38,22 @@ export function FestiveHeader() {
           </Link>
         </div>
 
-        {/* Center Nav */}
+        {/* Center Nav - Clean essential links only */}
         <nav className={styles.centerNav}>
+          <Link href="/" className={styles.navLink}>
+            Home
+          </Link>
           <Link href="/products" className={styles.navLink}>
-            Products <span className={styles.chevron}>v</span>
+            All Products
+          </Link>
+          <Link href="/festive" className={styles.navLinkActive}>
+            Custom Kurtas <span className={styles.newBadge}>New</span>
           </Link>
           <Link href="/how-it-works" className={styles.navLink}>
             How It Works
           </Link>
-          <Link href="/custom-kurtas" className={styles.navLinkActive}>
-            Custom Kurtas <span className={styles.newBadge}>New</span>
-          </Link>
-          <Link href="/our-work" className={styles.navLink}>
-            Our Work
-          </Link>
-          <Link href="/track-order" className={styles.navLink}>
-            Track Order
-          </Link>
-          <Link href="/about" className={styles.navLink}>
-            About Us
+          <Link href="/fabric-guide" className={styles.navLink}>
+            Fabrics
           </Link>
         </nav>
 
@@ -72,8 +67,8 @@ export function FestiveHeader() {
               </svg>
             </span>
           </a>
-          <Link href="/quote" className={styles.quoteBtn}>
-            Get a Quote
+          <Link href="/products" className={styles.quoteBtn}>
+            Browse Catalog
           </Link>
         </div>
 
@@ -81,3 +76,5 @@ export function FestiveHeader() {
     </header>
   );
 }
+
+export default FestiveHeader;

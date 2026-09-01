@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { attendanceDatabase, AttendanceRecord } from '../models/attendanceModel.js';
+import { saveDb } from '../../../config/jsonDb.js';
 
 export const getAttendanceController = (_req: Request, res: Response): void => {
   res.json({
@@ -40,6 +41,7 @@ export const checkInAttendanceController = (req: Request, res: Response): void =
   };
 
   attendanceDatabase.unshift(newRecord);
+  saveDb();
   res.status(201).json({ success: true, message: 'Checked in successfully', record: newRecord });
 };
 
@@ -60,5 +62,7 @@ export const checkOutAttendanceController = (req: Request, res: Response): void 
   record.logoutTime = timeStr;
   record.status = record.status === 'Late' ? 'Late' : 'Present';
 
+  saveDb();
   res.json({ success: true, message: 'Checked out successfully', record });
 };
+

@@ -183,6 +183,25 @@
   border-bottom: none;
 }
 
+/* Wagtail Form Inputs */
+.formInput {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-beige);
+  color: var(--color-text-title);
+  font-size: 13px;
+  outline: none;
+  transition: all 0.15s ease;
+}
+
+.formInput:focus {
+  border-color: var(--color-primary);
+  background: #111111;
+  box-shadow: 0 0 0 2px rgba(5, 122, 120, 0.2);
+}
+
 .editsTable tr:hover {
   background-color: var(--color-surface-hover);
 }
@@ -218,4 +237,103 @@
   text-align: right;
   width: 40px;
   color: var(--color-text-muted);
+}
+
+/* Custom Confirmation Modal */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(2px);
+}
+
+.modalContainer {
+  background-color: var(--color-surface-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  width: 100%;
+  max-width: 480px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+.modalHeader {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modalHeader h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text-title);
+  font-family: var(--font-mono);
+}
+
+.modalCloseBtn {
+  background: transparent;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 4px;
+}
+
+.modalBody {
+  padding: 24px;
+}
+
+.modalWarning {
+  background-color: rgba(192, 57, 43, 0.08);
+  border-left: 4px solid var(--color-status-danger);
+  padding: 12px 16px;
+  border-radius: 2px;
+  color: var(--color-status-danger);
+  font-size: 12px;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.modalInputLabel {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-title);
+  margin-bottom: 8px;
+}
+
+.modalInput {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 2px;
+  font-size: 13px;
+  font-family: var(--font-mono);
+  outline: none;
+  background-color: rgba(255, 255, 255, 0.02);
+  color: var(--color-text-title);
+  box-sizing: border-box;
+}
+
+.modalInput:focus {
+  border-color: var(--color-primary);
+}
+
+.modalFooter {
+  padding: 16px 24px;
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
 }

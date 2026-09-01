@@ -217,3 +217,8 @@ input, select, textarea {
   z-index: 1000;
   padding: 16px;
 }
+
+/* Global Search Input Override to ensure white text */
+input[class*="searchInput"] {
+  color: #ffffff !important;
+}

@@ -1,18 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowRight } from 'lucide-react';
-import Link from 'next/link';
+import { Link } from 'react-router-dom';
 import { Button } from '@/common/components/ui/Button/Button';
 import { PRODUCTS_CATALOG } from '@/features/catalog/data/productsData';
 import styles from './FestiveTabbedShowcase.module.css';
 
 export function FestiveTabbedShowcase() {
   const [activeTab, setActiveTab] = useState<'kurtas' | 'khanduva' | 'pancha' | 'pagdi'>('kurtas');
+  const [productsList, setProductsList] = useState(PRODUCTS_CATALOG);
 
-  const kurta = PRODUCTS_CATALOG.find(p => p.id === 'custom-kurta-seasonal')!;
-  const khanduva = PRODUCTS_CATALOG.find(p => p.id === 'festive-khanduva')!;
-  const zariKhanduva = PRODUCTS_CATALOG.find(p => p.id === 'festive-zari-khanduva')!;
-  const pancha = PRODUCTS_CATALOG.find(p => p.id === 'festive-pancha')!;
-  const pagdi = PRODUCTS_CATALOG.find(p => p.id === 'festive-pagdi')!;
+  useEffect(() => {
+    fetch('http://localhost:5000/api/v1/products')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && Array.isArray(data.products)) {
+          setProductsList(data.products);
+        }
+      })
+      .catch(err => console.error('Failed to load showcase products:', err));
+  }, []);
+
+  const kurta = productsList.find(p => p.id === 'custom-kurta-seasonal') || PRODUCTS_CATALOG.find(p => p.id === 'custom-kurta-seasonal')!;
+  const khanduva = productsList.find(p => p.id === 'festive-khanduva') || PRODUCTS_CATALOG.find(p => p.id === 'festive-khanduva')!;
+  const zariKhanduva = productsList.find(p => p.id === 'festive-zari-khanduva') || PRODUCTS_CATALOG.find(p => p.id === 'festive-zari-khanduva')!;
+  const pancha = productsList.find(p => p.id === 'festive-pancha') || PRODUCTS_CATALOG.find(p => p.id === 'festive-pancha')!;
+  const pagdi = productsList.find(p => p.id === 'festive-pagdi') || PRODUCTS_CATALOG.find(p => p.id === 'festive-pagdi')!;
 
   const tabs = [
     { id: 'kurtas', label: '1. Kurtas' },
@@ -48,7 +60,7 @@ export function FestiveTabbedShowcase() {
               </div>
 
               <div className={styles.actionRow}>
-                <Link href={`/product/${kurta.id}`}>
+                <Link to={`/product/${kurta.id}`}>
                   <Button variant="primary" size="lg" rightIcon={<ArrowRight size={18} />}>
                     CUSTOMIZE & ORDER
                   </Button>
@@ -83,7 +95,7 @@ export function FestiveTabbedShowcase() {
               </div>
 
               <div className={styles.actionRow}>
-                <Link href={`/product/${khanduva.id}`}>
+                <Link to={`/product/${khanduva.id}`}>
                   <Button variant="primary" size="lg" rightIcon={<ArrowRight size={18} />}>
                     ADD TO CART
                   </Button>
@@ -114,7 +126,7 @@ export function FestiveTabbedShowcase() {
               </div>
 
               <div className={styles.actionRow}>
-                <Link href={`/product/${pancha.id}`}>
+                <Link to={`/product/${pancha.id}`}>
                   <Button variant="primary" size="lg" rightIcon={<ArrowRight size={18} />}>
                     ADD TO CART
                   </Button>
@@ -145,7 +157,7 @@ export function FestiveTabbedShowcase() {
               </div>
 
               <div className={styles.actionRow}>
-                <Link href={`/product/${pagdi.id}`}>
+                <Link to={`/product/${pagdi.id}`}>
                   <Button variant="primary" size="lg" rightIcon={<ArrowRight size={18} />}>
                     ADD TO CART
                   </Button>

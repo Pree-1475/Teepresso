@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Environment Variables & Secrets
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+*.json-key
+service-account*.json
+
+# Build Outputs
+dist/
+build/
+*.tsbuildinfo
+
+# Logs & Temporary Files
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+logs/
+tmp/
+scratch/
+
+# Prisma & Database Local Storage
+db.json
+prisma/dev.db
+prisma/dev.db-journal
+
+# OS Files
+.DS_Store
+Thumbs.db

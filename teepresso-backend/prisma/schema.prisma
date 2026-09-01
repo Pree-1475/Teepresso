@@ -1,0 +1,146 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(uuid())
+  name          String
+  email         String   @unique
+  phone         String?
+  orgName       String?
+  orgType       String?
+  totalOrders   Int      @default(0)
+  totalSpent    Int      @default(0)
+  lastOrderDate String?
+  role          String   @default("customer")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Order {
+  id                       String   @id @default(uuid())
+  orderId                  String   @unique
+  customerName             String
+  email                    String?
+  phone                    String?
+  orgName                  String?
+  orgType                  String?
+  productName              String
+  category                 String
+  totalPieces              Int
+  totalAmount              Int
+  orderDate                String
+  estimatedDelivery        String?
+  currentStage             String   @default("Received")
+  isUrgent                 Boolean  @default(false)
+  paymentStatus            String   @default("Pending")
+  paymentDetails           Json?
+  mockupUrl                String?
+  mockupStatus             String?
+  softCopyUrl              String?
+  hasWatermark             Boolean  @default(true)
+  whatsappNotificationSent Boolean  @default(false)
+  dispatchDetails          Json?
+  notes                    String?
+  items                    Json?
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
+}
+
+model Product {
+  id                  String   @id @default(uuid())
+  name                String
+  category            String
+  shortDesc           String?
+  startingPrice       Int
+  priceRange          String?
+  colors              Json?
+  sizes               Json?
+  patterns            Json?
+  image               String?
+  popularFor          String?
+  requiresSizes       Boolean  @default(true)
+  requiresColors      Boolean  @default(true)
+  requiresPatterns    Boolean  @default(false)
+  requiresMockup      Boolean  @default(true)
+  applyVolumeDiscount Boolean  @default(false)
+  isSeasonalKurta     Boolean  @default(false)
+  tiers               Json?
+  stock               Int?
+  sizesStock          Json?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+model Inventory {
+  id            String   @id @default(uuid())
+  itemCode      String   @unique
+  itemName      String
+  category      String
+  stockLevel    Int
+  reorderPoint  Int
+  unitPrice     Int
+  unit          String
+  lastRestocked String
+  supplier      String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Attendance {
+  id        String   @id @default(uuid())
+  staffName String
+  role      String
+  date      String
+  status    String
+  checkIn   String?
+  checkOut  String?
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Category {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  slug        String   @unique
+  image       String?
+  description String?
+  createdAt   DateTime @default(now())
+}
+
+model Color {
+  id        String   @id @default(uuid())
+  name      String
+  hex       String   @unique
+  createdAt DateTime @default(now())
+}
+
+model Size {
+  id        String   @id @default(uuid())
+  name      String
+  category  String
+  chest     String?
+  length    String?
+  createdAt DateTime @default(now())
+}
+
+model Pattern {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  image     String?
+  createdAt DateTime @default(now())
+}
+
+model Setting {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

@@ -1,3 +1,5 @@
+import { registerDatabase } from '../../../config/jsonDb.js';
+
 export interface MonthlySalesData {
   month: string;
   sales: number;
@@ -54,6 +56,8 @@ export const monthlySalesDatabase: MonthlySalesData[] = [
   }
 ];
 
+registerDatabase('reports', monthlySalesDatabase);
+
 export const getBusinessAnalytics = (): BusinessAnalytics => {
   return {
     totalRevenue: 1098235,
@@ -63,3 +67,4 @@ export const getBusinessAnalytics = (): BusinessAnalytics => {
     totalPcsProduced: 2850,
   };
 };
+

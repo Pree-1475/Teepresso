@@ -12,8 +12,15 @@ export interface ProductItem {
   // New configuration flags
   requiresSizes: boolean;
   requiresColors: boolean;
+  requiresPatterns?: boolean;
   requiresMockup: boolean;
   applyVolumeDiscount: boolean;
+  stock?: number;
+  sizesStock?: Record<string, number>;
+  sizes?: string[];
+  patterns?: string[];
+  gallery?: string[];
+  tiers?: { minQty: number; price: number }[];
 }
 
 export const CATEGORIES = [

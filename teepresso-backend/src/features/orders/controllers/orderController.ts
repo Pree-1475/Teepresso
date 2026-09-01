@@ -1,9 +1,19 @@
 import { Request, Response } from 'express';
 import { ordersDatabase, Order } from '../models/orderModel.js';
+import { productsDatabase, Product } from '../../products/models/productModel.js';
+import { usersDatabase } from '../../auth/models/userModel.js';
+import { settingsDatabase } from '../../settings/models/settingsModel.js';
+import { saveDb } from '../../../config/jsonDb.js';
 
-// Get all orders (with optional role-based filtering)
+// Get all orders (with optional role-based filtering or customer phone filtering)
 export const getOrdersController = (req: Request, res: Response): void => {
-  const { role } = req.query;
+  const { role, phone } = req.query;
+
+  if (phone) {
+    const customerOrders = ordersDatabase.filter(o => o.phone === String(phone));
+    res.json({ success: true, orders: customerOrders });
+    return;
+  }
 
   if (role === 'manager') {
     // Limited operational access: only quantity, order details, points/status. No customer PII!
@@ -100,15 +110,72 @@ export const createOrderController = (req: Request, res: Response): void => {
   };
 
   ordersDatabase.push(newOrder);
+
+  // Sync / Upsert Customer Profile in usersDatabase
+  if (phone) {
+    const existingUser = usersDatabase.find(u => u.phone === phone || (email && u.email === email));
+    if (existingUser) {
+      if (customerName) existingUser.name = customerName;
+      if (email) existingUser.email = email;
+      if (orgName) existingUser.orgName = orgName;
+      if (orgType) existingUser.orgType = orgType;
+      existingUser.totalOrders = (existingUser.totalOrders || 0) + 1;
+      existingUser.totalSpent = (existingUser.totalSpent || 0) + Number(totalAmount || 0);
+      existingUser.lastOrderDate = dateStr;
+    } else {
+      const newUser = {
+        id: `c_${Date.now()}`,
+        name: customerName || '',
+        email: email || '',
+        phone: phone || '',
+        orgName: orgName || '',
+        orgType: orgType || 'Corporate',
+        totalOrders: 1,
+        totalSpent: Number(totalAmount || 0),
+        lastOrderDate: dateStr,
+        role: 'customer' as const,
+        createdAt: new Date()
+      };
+      usersDatabase.push(newUser);
+    }
+  }
+
+  saveDb();
   res.status(201).json({
     success: true,
     order: newOrder,
   });
 };
 
+// Helper to decrement product inventory stock on paid orders
+const decrementProductStock = (items: any[]) => {
+  if (!Array.isArray(items)) return;
+  for (const item of items) {
+    if (!item.productId) continue;
+    const prod = productsDatabase.find(p => p.id === item.productId);
+    if (prod) {
+      const qty = Number(item.qty || 1);
+      if (prod.stock !== undefined && prod.stock !== null) {
+        prod.stock = Math.max(0, prod.stock - qty);
+      }
+      if (prod.sizesStock && typeof prod.sizesStock === 'object') {
+        const key3 = `${item.color}_${item.pattern}_${item.size}`;
+        const key2 = `${item.color}_${item.size}`;
+        if (prod.sizesStock[key3] !== undefined) {
+          prod.sizesStock[key3] = Math.max(0, Number(prod.sizesStock[key3]) - qty);
+        } else if (prod.sizesStock[key2] !== undefined) {
+          prod.sizesStock[key2] = Math.max(0, Number(prod.sizesStock[key2]) - qty);
+        } else if (item.size && prod.sizesStock[item.size] !== undefined) {
+          prod.sizesStock[item.size] = Math.max(0, Number(prod.sizesStock[item.size]) - qty);
+        }
+      }
+    }
+  }
+};
+
 // Create offline customer order (Manager Panel feature)
 export const createOfflineOrderController = (req: Request, res: Response): void => {
-  const { customerName, phone, orgName, productName, category, totalPieces, totalAmount, notes } = req.body;
+  const { customerName, phone, orgName, productName, category, totalPieces, totalAmount, paymentStatus, items, notes } = req.body;
 
   const orderId = `TP-${new Date().getFullYear()}-OFFLINE-${Math.floor(1000 + Math.random() * 9000)}`;
   const dateStr = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
@@ -132,7 +199,7 @@ export const createOfflineOrderController = (req: Request, res: Response): void 
     estimatedDelivery: deliveryStr,
     currentStage: 'Order Placed',
     isUrgent: false,
-    paymentStatus: 'Pending', // Offline orders default to pending until QR payment collected
+    paymentStatus: paymentStatus || 'Pending',
     paymentDetails: null,
     mockupUrl: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&q=80&w=250',
     mockupStatus: 'Pending Editing',
@@ -148,9 +215,12 @@ export const createOfflineOrderController = (req: Request, res: Response): void 
       trackingNumber: '',
     },
     notes: notes || 'Offline Order',
+    items: Array.isArray(items) ? items : []
   };
 
   ordersDatabase.push(newOrder);
+  decrementProductStock(newOrder.items || []);
+  saveDb();
   res.status(201).json({
     success: true,
     order: newOrder,
@@ -167,10 +237,16 @@ export const collectQRPaymentController = (req: Request, res: Response): void =>
     return;
   }
 
-  // Generate simulated UPI QR Code payload
-  const upiPayload = `upi://pay?pa=pay@teepresso&pn=Teepresso&am=${order.totalAmount}&cu=INR&tn=Order_${order.orderId}`;
+  // Fetch dynamic merchant UPI settings
+  const upiSetting = settingsDatabase.find(s => s.key === 'upiVpa');
+  const upiVpa = upiSetting ? upiSetting.value : 'teepresso@upi';
+  const payeeSetting = settingsDatabase.find(s => s.key === 'payeeName');
+  const payeeName = payeeSetting ? payeeSetting.value : 'Teepresso Enterprise';
+
+  // Generate real UPI QR Code payload
+  const upiPayload = `upi://pay?pa=${upiVpa}&pn=${encodeURIComponent(payeeName)}&am=${order.totalAmount}&cu=INR&tn=Order_${order.orderId}`;
   
-  // Return simulated QR data URI (a placeholder QR image using chart API)
+  // Return functional QR data URI
   const qrImage = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(upiPayload)}`;
 
   res.json({
@@ -178,7 +254,8 @@ export const collectQRPaymentController = (req: Request, res: Response): void =>
     upiLink: upiPayload,
     qrUrl: qrImage,
     amount: order.totalAmount,
-    orderId: order.orderId
+    orderId: order.orderId,
+    vpa: upiVpa
   });
 };
 
@@ -199,6 +276,7 @@ export const confirmOfflinePaymentController = (req: Request, res: Response): vo
     date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
   };
 
+  saveDb();
   res.json({
     success: true,
     message: 'Payment confirmed via QR code successfully',
@@ -218,6 +296,7 @@ export const updateOrderStageController = (req: Request, res: Response): void =>
   }
 
   order.currentStage = stage;
+  saveDb();
   res.json({ success: true, message: `Order stage updated to ${stage}`, order });
 };
 
@@ -252,6 +331,7 @@ export const updateOrderMockupController = (req: Request, res: Response): void =
     order.mockupStatus = 'Customer Approval Pending';
   }
 
+  saveDb();
   res.json({
     success: true,
     message: action === 'send_whatsapp' ? 'Mockup sent via WhatsApp notification simulation' : 'Mockup updated successfully',
@@ -288,6 +368,7 @@ export const updateDispatchController = (req: Request, res: Response): void => {
     order.dispatchDetails.invoiceGenerated = true;
   }
 
+  saveDb();
   res.json({
     success: true,
     message: 'Dispatch details updated successfully',

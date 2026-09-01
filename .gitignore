@@ -1,47 +1,34 @@
-# Dependencies
-node_modules/
+# Dependencies across all monorepo packages
 **/node_modules/
-.pnp
-.pnp.js
+**/.pnpm-store/
 
-# Build outputs
-dist/
-**/dist/
-build/
-**/build/
-.next/
-**/.next/
-out/
-**/out/
-
-# Local env files
+# Environment Files & Secrets
 .env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-**/.env*
-!**/.env.example
+**/.env
+**/.env.local
+**/.env.*.local
+**/*.pem
+**/*.key
+**/*service-account*.json
+agy.conf
+agy.*
 
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-lerna-debug.log*
-.pnpm-debug.log*
-
-# IDE & OS files
+# IDE & Tooling Configs
 .vscode/
 .idea/
-*.swp
-*.swo
-.DS_Store
-Thumbs.db
+.gemini/
 
-# Cache & Temp
-.cache/
-**/.cache/
-.vite/
-**/.vite/
+# Build Outputs
+**/dist/
+**/build/
+**/.next/
+**/out/
+**/*.tsbuildinfo
+
+# Local Databases, Logs & Temporary Files
+**/db.json
+**/*.log
+**/.DS_Store
+**/tmp/
+**/scratch/
+**/coverage/

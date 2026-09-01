@@ -1,115 +1,149 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
 import {
   Search,
   Filter,
   Download,
   Plus,
-  MoreHorizontal
+  MoreHorizontal,
+  ShieldAlert,
+  X
 } from 'lucide-react';
 import styles from './OrdersPage.module.css';
 
-interface OrderItem {
+interface Order {
   id: string;
   orderId: string;
-  client: string;
-  org: string;
+  customerName: string;
+  email: string;
+  phone: string;
+  orgName: string;
+  orgType: string;
+  productName: string;
   category: string;
-  product: string;
-  qty: number;
-  total: number;
-  status: string;
-  priority: 'High' | 'Normal' | 'Express';
+  totalPieces: number;
+  totalAmount: number;
+  orderDate: string;
+  estimatedDelivery: string;
+  currentStage: 'Order Placed' | 'Waiting for Approval' | 'Approved' | 'Design in Progress' | 'Printing' | 'Quality Check' | 'Packed' | 'In Transit' | 'Delivered';
+  isUrgent: boolean;
+  paymentStatus: string;
+  notes: string;
 }
 
-const ORDERS_DATA: OrderItem[] = [
-  {
-    id: '1',
-    orderId: 'TP-2026-8842',
-    client: 'Rahul Sharma',
-    org: 'IIT Bombay TechFest',
-    category: 'Kurtas',
-    product: 'Custom Kurta Seasonal Batch',
-    qty: 50,
-    total: 19950,
-    status: 'Waiting for Approval',
-    priority: 'Express'
-  },
-  {
-    id: '2',
-    orderId: 'TP-2026-9011',
-    client: 'Ananya Verma',
-    org: 'ZettaScale Tech Inc.',
-    category: 'T-Shirts',
-    product: 'Heavyweight Oversized Tee',
-    qty: 320,
-    total: 112000,
-    status: 'Printing',
-    priority: 'Normal'
-  },
-  {
-    id: '3',
-    orderId: 'TP-2026-9104',
-    client: 'Vikramaditya Roy',
-    org: 'Greenwood Heights RWA',
-    category: 'Kurtas',
-    product: 'Festive Printed Kurta',
-    qty: 85,
-    total: 38165,
-    status: 'Approved',
-    priority: 'Express'
-  },
-  {
-    id: '4',
-    orderId: 'TP-2026-8720',
-    client: 'Priya Nair',
-    org: 'Global Consulting Group',
-    category: 'Polos',
-    product: 'Corporate Polo Shirt',
-    qty: 200,
-    total: 85800,
-    status: 'Dispatched',
-    priority: 'High'
-  },
-  {
-    id: '5',
-    orderId: 'TP-2026-8519',
-    client: 'Amitabh Sen',
-    org: "St. Xavier's Cultural Club",
-    category: 'Hoodies',
-    product: 'Premium Pullover Hoodie',
-    qty: 60,
-    total: 47940,
-    status: 'QC Check',
-    priority: 'Normal'
-  }
+const STAGES = [
+  'All',
+  'Order Placed',
+  'Waiting for Approval',
+  'Approved',
+  'Printing',
+  'Quality Check',
+  'In Transit',
+  'Delivered'
 ];
 
 export function OrdersPage() {
-  const navigate = useNavigate();
-  const [orders, setOrders] = useState<OrderItem[]>(ORDERS_DATA);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [activeTab, setActiveTab] = useState('All');
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [updatingStage, setUpdatingStage] = useState(false);
+
+  // Get current user role
+  const storedUser = localStorage.getItem('teepresso_user');
+  const currentUser = storedUser ? JSON.parse(storedUser) : null;
+  const isManager = currentUser?.role === 'manager';
+
+  const fetchOrders = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch('http://localhost:5000/api/v1/orders');
+      const data = await res.json();
+      if (data.success) {
+        setOrders(data.orders);
+      }
+    } catch (err) {
+      console.error('Failed to fetch orders:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchOrders();
+  }, []);
+
+  const handleUpdateStage = async (orderId: string, newStage: string) => {
+    setUpdatingStage(true);
+    try {
+      const res = await fetch(`http://localhost:5000/api/v1/orders/${orderId}/stage`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ stage: newStage })
+      });
+      const data = await res.json();
+      if (data.success) {
+        // Update local state
+        setOrders(prev => prev.map(o => o.id === orderId ? { ...o, currentStage: newStage as any } : o));
+        if (selectedOrder && selectedOrder.id === orderId) {
+          setSelectedOrder({ ...selectedOrder, currentStage: newStage as any });
+        }
+      }
+    } catch (err) {
+      console.error('Failed to update stage:', err);
+    } finally {
+      setUpdatingStage(false);
+    }
+  };
 
   const filtered = orders.filter(item => {
-    return item.orderId.toLowerCase().includes(search.toLowerCase()) ||
-           item.org.toLowerCase().includes(search.toLowerCase());
+    const matchesSearch = 
+      item.orderId.toLowerCase().includes(search.toLowerCase()) ||
+      item.orgName.toLowerCase().includes(search.toLowerCase()) ||
+      (!isManager && item.customerName.toLowerCase().includes(search.toLowerCase()));
+    
+    if (activeTab === 'All') return matchesSearch;
+    return item.currentStage === activeTab && matchesSearch;
   });
 
   return (
     <div className={styles.workspace}>
-      
       {/* Header */}
       <div className={styles.header}>
         <div>
           <h1 className={styles.title}>Orders Queue</h1>
           <p className={styles.subtitle}>Manage all production orders and walk-in sales.</p>
         </div>
-        <div className={styles.actions}>
-          <button className="erp-btn-primary" onClick={() => navigate('/offline-orders')} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-            <Plus size={14} />
-            <span>New POS Order</span>
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <button className="erp-btn-secondary" onClick={fetchOrders} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <span>Refresh</span>
           </button>
         </div>
+      </div>
+
+      {/* Tabs */}
+      <div className={styles.tabContainer} style={{ display: 'flex', gap: '8px', marginBottom: '20px', borderBottom: '1px solid #ddd', paddingBottom: '10px', overflowX: 'auto' }}>
+        {STAGES.map(stage => (
+          <button
+            key={stage}
+            onClick={() => setActiveTab(stage)}
+            style={{
+              padding: '8px 16px',
+              border: 'none',
+              background: activeTab === stage ? '#ECEF22' : 'transparent',
+              color: '#0F0F11',
+              fontWeight: 600,
+              borderRadius: '6px',
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+              borderWidth: '1px',
+              borderStyle: 'solid',
+              borderColor: activeTab === stage ? '#0F0F11' : 'transparent'
+            }}
+          >
+            {stage}
+          </button>
+        ))}
       </div>
 
       {/* Toolbar */}
@@ -137,61 +171,167 @@ export function OrdersPage() {
         </div>
       </div>
 
-      {/* Clean Table */}
-      <div className="erp-table-container">
-        <table className="erp-table">
-          <thead>
-            <tr>
-              <th style={{ width: '40px' }}><input type="checkbox" /></th>
-              <th>Order ID</th>
-              <th>Customer</th>
-              <th>Product</th>
-              <th>Quantity</th>
-              <th>Amount</th>
-              <th>Status</th>
-              <th>Priority</th>
-              <th style={{ width: '40px' }}></th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map(item => (
-              <tr key={item.id} onClick={() => navigate(`/orders/${item.id}`)}>
-                <td onClick={e => e.stopPropagation()}><input type="checkbox" /></td>
-                <td className="text-mono">{item.orderId}</td>
-                <td>
-                  <div style={{ fontWeight: 500 }}>{item.client}</div>
-                  <div className="text-muted" style={{ fontSize: '11px' }}>{item.org}</div>
-                </td>
-                <td>
-                  <div style={{ fontWeight: 500 }}>{item.product}</div>
-                  <div className="text-muted" style={{ fontSize: '11px' }}>{item.category}</div>
-                </td>
-                <td>{item.qty} pcs</td>
-                <td>₹{item.total.toLocaleString('en-IN')}</td>
-                <td>
-                  <span className={`badge ${
-                    item.status === 'Approved' ? 'badge-success' : 
-                    item.status === 'Waiting for Approval' ? 'badge-warning' : 
-                    item.status === 'Dispatched' ? 'badge-neutral' : 'badge-info'
-                  }`}>
-                    {item.status}
-                  </span>
-                </td>
-                <td>
-                  {item.priority === 'Express' || item.priority === 'High' ? (
-                    <span className="badge badge-danger">{item.priority}</span>
-                  ) : (
-                    <span className="text-muted">Normal</span>
-                  )}
-                </td>
-                <td onClick={e => e.stopPropagation()}>
-                  <button className={styles.moreBtn}><MoreHorizontal size={14} /></button>
-                </td>
+      {/* Table */}
+      {loading ? (
+        <div style={{ textAlign: 'center', padding: '40px' }}>Loading orders...</div>
+      ) : (
+        <div className="erp-table-container">
+          <table className="erp-table">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Priority</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {filtered.map(item => (
+                <tr key={item.id} onClick={() => setSelectedOrder(item)} style={{ cursor: 'pointer' }}>
+                  <td className="text-mono" style={{ fontWeight: 'bold' }}>{item.orderId}</td>
+                  <td>
+                    <div style={{ fontWeight: 500 }}>
+                      {isManager ? (
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: '#fee2e2', color: '#991b1b', padding: '2px 6px', borderRadius: '4px', fontSize: '11px' }}>
+                          <ShieldAlert size={10} /> Masked
+                        </span>
+                      ) : item.customerName}
+                    </div>
+                    <div className="text-muted" style={{ fontSize: '11px' }}>{item.orgName}</div>
+                  </td>
+                  <td>
+                    <div style={{ fontWeight: 500 }}>{item.productName}</div>
+                    <div className="text-muted" style={{ fontSize: '11px' }}>{item.category}</div>
+                  </td>
+                  <td>{item.totalPieces} pcs</td>
+                  <td>₹{item.totalAmount.toLocaleString('en-IN')}</td>
+                  <td>
+                    <span className="badge badge-info">
+                      {item.currentStage}
+                    </span>
+                  </td>
+                  <td>
+                    {item.isUrgent ? (
+                      <span className="badge badge-danger">Express</span>
+                    ) : (
+                      <span className="text-muted">Normal</span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* Order Inspection Modal */}
+      {selectedOrder && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          background: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            background: '#F8F8F5',
+            border: '3px solid #0F0F11',
+            borderRadius: '12px',
+            width: '90%',
+            maxWidth: '600px',
+            padding: '24px',
+            boxShadow: '8px 8px 0px 0px #0F0F11',
+            position: 'relative'
+          }}>
+            <button 
+              onClick={() => setSelectedOrder(null)} 
+              style={{
+                position: 'absolute',
+                top: '16px',
+                right: '16px',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer'
+              }}
+            >
+              <X size={20} />
+            </button>
+
+            <h2 style={{ fontFamily: 'var(--font-heading)', marginBottom: '16px' }}>Inspect Order: {selectedOrder.orderId}</h2>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '20px' }}>
+              <div>
+                <strong style={{ fontSize: '12px', color: '#666' }}>Client Organization:</strong>
+                <div>{selectedOrder.orgName} ({selectedOrder.orgType})</div>
+              </div>
+              <div>
+                <strong style={{ fontSize: '12px', color: '#666' }}>Apparel Specs:</strong>
+                <div>{selectedOrder.productName}</div>
+              </div>
+              <div>
+                <strong style={{ fontSize: '12px', color: '#666' }}>Quantity / Value:</strong>
+                <div>{selectedOrder.totalPieces} Pcs / ₹{selectedOrder.totalAmount.toLocaleString('en-IN')}</div>
+              </div>
+              <div>
+                <strong style={{ fontSize: '12px', color: '#666' }}>Payment Status:</strong>
+                <div>{selectedOrder.paymentStatus}</div>
+              </div>
+              <div>
+                <strong style={{ fontSize: '12px', color: '#666' }}>Customer Contact:</strong>
+                {isManager ? (
+                  <div style={{ color: '#991b1b', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <ShieldAlert size={12} /> Contact Details Masked (Manager Role)
+                  </div>
+                ) : (
+                  <div>{selectedOrder.customerName} ({selectedOrder.phone} | {selectedOrder.email})</div>
+                )}
+              </div>
+              <div>
+                <strong style={{ fontSize: '12px', color: '#666' }}>Order Date:</strong>
+                <div>{selectedOrder.orderDate}</div>
+              </div>
+            </div>
+
+            {selectedOrder.notes && (
+              <div style={{ background: '#eee', padding: '12px', borderRadius: '6px', marginBottom: '20px', fontSize: '13px' }}>
+                <strong>Notes:</strong> {selectedOrder.notes}
+              </div>
+            )}
+
+            <div style={{ borderTop: '2px dashed #0F0F11', paddingTop: '20px' }}>
+              <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '8px' }}>Update Production Stage:</label>
+              <select
+                disabled={updatingStage}
+                value={selectedOrder.currentStage}
+                onChange={e => handleUpdateStage(selectedOrder.id, e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  borderRadius: '6px',
+                  border: '2px solid #0F0F11',
+                  fontWeight: 600,
+                  fontSize: '14px',
+                  background: '#ECEF22'
+                }}
+              >
+                {STAGES.filter(s => s !== 'All').map(stage => (
+                  <option key={stage} value={stage}>{stage}</option>
+                ))}
+                <option value="Design in Progress">Design in Progress</option>
+                <option value="Packed">Packed</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

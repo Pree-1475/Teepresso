@@ -7,16 +7,25 @@ import { useAuth } from '@/features/auth/context/AuthContext';
 import { useCart } from '@/features/cart/context/CartContext';
 import { Menu, X, ShoppingBag, User as UserIcon, LogOut, PackageCheck, Layers, Home, Sparkles, LogIn, Truck } from 'lucide-react';
 import styles from './Header.module.css';
-import { STOREFRONT_MODE } from '@/common/config/storefront';
 import { FestiveHeader } from './FestiveHeader';
 
+const getInitialMode = (): 'STANDARD' | 'FESTIVE' => {
+  if (typeof window !== 'undefined') {
+    const cached = localStorage.getItem('teepresso_storefront_mode');
+    if (cached === 'FESTIVE' || cached === 'STANDARD') {
+      return cached;
+    }
+  }
+  return 'STANDARD';
+};
+
 export function Header() {
+  const [mode, setMode] = useState<'STANDARD' | 'FESTIVE'>(getInitialMode);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
   const pathname = usePathname();
-  const isProductPage = pathname.startsWith('/product/');
   const router = useRouter();
   const { user, isAuthenticated, logout } = useAuth();
   const { cart, setIsCartDrawerOpen } = useCart();
@@ -28,7 +37,27 @@ export function Header() {
       setIsScrolled(window.scrollY > 10);
     };
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+
+    const fetchSettings = () => {
+      fetch('http://localhost:5000/api/v1/settings')
+        .then(res => res.json())
+        .then(data => {
+          if (data.success && data.settings && data.settings.storefrontMode) {
+            const newMode = data.settings.storefrontMode as 'STANDARD' | 'FESTIVE';
+            setMode(newMode);
+            localStorage.setItem('teepresso_storefront_mode', newMode);
+          }
+        })
+        .catch(() => {});
+    };
+
+    fetchSettings();
+    const interval = setInterval(fetchSettings, 3000);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      clearInterval(interval);
+    };
   }, []);
 
   const handleLogout = () => {
@@ -36,6 +65,10 @@ export function Header() {
     setIsUserMenuOpen(false);
     router.push('/');
   };
+
+  if (mode === 'FESTIVE') {
+    return <FestiveHeader />;
+  }
 
   const userProfileMarkup = (className: string) => (
     isAuthenticated && (
@@ -90,137 +123,100 @@ export function Header() {
               Home
             </Link>
             <Link href="/products" className={`${styles.navLink} ${pathname === '/products' ? styles.activeLink : ''}`}>
-              Products
+              All Products
             </Link>
-            <Link href="/festive" className={`${styles.navLink} ${pathname === '/festive' ? styles.activeLink : ''}`} style={{ color: 'var(--color-primary-600)', fontWeight: 600 }}>
-              Festive <span className={styles.newBadge}>New</span>
-            </Link>
-            <Link href="/fabric-guide" className={`${styles.navLink} ${pathname === '/fabric-guide' ? styles.activeLink : ''}`}>
-              Fabric & Printing
+            <Link href="/festive" className={`${styles.navLink} ${pathname === '/festive' ? styles.activeLink : ''} ${styles.festiveTag}`}>
+              <Sparkles size={14} /> Festive Kurtas
             </Link>
           </div>
-
-          {/* Mobile Hamburger Menu (Only on Product Page) */}
-          {isProductPage && (
-            <button 
-              className={styles.mobileHamburgerBtn}
-              onClick={() => setIsMobileMenuOpen(true)}
-              aria-label="Open menu"
-            >
-              <Menu size={24} strokeWidth={1.5} color="#1a1a1a" />
-            </button>
-          )}
-
-          {/* User Profile Badge (Moved to Left on Mobile Only, hidden on Product Page) */}
-          {!isProductPage && userProfileMarkup(styles.mobileOnlyProfile)}
         </nav>
 
-        {/* Center Logo */}
-        <div className={styles.logo}>
-          <Link href="/">
-            <span className={styles.logoText}>teepresso.</span>
+        {/* Brand Logo */}
+        <div className={styles.logoWrapper}>
+          <Link href="/" className={styles.logo}>
+            TEEPRESSO
           </Link>
         </div>
 
-        {/* Right Nav */}
+        {/* Right Nav / Actions */}
         <div className={styles.rightNav}>
           <div className={styles.desktopRightLinks}>
-            <Link href="/my-orders" className={`${styles.navLink} ${pathname === '/my-orders' ? styles.activeLink : ''}`}>
-              My Orders
+            <Link href="/how-it-works" className={styles.navLink}>
+              How It Works
+            </Link>
+            <Link href="/fabric-guide" className={styles.navLink}>
+              Fabrics
             </Link>
           </div>
-          
-          {!isAuthenticated && (
-            <Link href="/login" className={styles.quoteBtn}>
-              Sign In
-            </Link>
-          )}
 
-          {/* User Profile Badge (Right on Desktop Only) */}
-          {userProfileMarkup(styles.desktopOnlyProfile)}
+          <div className={styles.actionGroup}>
+            {userProfileMarkup(styles.desktopUserGroup)}
 
-          <button 
-            type="button" 
-            className={styles.bagBtn} 
-            aria-label="Open Cart" 
-            onClick={() => setIsCartDrawerOpen(true)}
-            style={{ position: 'relative' }}
-          >
-            <ShoppingBag size={20} strokeWidth={1.5} />
-            {totalCartItems > 0 && (
-              <span className={styles.cartBadge}>{totalCartItems}</span>
+            {!isAuthenticated && (
+              <Link href="/login" className={styles.loginBtn}>
+                <LogIn size={18} />
+                <span>Sign In</span>
+              </Link>
             )}
-          </button>
-          
+
+            <button 
+              type="button" 
+              className={styles.cartBtn}
+              onClick={() => setIsCartDrawerOpen(true)}
+              aria-label="Open Cart"
+            >
+              <ShoppingBag size={20} />
+              {totalCartItems > 0 && (
+                <span className={styles.cartBadge}>{totalCartItems}</span>
+              )}
+            </button>
+
+            <button 
+              type="button" 
+              className={styles.mobileMenuToggle}
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              aria-label="Toggle Menu"
+            >
+              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
         </div>
 
       </div>
 
-      {/* Floating Action Button (FAB) for Mobile Menu (Hidden on Product Page) */}
-      {!isProductPage && (
-        <button 
-          className={`${styles.fabButton} ${isMobileMenuOpen ? styles.fabHidden : ''}`}
-          onClick={() => setIsMobileMenuOpen(true)}
-          aria-label="Open menu"
-        >
-          <Menu size={16} strokeWidth={2.5} /> MENU
-        </button>
-      )}
-
-      {/* Mobile Menu Overlay */}
+      {/* Mobile Drawer */}
       {isMobileMenuOpen && (
-        <div className={styles.mobileMenuOverlay} onClick={() => setIsMobileMenuOpen(false)}></div>
-      )}
+        <div className={styles.mobileDrawer}>
+          <div className={styles.mobileDrawerContent}>
+            {userProfileMarkup(styles.mobileUserGroup)}
 
-      {/* Mobile Menu Card */}
-      <div className={`${styles.mobileMenu} ${isMobileMenuOpen ? styles.mobileMenuOpen : ''} ${isProductPage ? styles.mobileMenuRaised : ''}`}>
-        <nav className={styles.mobileNavWrapper}>
-          <ul className={styles.mobileNavList}>
-            <li>
+            <nav className={styles.mobileNav}>
               <Link href="/" className={styles.mobileNavLink} onClick={() => setIsMobileMenuOpen(false)}>
-                <Home size={18} style={{ marginRight: '8px' }} /> Home
+                <Home size={18} /> Home
               </Link>
-            </li>
-            <li>
               <Link href="/products" className={styles.mobileNavLink} onClick={() => setIsMobileMenuOpen(false)}>
-                <ShoppingBag size={18} style={{ marginRight: '8px' }} /> Products
+                <Layers size={18} /> All Products
               </Link>
-            </li>
-            <li>
-              <Link href="/festive" className={styles.mobileNavLink} onClick={() => setIsMobileMenuOpen(false)}>
-                <Sparkles size={18} style={{ marginRight: '8px' }} /> Festive Collection
+              <Link href="/festive" className={`${styles.mobileNavLink} ${styles.mobileFestiveLink}`} onClick={() => setIsMobileMenuOpen(false)}>
+                <Sparkles size={18} /> Festive Collection
               </Link>
-            </li>
-            <li>
-              <Link href="/my-orders" className={styles.mobileNavLink} onClick={() => setIsMobileMenuOpen(false)}>
-                <Truck size={18} style={{ marginRight: '8px' }} /> My Orders
+              <Link href="/how-it-works" className={styles.mobileNavLink} onClick={() => setIsMobileMenuOpen(false)}>
+                <Truck size={18} /> How It Works
               </Link>
-            </li>
-            {isAuthenticated ? (
-              <li>
-                <button className={`${styles.mobileNavLink} ${styles.mobileActionPill}`} onClick={handleLogout}>
-                  <LogOut size={18} style={{ marginRight: '8px' }} /> Sign Out
-                </button>
-              </li>
-            ) : (
-              <li>
-                <Link href="/login" className={`${styles.mobileNavLink} ${styles.mobileActionPill}`} onClick={() => setIsMobileMenuOpen(false)}>
-                  <LogIn size={18} style={{ marginRight: '8px' }} /> Sign In
+              <Link href="/fabric-guide" className={styles.mobileNavLink} onClick={() => setIsMobileMenuOpen(false)}>
+                <Layers size={18} /> Fabric Guide
+              </Link>
+              {!isAuthenticated && (
+                <Link href="/login" className={styles.mobileNavLink} onClick={() => setIsMobileMenuOpen(false)}>
+                  <LogIn size={18} /> Sign In / Register
                 </Link>
-              </li>
-            )}
-          </ul>
-        </nav>
-        
-        {/* FAB Close Button Morph */}
-        <button 
-          className={styles.fabCloseButton}
-          onClick={() => setIsMobileMenuOpen(false)}
-          aria-label="Close menu"
-        >
-          <X size={24} strokeWidth={2} />
-        </button>
-      </div>
+              )}
+            </nav>
+          </div>
+        </div>
+      )}
     </header>
   );
 }
+
+export default Header;

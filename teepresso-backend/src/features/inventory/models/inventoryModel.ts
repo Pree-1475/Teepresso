@@ -1,3 +1,5 @@
+import { registerDatabase } from '../../../config/jsonDb.js';
+
 export interface InventoryTransaction {
   type: 'IN' | 'OUT';
   quantity: number;
@@ -98,3 +100,6 @@ export const inventoryDatabase: InventoryItem[] = [
     ]
   }
 ];
+
+registerDatabase('inventory', inventoryDatabase);
+

@@ -1,3 +1,5 @@
+import { registerDatabase } from '../../../config/jsonDb.js';
+
 export interface AttendanceRecord {
   id: string;
   employeeName: string;
@@ -65,3 +67,6 @@ export const attendanceDatabase: AttendanceRecord[] = [
     status: 'Active'
   }
 ];
+
+registerDatabase('attendance', attendanceDatabase);
+

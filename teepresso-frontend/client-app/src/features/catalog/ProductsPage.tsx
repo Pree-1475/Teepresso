@@ -1,17 +1,23 @@
-import React, { useState } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { ArrowRight, CheckCircle2, ShieldCheck, Sparkles, Truck } from 'lucide-react';
 import { Button } from '@/common/components/ui/Button/Button';
-import { PRODUCTS_CATALOG, CATEGORIES } from '@/features/catalog/data/productsData';
+import { PRODUCTS_CATALOG } from '@/features/catalog/data/productsData';
 import styles from './products.module.css';
 
 export function ProductsPage() {
-  const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const [productsList, setProductsList] = useState(PRODUCTS_CATALOG);
 
-  const filteredProducts = selectedCategory === 'All'
-    ? PRODUCTS_CATALOG
-    : PRODUCTS_CATALOG.filter(p => p.category === selectedCategory);
+  useEffect(() => {
+    fetch('http://localhost:5000/api/v1/products')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && Array.isArray(data.products)) {
+          setProductsList(data.products);
+        }
+      })
+      .catch(err => console.error('Failed to load products from backend:', err));
+  }, []);
 
   return (
     <div className={styles.pageContainer}>
@@ -36,44 +42,17 @@ export function ProductsPage() {
         </div>
       </section>
 
-      {/* 2. Product Category Navigation */}
-      <div className={styles.categoryNavWrapper}>
-        <div className="container">
-          <nav className={styles.categoryNav} aria-label="Product categories">
-            {CATEGORIES.map(category => {
-              const isActive = selectedCategory === category;
-              const isKurta = category === 'Kurtas';
-              return (
-                <button
-                  key={category}
-                  className={`${styles.chipBtn} ${isActive ? styles.chipBtnActive : ''} ${isKurta && !isActive ? styles.chipKurta : ''}`}
-                  onClick={() => setSelectedCategory(category)}
-                >
-                  {isKurta ? '✨ Custom Kurtas' : category}
-                </button>
-              );
-            })}
-          </nav>
-        </div>
-      </div>
-
-      <div className="container">
+      <div className="container" style={{ paddingTop: '32px' }}>
         
-
-
-
-        {/* 3. Product Catalogue Grid */}
+        {/* 2. Product Catalogue Grid */}
         <div className={styles.catalogGrid}>
-          {filteredProducts.map(product => (
-            <Link key={product.id} href={`/product/${product.id}`} className={styles.productCard}>
+          {productsList.map(product => (
+            <Link key={product.id} to={`/product/${product.id}`} className={styles.productCard}>
               <div className={styles.imageWrapper}>
-                <Image
-                  src={product.image}
+                <img
+                  src={product.image || 'https://images.unsplash.com/photo-1610996843657-3f82fc464c17?auto=format&fit=crop&q=80&w=800'}
                   alt={product.name}
-                  width={400}
-                  height={500}
                   className={styles.productImg}
-                  unoptimized
                 />
               </div>
 
@@ -82,7 +61,7 @@ export function ProductsPage() {
                 <div className={styles.priceRow}>
                   <span className={styles.productPriceText}>{product.priceRange}</span>
                   <div className={styles.swatchGroup} title="Available colors">
-                    {product.colors.map((colorHex, idx) => (
+                    {(product.colors || []).map((colorHex, idx) => (
                       <span
                         key={idx}
                         className={styles.swatchDot}
@@ -99,22 +78,19 @@ export function ProductsPage() {
           ))}
         </div>
 
-
         {/* 6. Simple CTA near the end */}
         <div className={styles.quoteCtaSection}>
           <h2 className={styles.quoteCtaTitle}>Not sure what you need?</h2>
           <p className={styles.quoteCtaDesc}>
             Tell us your group size, budget, and event dates. Our team will guide you to the perfect fabric, print method, and quantity discounts.
           </p>
-          <Link href="/festive">
+          <Link to="/festive">
             <Button variant="primary" size="lg" rightIcon={<ArrowRight size={18} />}>
               Explore Festive Collection
             </Button>
           </Link>
         </div>
-
       </div>
-
     </div>
   );
 }

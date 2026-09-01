@@ -3,33 +3,63 @@ import { Layers, Shield, Sparkles, UserCheck } from 'lucide-react';
 import styles from './LoginPage.module.css';
 
 interface LoginPageProps {
-  onLogin: (role: 'admin' | 'manager' | 'editing_team' | 'dispatch_team', name: string) => void;
+  onLogin: (role: 'admin' | 'manager' | 'editor', name: string, email: string) => void;
 }
 
 export function LoginPage({ onLogin }: LoginPageProps) {
-  const [selectedRole, setSelectedRole] = useState<'admin' | 'manager' | 'editing_team' | 'dispatch_team'>('admin');
+  const [selectedRole, setSelectedRole] = useState<'admin' | 'manager' | 'editor'>('admin');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const getRoleDetails = (role: string) => {
     switch (role) {
-      case 'admin': return { label: 'Administrator', desc: 'Full business analytics, financials, orders & attendance control.' };
+      case 'admin': return { label: 'Administrator', desc: 'Full business analytics, financials, orders, workforce & users control.' };
       case 'manager': return { label: 'Store Manager', desc: 'Manage offline orders, QR payments, billing & inventory stocks.' };
-      case 'editing_team': return { label: 'Design Editor', desc: 'Customer mockup uploads, watermark management & WhatsApp status.' };
-      case 'dispatch_team': return { label: 'Logistics Dispatcher', desc: 'Piece count verification, QC checklist, invoices & shipping label generation.' };
+      case 'editor': return { label: 'Design Editor', desc: 'Customer mockup uploads, watermark management & WhatsApp status.' };
       default: return { label: 'User', desc: '' };
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    let name = 'System User';
-    if (selectedRole === 'admin') name = 'Production Director';
-    if (selectedRole === 'manager') name = 'Operations Manager';
-    if (selectedRole === 'editing_team') name = 'Lead designer';
-    if (selectedRole === 'dispatch_team') name = 'Fulfillment Lead';
+    setIsSubmitting(true);
+    setErrorMsg('');
 
-    onLogin(selectedRole, name);
+    try {
+      const res = await fetch('http://localhost:5000/api/v1/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ emailOrPhone: username, role: selectedRole })
+      });
+      const data = await res.json();
+      if (data.success) {
+        // Authenticated! Pass selected role, name, and email to shell
+        onLogin(data.user.role, data.user.name, data.user.email);
+      } else {
+        setErrorMsg(data.message || 'Invalid credentials');
+      }
+    } catch (err) {
+      // Offline fallback
+      let name = 'System User';
+      let email = username || 'operator@teepresso.com';
+      if (selectedRole === 'admin') {
+        name = 'Production Director';
+        email = 'admin@teepresso.com';
+      }
+      if (selectedRole === 'manager') {
+        name = 'Operations Manager';
+        email = 'manager@teepresso.com';
+      }
+      if (selectedRole === 'editor') {
+        name = 'Lead Designer';
+        email = 'editor@teepresso.com';
+      }
+      onLogin(selectedRole, name, email);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -51,10 +81,16 @@ export function LoginPage({ onLogin }: LoginPageProps) {
           <p className={styles.subtitle}>Select your operational department to proceed</p>
         </div>
 
+        {errorMsg && (
+          <div style={{ background: '#fee2e2', color: '#b91c1c', padding: '10px', borderRadius: '6px', fontSize: '13px', marginBottom: '16px', fontWeight: 600, border: '1px solid #fca5a5' }}>
+            {errorMsg}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className={styles.form}>
           {/* Role selector grid */}
           <div className={styles.roleGrid}>
-            {(['admin', 'manager', 'editing_team', 'dispatch_team'] as const).map(role => (
+            {(['admin', 'manager', 'editor'] as const).map(role => (
               <button
                 key={role}
                 type="button"
@@ -64,8 +100,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
                 <div className={styles.roleIcon}>
                   {role === 'admin' && <Shield size={16} />}
                   {role === 'manager' && <UserCheck size={16} />}
-                  {role === 'editing_team' && <Sparkles size={16} />}
-                  {role === 'dispatch_team' && <Layers size={16} />}
+                  {role === 'editor' && <Sparkles size={16} />}
                 </div>
                 <div className={styles.roleLabel}>{getRoleDetails(role).label}</div>
               </button>
@@ -101,8 +136,8 @@ export function LoginPage({ onLogin }: LoginPageProps) {
             />
           </div>
 
-          <button type="submit" className={styles.submitBtn}>
-            Authorize Console Session
+          <button type="submit" className={styles.submitBtn} disabled={isSubmitting}>
+            {isSubmitting ? 'Authorizing...' : 'Authorize Console Session'}
           </button>
         </form>
 
@@ -113,3 +148,5 @@ export function LoginPage({ onLogin }: LoginPageProps) {
     </div>
   );
 }
+
+export default LoginPage;

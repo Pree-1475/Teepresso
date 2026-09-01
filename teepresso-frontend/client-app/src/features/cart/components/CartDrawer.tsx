@@ -54,14 +54,46 @@ export function CartDrawer() {
                 <div className={styles.itemDetails}>
                   <div className={styles.itemName}>{item.name}</div>
                   
-                  {item.colorVariants.map((variant, idx) => (
-                    <div key={idx} className={styles.itemMeta}>
-                      {item.requiresColors && (
-                        <span>Color: <strong>{variant.color}</strong><br/></span>
-                      )}
-                      <span>Quantity: {item.totalItemQuantity}</span>
-                    </div>
-                  ))}
+                  {(() => {
+                    const getColorName = (hexOrName: string) => {
+                      const mapping: Record<string, string> = {
+                        '#8c5b45': 'Brown',
+                        '#d2c4b4': 'Beige',
+                        '#d35400': 'Saffron Orange',
+                        '#27ae60': 'Emerald Green',
+                        '#8e44ad': 'Royal Purple',
+                        '#1f1d1c': 'Charcoal Black',
+                        '#ffffff': 'Classic White',
+                      };
+                      return mapping[hexOrName.toLowerCase()] || hexOrName;
+                    };
+
+                    return item.colorVariants.map((variant, idx) => {
+                      const qty = item.requiresSizes
+                        ? Object.values(variant.sizes).reduce((sum, q) => sum + (q || 0), 0)
+                        : variant.quantity;
+                      
+                      const sizesList = item.requiresSizes
+                        ? Object.entries(variant.sizes)
+                            .filter(([_, q]) => q > 0)
+                            .map(([sz, q]) => `${sz} (${q})`)
+                            .join(', ')
+                        : '';
+
+                      return (
+                        <div key={idx} className={styles.itemMeta} style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px' }}>
+                          {item.requiresColors && (
+                            <div>Color: <strong>{getColorName(variant.color)}</strong></div>
+                          )}
+                          {item.requiresSizes ? (
+                            <div>Sizes: <strong>{sizesList || 'None Selected'}</strong></div>
+                          ) : (
+                            <div>Quantity: <strong>{qty}</strong></div>
+                          )}
+                        </div>
+                      );
+                    });
+                  })()}
 
                   <div className={styles.itemMeta}>
                     {item.artwork.mode === 'has_design' && <span style={{ color: '#10b981' }}>✓ Design selected</span>}

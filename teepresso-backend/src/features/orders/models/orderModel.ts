@@ -1,3 +1,5 @@
+import { registerDatabase } from '../../../config/jsonDb.js';
+
 export interface Order {
   id: string;
   orderId: string;
@@ -36,6 +38,7 @@ export interface Order {
     ewayBillNumber?: string; // Auto-generated if value > 50,000
   };
   notes: string;
+  items?: any[];
 }
 
 export const ordersDatabase: Order[] = [
@@ -259,3 +262,6 @@ export const ordersDatabase: Order[] = [
     notes: 'Offline order created by Manager. Requires QR payment collection.',
   }
 ];
+
+registerDatabase('orders', ordersDatabase);
+

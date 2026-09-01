@@ -5,7 +5,5 @@
  * Options:
  * - 'STANDARD': The normal T-shirt focused Teepresso homepage.
  * - 'FESTIVE': The custom Kurta focused campaign homepage for communities/groups.
- * 
- * In a future phase, this will be dynamically controlled via the Admin dashboard API.
  */
-export const STOREFRONT_MODE: 'STANDARD' | 'FESTIVE' = 'FESTIVE';
+export const STOREFRONT_MODE: 'STANDARD' | 'FESTIVE' = 'STANDARD';

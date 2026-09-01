@@ -2,7 +2,7 @@
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.4);
-  z-index: 1000;
+  z-index: 2000;
   backdrop-filter: blur(2px);
 }
 
@@ -14,7 +14,7 @@
   max-width: 450px;
   height: 100vh;
   background: #fff;
-  z-index: 1001;
+  z-index: 2001;
   display: flex;
   flex-direction: column;
   box-shadow: -4px 0 24px rgba(0, 0, 0, 0.1);
@@ -61,6 +61,7 @@
 .drawerBody {
   flex: 1;
   overflow-y: auto;
+  min-height: 0;
   padding: 24px;
   display: flex;
   flex-direction: column;
@@ -197,6 +198,7 @@
 
 .recommendationBox {
   margin-top: 16px;
+  margin-bottom: 32px;
   border: 1px solid #10b981;
   border-radius: 12px;
   background: #f0fdf4;

@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { inventoryDatabase, InventoryItem, InventoryTransaction } from '../models/inventoryModel.js';
+import { saveDb } from '../../../config/jsonDb.js';
 
 export const getInventoryController = (_req: Request, res: Response): void => {
   res.json({
@@ -57,6 +58,7 @@ export const updateStockController = (req: Request, res: Response): void => {
   };
 
   item.transactions.unshift(newTx);
+  saveDb();
 
   res.json({
     success: true,
@@ -64,3 +66,4 @@ export const updateStockController = (req: Request, res: Response): void => {
     item,
   });
 };
+
