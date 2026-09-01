@@ -1,16 +1,15 @@
-'use client';
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useCart } from '@/features/cart/context/CartContext';
 import { useAuth } from '@/features/auth/context/AuthContext';
+import { CheckCircle, ShieldCheck, ArrowLeft, PackageCheck } from 'lucide-react';
 import styles from './CheckoutPage.module.css';
-import { ArrowLeft, CheckCircle, ShieldCheck } from 'lucide-react';
+import { API_BASE_URL } from '@/common/config/api';
 
 export function CheckoutPage() {
+  const navigate = useNavigate();
   const { cart, clearCart } = useCart();
   const { user, isAuthenticated } = useAuth();
-  const navigate = useNavigate();
 
   const [customerInfo, setCustomerInfo] = useState({
     name: '',
@@ -29,13 +28,16 @@ export function CheckoutPage() {
   const [isUrgent, setIsUrgent] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderComplete, setOrderComplete] = useState(false);
+  const [confirmedOrderId, setConfirmedOrderId] = useState<string>('');
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (isAuthenticated && user) {
       setCustomerInfo(prev => ({
         ...prev,
         name: user.name || '',
-        email: user.email || ''
+        email: user.email || '',
+        phone: user.phone || ''
       }));
     }
   }, [isAuthenticated, user]);
@@ -55,25 +57,80 @@ export function CheckoutPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
-    // Simulate API call
-    setTimeout(() => {
+    setErrorMessage(null);
+
+    // Format all multi-item cart entries cleanly for database JSONB storage
+    const formattedItems = cart.items.map(item => ({
+      id: item.id,
+      productName: item.name,
+      category: item.category || 'Custom Apparel',
+      totalPieces: item.totalItemQuantity,
+      unitPrice: Math.round(item.totalItemPrice / (item.totalItemQuantity || 1)),
+      totalPrice: item.totalItemPrice,
+      color: item.colorVariants?.[0]?.color || 'Default',
+      colorHex: item.colorVariants?.[0]?.color || '',
+      artworkMode: item.artwork?.mode || 'none',
+      placements: item.artwork?.placements || {}
+    }));
+
+    const totalPieces = cart.items.reduce((sum, item) => sum + item.totalItemQuantity, 0);
+
+    const payload = {
+      customerName: customerInfo.name.trim(),
+      email: customerInfo.email.trim(),
+      phone: customerInfo.phone.trim(),
+      orgName: customerInfo.organization.trim() || 'Individual',
+      orgType: 'Individual',
+      productName: cart.items.length === 1 ? cart.items[0].name : `${cart.items[0].name} (+${cart.items.length - 1} more items)`,
+      category: cart.items[0]?.category || 'Bulk Order',
+      totalPieces,
+      totalAmount: grandTotal,
+      isUrgent,
+      items: formattedItems,
+      deliveryAddress: `${deliveryInfo.address}, ${deliveryInfo.city}, ${deliveryInfo.state} - ${deliveryInfo.pincode}`,
+      notes: `Online Order placed via Storefront Checkout. ${isUrgent ? '[URGENT PROCESSING REQUESTED]' : ''}`
+    };
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/orders/create`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+
+      if (data.success && data.order) {
+        setConfirmedOrderId(data.order.orderId || data.order.id);
+        setOrderComplete(true);
+        clearCart();
+      } else {
+        setErrorMessage(data.message || 'Failed to submit order to database.');
+      }
+    } catch (err) {
+      console.error('Checkout API error:', err);
+      setErrorMessage('Network error while placing order. Please try again.');
+    } finally {
       setIsSubmitting(false);
-      setOrderComplete(true);
-      clearCart();
-    }, 1500);
+    }
   };
 
   if (orderComplete) {
     return (
       <div className={styles.pageContainer} style={{ textAlign: 'center', paddingTop: '100px' }}>
         <CheckCircle size={64} color="#10b981" style={{ marginBottom: '24px' }} />
-        <h1 style={{ marginBottom: '16px' }}>Order Confirmed!</h1>
+        <h1 style={{ marginBottom: '16px' }}>Order Confirmed! ({confirmedOrderId})</h1>
         <p style={{ color: '#666', marginBottom: '32px' }}>
-          Thank you for choosing Teepresso. We have received your order details.<br/>
-          Our team will review your designs and get in touch shortly.
+          Thank you for choosing Teepresso. We have received your order details and saved it to your account.<br/>
+          Our design team will review your specs and send proofing mockups shortly.
         </p>
-        <Link to="/" className="btn-primary">Return Home</Link>
+        <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
+          <Link to="/my-orders" className="btn-primary" style={{ padding: '12px 24px', textDecoration: 'none', borderRadius: '6px', backgroundColor: 'var(--color-primary-600)', color: '#fff', fontWeight: 600 }}>
+            View Order in My Orders
+          </Link>
+          <Link to="/products" className="btn-secondary" style={{ padding: '12px 24px', textDecoration: 'none', borderRadius: '6px', border: '1px solid #ccc', color: '#1a1a1a', fontWeight: 600 }}>
+            Continue Shopping
+          </Link>
+        </div>
       </div>
     );
   }
@@ -86,6 +143,12 @@ export function CheckoutPage() {
           <ArrowLeft size={18} /> Back to Cart
         </button>
 
+        {errorMessage && (
+          <div style={{ padding: '16px', backgroundColor: '#fee2e2', color: '#b91c1c', borderRadius: '8px', marginBottom: '24px', fontWeight: 600 }}>
+            {errorMessage}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className={styles.checkoutLayout}>
           
           <div className={styles.checkoutForm}>
@@ -95,7 +158,7 @@ export function CheckoutPage() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div>
                     <h3 style={{ margin: '0 0 8px 0' }}>Already have an account?</h3>
-                    <p style={{ margin: 0, color: '#6b7280', fontSize: '0.9rem' }}>Log in for faster checkout.</p>
+                    <p style={{ margin: 0, color: '#6b7280', fontSize: '0.9rem' }}>Log in to automatically save this order to your history.</p>
                   </div>
                   <Link to="/login?redirect=/checkout" className="btn-secondary" style={{ padding: '8px 16px', border: '1px solid #ccc', borderRadius: '6px', color: '#1a1a1a', textDecoration: 'none', fontWeight: 600 }}>Log In</Link>
                 </div>
@@ -198,10 +261,10 @@ export function CheckoutPage() {
             </div>
 
             <button type="submit" className={styles.submitBtn} disabled={isSubmitting}>
-              {isSubmitting ? 'Processing...' : 'Confirm Order'} <ShieldCheck size={20} />
+              {isSubmitting ? 'Submitting Order...' : 'Confirm & Submit Order'} <ShieldCheck size={20} />
             </button>
             <p style={{ textAlign: 'center', fontSize: '0.85rem', color: '#6b7280', marginTop: '16px' }}>
-              By confirming your order, you agree to our Terms of Service and Privacy Policy.
+              Saved directly to your customer account and linked with production queue.
             </p>
           </div>
 
