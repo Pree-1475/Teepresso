@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Settings, Sparkles, Sun, CreditCard, Save, CheckCircle2 } from 'lucide-react';
+import { Sparkles, Sun, CreditCard, Save, CheckCircle2, PhoneCall } from 'lucide-react';
 import styles from '../products/ProductsAdminPage.module.css';
 import { API_BASE_URL } from '@/common/config/api';
 
@@ -7,6 +7,7 @@ export function SettingsPage() {
   const [storefrontMode, setStorefrontMode] = useState<'STANDARD' | 'FESTIVE'>('FESTIVE');
   const [upiVpa, setUpiVpa] = useState('9390771123@axl');
   const [payeeName, setPayeeName] = useState('Teepresso Enterprise');
+  const [contactPhone, setContactPhone] = useState('919390771123');
   const [loading, setLoading] = useState(true);
   const [savingKey, setSavingKey] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
@@ -22,6 +23,7 @@ export function SettingsPage() {
         if (data.settings.storefrontMode) setStorefrontMode(data.settings.storefrontMode);
         if (data.settings.upiVpa) setUpiVpa(data.settings.upiVpa);
         if (data.settings.payeeName) setPayeeName(data.settings.payeeName);
+        if (data.settings.contactPhone) setContactPhone(data.settings.contactPhone);
       }
     } catch (err) {
       console.error('Failed to load settings:', err);
@@ -71,7 +73,7 @@ export function SettingsPage() {
       <div className={styles.header} style={{ marginBottom: '24px' }}>
         <div>
           <h1 className={styles.title}>System & Storefront Settings</h1>
-          <p className={styles.subtitle}>Configure live storefront themes, payment gateways, and operational defaults</p>
+          <p className={styles.subtitle}>Configure live storefront themes, payment gateways, and WhatsApp support contact numbers</p>
         </div>
       </div>
 
@@ -171,20 +173,42 @@ export function SettingsPage() {
             </div>
           </div>
 
-          {/* Card 2: Merchant Payment & UPI Settings */}
+          {/* Card 2: Merchant Payment & Contact Phone Settings */}
           <div style={{ backgroundColor: 'var(--color-surface-white)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', padding: '24px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
               <div style={{ width: '36px', height: '36px', borderRadius: '8px', backgroundColor: 'rgba(16, 185, 129, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#10b981' }}>
                 <CreditCard size={18} />
               </div>
               <div>
-                <h3 style={{ margin: 0, fontSize: '16px', color: 'var(--color-text-title)' }}>Offline POS & UPI QR Settings</h3>
-                <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>Configure Merchant VPA for dynamic QR billing</span>
+                <h3 style={{ margin: 0, fontSize: '16px', color: 'var(--color-text-title)' }}>Payment & WhatsApp Support Settings</h3>
+                <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>Configure Merchant VPA and system-wide WhatsApp contact</span>
               </div>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div>
+                <label className={styles.formLabel}>Storefront Contact / WhatsApp Support Number *</label>
+                <input
+                  type="text"
+                  value={contactPhone}
+                  onChange={e => setContactPhone(e.target.value)}
+                  className={styles.formInput}
+                  placeholder="e.g. 919390771123 or 9390771123"
+                />
+                <span className={styles.formHelp}>System-wide WhatsApp number. Clicking "Contact Us" on product pages opens wa.me with this number.</span>
+                <button
+                  type="button"
+                  onClick={() => handleUpdateSetting('contactPhone', contactPhone)}
+                  disabled={savingKey === 'contactPhone'}
+                  className="erp-btn-primary"
+                  style={{ marginTop: '8px', padding: '6px 14px', fontSize: '12px', display: 'inline-flex', gap: '6px', alignItems: 'center', cursor: 'pointer' }}
+                >
+                  <Save size={12} />
+                  <span>{savingKey === 'contactPhone' ? 'Saving...' : 'Save WhatsApp Number'}</span>
+                </button>
+              </div>
+
+              <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: '16px' }}>
                 <label className={styles.formLabel}>Merchant UPI VPA (Virtual Payment Address) *</label>
                 <input
                   type="text"

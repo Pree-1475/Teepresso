@@ -1,3 +1,4 @@
+import { useStorefront } from '@/common/context/StorefrontContext';
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -12,6 +13,7 @@ import { MockupCanvasEditor } from './components/MockupCanvasEditor';
 const defaultSizes: SizeQtyMap = { XS: 0, S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, '4XL': 0, '5XL': 0, '6XL': 0 };
 
 export function ProductPage() {
+  const { contactPhone } = useStorefront();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { addToCart } = useCart();
@@ -326,7 +328,15 @@ export function ProductPage() {
                       <HelpCircle size={16} color="#b45309" />
                       <h4>Need help with design?</h4>
                     </div>
-                    <button className={styles.talkBtn} onClick={() => setDesignMode('need_help')}>Contact Us</button>
+                    <a 
+                      href={`https://wa.me/${(contactPhone || '919390771123').replace(/[^0-9]/g, '').length === 10 ? '91' + (contactPhone || '919390771123').replace(/[^0-9]/g, '') : (contactPhone || '919390771123').replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hi Teepresso Team! I need help with design for ${product?.name || 'custom apparel'}`)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={styles.talkBtn}
+                      style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
+                    >
+                      Contact Us
+                    </a>
                   </div>
                 </div>
               </div>
