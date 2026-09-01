@@ -180,7 +180,7 @@ export function ProductsAdminPage() {
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
                       {p.requiresSizes && <span className="badge badge-success" style={{ fontSize: '10px' }}>Sizes</span>}
                       {p.requiresColors && <span className="badge badge-success" style={{ fontSize: '10px' }}>Colors</span>}
-                      {p.requiresPatterns && <span className="badge badge-primary" style={{ fontSize: '10px', backgroundColor: 'var(--color-primary)', color: '#fff' }}>Patterns</span>}
+                      {p.requiresPatterns && <span className="badge badge-success" style={{ fontSize: '10px' }}>Patterns</span>}
                       {p.requiresMockup && <span className="badge badge-success" style={{ fontSize: '10px' }}>Mockup</span>}
                       {p.applyVolumeDiscount && <span className="badge badge-success" style={{ fontSize: '10px' }}>Discount</span>}
                     </div>

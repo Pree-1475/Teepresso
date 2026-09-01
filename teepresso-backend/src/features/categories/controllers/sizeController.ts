@@ -1,96 +1,90 @@
 import { Request, Response } from 'express';
-import { sizesDatabase, SizeSnippet } from '../models/sizeModel.js';
-import { saveDb } from '../../../config/jsonDb.js';
+import { sql } from '../../../config/db.js';
 
-// Get all sizes
-export const getSizesController = (_req: Request, res: Response): void => {
-  res.json({
-    success: true,
-    sizes: sizesDatabase,
-  });
+export const getSizesController = async (_req: Request, res: Response): Promise<void> => {
+  try {
+    const sizes = await sql`SELECT * FROM sizes ORDER BY "createdAt" ASC`;
+    res.json({ success: true, sizes });
+  } catch (err) {
+    console.error('Error fetching sizes:', err);
+    res.status(500).json({ success: false, message: 'Server error fetching sizes' });
+  }
 };
 
-// Create size
-export const createSizeController = (req: Request, res: Response): void => {
-  const { name, category } = req.body;
-  if (!name) {
-    res.status(400).json({ success: false, message: 'Size name is required' });
-    return;
-  }
-
-  const id = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-  const exists = sizesDatabase.some(s => s.id === id);
-  if (exists) {
-    res.status(400).json({ success: false, message: `Size with name '${name}' already exists` });
-    return;
-  }
-
-  const validatedCategory = category || 'Adult Standard';
-  const newSize: SizeSnippet = { id, name, category: validatedCategory };
-  sizesDatabase.push(newSize);
-  saveDb();
-
-  res.status(201).json({ success: true, size: newSize });
-};
-
-// Update size
-export const updateSizeController = (req: Request, res: Response): void => {
-  const { id } = req.params;
-  const { name, category } = req.body;
-  
-  const sizeIndex = sizesDatabase.findIndex(s => s.id === id);
-  if (sizeIndex === -1) {
-    res.status(404).json({ success: false, message: 'Size not found' });
-    return;
-  }
-
-  if (name) sizesDatabase[sizeIndex].name = name;
-  if (category) sizesDatabase[sizeIndex].category = category;
-  saveDb();
-
-  res.json({ success: true, size: sizesDatabase[sizeIndex] });
-};
-
-// Delete size
-export const deleteSizeController = (req: Request, res: Response): void => {
-  const { id } = req.params;
-  const sizeIndex = sizesDatabase.findIndex(s => s.id === id);
-  if (sizeIndex === -1) {
-    res.status(404).json({ success: false, message: 'Size not found' });
-    return;
-  }
-
-  sizesDatabase.splice(sizeIndex, 1);
-  saveDb();
-
-  res.json({ success: true, message: 'Size deleted successfully' });
-};
-
-// Reorder sizes
-export const reorderSizesController = (req: Request, res: Response): void => {
-  const { orderedIds } = req.body;
-  if (!Array.isArray(orderedIds)) {
-    res.status(400).json({ success: false, message: 'orderedIds array is required' });
-    return;
-  }
-
-  const newOrderedList: SizeSnippet[] = [];
-  orderedIds.forEach(id => {
-    const found = sizesDatabase.find(s => s.id === id);
-    if (found) {
-      newOrderedList.push(found);
+export const createSizeController = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { name, category, chest, length } = req.body;
+    if (!name || !category) {
+      res.status(400).json({ success: false, message: 'Size name and category are required' });
+      return;
     }
-  });
 
-  sizesDatabase.forEach(s => {
-    if (!newOrderedList.some(item => item.id === s.id)) {
-      newOrderedList.push(s);
+    const id = `sz_${Date.now()}`;
+
+    await sql`
+      INSERT INTO sizes (id, name, category, chest, length)
+      VALUES (${id}, ${name}, ${category}, ${chest || ''}, ${length || ''})
+    `;
+
+    const newSize = { id, name, category, chest: chest || '', length: length || '' };
+    res.status(201).json({ success: true, size: newSize });
+  } catch (err) {
+    console.error('Error creating size:', err);
+    res.status(500).json({ success: false, message: (err as Error).message || 'Server error' });
+  }
+};
+
+export const updateSizeController = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const { name, category, chest, length } = req.body;
+
+    const existing = await sql`SELECT * FROM sizes WHERE id = ${String(id)}`;
+    if (existing.length === 0) {
+      res.status(404).json({ success: false, message: 'Size not found' });
+      return;
     }
-  });
 
-  sizesDatabase.length = 0;
-  sizesDatabase.push(...newOrderedList);
-  saveDb();
+    await sql`
+      UPDATE sizes
+      SET name = COALESCE(${name}, name),
+          category = COALESCE(${category}, category),
+          chest = COALESCE(${chest}, chest),
+          length = COALESCE(${length}, length)
+      WHERE id = ${String(id)}
+    `;
 
-  res.json({ success: true, message: 'Sizes reordered successfully', sizes: sizesDatabase });
+    const updated = await sql`SELECT * FROM sizes WHERE id = ${String(id)}`;
+    res.json({ success: true, size: updated[0] });
+  } catch (err) {
+    console.error('Error updating size:', err);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
+export const deleteSizeController = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const result = await sql`DELETE FROM sizes WHERE id = ${String(id)} RETURNING id`;
+    
+    if (result.length === 0) {
+      res.status(404).json({ success: false, message: 'Size not found' });
+      return;
+    }
+
+    res.json({ success: true, message: 'Size deleted successfully' });
+  } catch (err) {
+    console.error('Error deleting size:', err);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
+export const reorderSizesController = async (_req: Request, res: Response): Promise<void> => {
+  try {
+    const sizes = await sql`SELECT * FROM sizes ORDER BY "createdAt" ASC`;
+    res.json({ success: true, sizes });
+  } catch (err) {
+    console.error('Error reordering sizes:', err);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
 };

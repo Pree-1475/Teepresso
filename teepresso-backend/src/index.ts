@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import { config } from './config/index.js';
-import { loadDb } from './config/jsonDb.js';
+import { initNeonDatabase } from './config/db.js';
 import authRoutes from './features/auth/routes/authRoutes.js';
 import { getCustomersController } from './features/auth/controllers/authController.js';
 import orderRoutes from './features/orders/routes/orderRoutes.js';
@@ -15,13 +15,13 @@ import sizeRoutes from './features/categories/routes/sizeRoutes.js';
 import patternRoutes from './features/categories/routes/patternRoutes.js';
 import settingsRoutes from './features/settings/routes/settingsRoutes.js';
 
-// Load local JSON DB
-loadDb();
-
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+
+// Initialize Neon Database Schema on startup
+initNeonDatabase().catch(err => console.error('Database initialization error:', err));
 
 // Health Check Endpoint
 app.get('/health', (_req, res) => {
@@ -45,4 +45,3 @@ app.use(`${config.apiPrefix}/settings`, settingsRoutes);
 app.listen(config.port, () => {
   console.log(`🚀 Teepresso Backend API listening on port ${config.port}`);
 });
-

@@ -1,50 +1,40 @@
 import { Request, Response } from 'express';
-import { settingsDatabase } from '../models/settingsModel.js';
-import { saveDb } from '../../../config/jsonDb.js';
+import { sql } from '../../../config/db.js';
 
-// Get settings
-export const getSettingsController = (_req: Request, res: Response): void => {
-  // Convert settings array to key-value object
-  const settingsObj: Record<string, any> = {};
-  settingsDatabase.forEach(item => {
-    settingsObj[item.key] = item.value;
-  });
-
-  res.json({
-    success: true,
-    settings: settingsObj
-  });
-};
-
-// Update settings
-export const updateSettingsController = (req: Request, res: Response): void => {
-  const updates = req.body; // e.g. { storefrontMode: 'STANDARD' }
-
-  if (typeof updates !== 'object' || updates === null) {
-    res.status(400).json({ success: false, message: 'Invalid updates payload' });
-    return;
+export const getSettingsController = async (_req: Request, res: Response): Promise<void> => {
+  try {
+    const settings = await sql`SELECT * FROM settings`;
+    res.json({ success: true, settings });
+  } catch (err) {
+    console.error('Error fetching settings:', err);
+    res.status(500).json({ success: false, message: 'Server error fetching settings' });
   }
-
-  Object.entries(updates).forEach(([key, value]) => {
-    const existing = settingsDatabase.find(item => item.key === key);
-    if (existing) {
-      existing.value = value;
-    } else {
-      settingsDatabase.push({ key, value });
-    }
-  });
-
-  saveDb();
-
-  // Return full updated settings
-  const settingsObj: Record<string, any> = {};
-  settingsDatabase.forEach(item => {
-    settingsObj[item.key] = item.value;
-  });
-
-  res.json({
-    success: true,
-    message: 'Settings updated successfully',
-    settings: settingsObj
-  });
 };
+
+export const updateSettingController = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { key, value } = req.body;
+    if (!key) {
+      res.status(400).json({ success: false, message: 'Setting key is required' });
+      return;
+    }
+
+    const id = `set_${key}`;
+    const valueJson = JSON.stringify(value);
+
+    await sql`
+      INSERT INTO settings (id, key, value)
+      VALUES (${id}, ${key}, ${valueJson}::jsonb)
+      ON CONFLICT (key) DO UPDATE SET
+        value = EXCLUDED.value
+    `;
+
+    const updated = await sql`SELECT * FROM settings WHERE key = ${key}`;
+    res.json({ success: true, setting: updated[0] });
+  } catch (err) {
+    console.error('Error updating setting:', err);
+    res.status(500).json({ success: false, message: (err as Error).message || 'Server error' });
+  }
+};
+
+export const updateSettingsController = updateSettingController;

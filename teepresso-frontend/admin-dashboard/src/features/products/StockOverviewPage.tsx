@@ -254,24 +254,50 @@ export function StockOverviewPage() {
     return vals.some(v => v > 0 && v <= threshold);
   };
 
-  // Calculate Metrics
+  // Calculate Metrics dynamically from active variants
   let totalUnits = 0;
   let totalLowStockCount = 0;
   let totalOutOfStockCount = 0;
 
   products.forEach(p => {
+    const stockMap = editingSizesStock[p.id] || p.sizesStock || {};
+    
     if (!p.requiresSizes && !p.requiresColors) {
       const q = editingStock[p.id] !== undefined ? editingStock[p.id] : (p.stock || 0);
       totalUnits += q;
       if (q === 0) totalOutOfStockCount++;
       else if (q <= 20) totalLowStockCount++;
+    } else if (p.requiresSizes && p.requiresColors && p.colors && p.sizes) {
+      p.colors.forEach(col => {
+        p.sizes!.forEach(sz => {
+          const key3 = `${col}_${sz}`;
+          const q = stockMap[key3] !== undefined ? Number(stockMap[key3]) : 0;
+          totalUnits += q;
+          if (q === 0) totalOutOfStockCount++;
+          else if (q <= 20) totalLowStockCount++;
+        });
+      });
+    } else if (p.requiresColors && p.colors) {
+      p.colors.forEach(col => {
+        const q = stockMap[col] !== undefined ? Number(stockMap[col]) : 0;
+        totalUnits += q;
+        if (q === 0) totalOutOfStockCount++;
+        else if (q <= 20) totalLowStockCount++;
+      });
+    } else if (p.requiresSizes && p.sizes) {
+      p.sizes.forEach(sz => {
+        const q = stockMap[sz] !== undefined ? Number(stockMap[sz]) : 0;
+        totalUnits += q;
+        if (q === 0) totalOutOfStockCount++;
+        else if (q <= 20) totalLowStockCount++;
+      });
     } else {
-      const map = editingSizesStock[p.id] || p.sizesStock || {};
-      const vals = Object.values(map);
+      const vals = Object.values(stockMap);
       vals.forEach(v => {
-        totalUnits += v;
-        if (v === 0) totalOutOfStockCount++;
-        else if (v <= 20) totalLowStockCount++;
+        const q = Number(v || 0);
+        totalUnits += q;
+        if (q === 0) totalOutOfStockCount++;
+        else if (q <= 20) totalLowStockCount++;
       });
     }
   });

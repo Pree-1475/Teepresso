@@ -67,7 +67,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
             <label className={styles.label}>Email Address</label>
             <input
               type="email"
-              placeholder="e.g. sai@kurtawala.store"
+              placeholder="operator@teepresso.com"
               value={email}
               onChange={e => setEmail(e.target.value)}
               className={styles.input}

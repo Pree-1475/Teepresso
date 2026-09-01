@@ -1,90 +1,128 @@
 import { Request, Response } from 'express';
-import { patternsDatabase, PatternSnippet } from '../models/patternModel.js';
-import { saveDb } from '../../../config/jsonDb.js';
+import { sql } from '../../../config/db.js';
+import { uploadBase64ToGCS } from '../../../config/storageService.js';
+
+// Helper to auto-upload base64 pattern swatches to GCS
+const processPatternImageUpload = async (imageStr: string, patternId: string): Promise<string> => {
+  if (!imageStr) return '';
+  if (imageStr.startsWith('http://') || imageStr.startsWith('https://')) {
+    return imageStr;
+  }
+
+  try {
+    const fileName = `patterns/pattern_${patternId}_${Date.now()}.webp`;
+    const gcsUrl = await uploadBase64ToGCS(imageStr, fileName);
+    return gcsUrl;
+  } catch (err) {
+    console.error('Failed to upload pattern image to GCS:', err);
+    return imageStr;
+  }
+};
 
 // Get all patterns
-export const getPatternsController = (_req: Request, res: Response): void => {
-  res.json({
-    success: true,
-    patterns: patternsDatabase,
-  });
+export const getPatternsController = async (_req: Request, res: Response): Promise<void> => {
+  try {
+    const patterns = await sql`SELECT * FROM patterns ORDER BY "createdAt" ASC`;
+    res.json({
+      success: true,
+      patterns,
+    });
+  } catch (err) {
+    console.error('Error fetching patterns:', err);
+    res.status(500).json({ success: false, message: 'Server error fetching patterns' });
+  }
 };
 
 // Create pattern
-export const createPatternController = (req: Request, res: Response): void => {
-  const { name, image } = req.body;
-  if (!name || !image) {
-    res.status(400).json({ success: false, message: 'Pattern name and image are required' });
-    return;
+export const createPatternController = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { name, image } = req.body;
+    if (!name || !image) {
+      res.status(400).json({ success: false, message: 'Pattern name and image are required' });
+      return;
+    }
+
+    const id = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    
+    const existing = await sql`SELECT * FROM patterns WHERE id = ${id} OR name = ${name}`;
+    if (existing.length > 0) {
+      res.status(400).json({ success: false, message: `Pattern with name '${name}' already exists` });
+      return;
+    }
+
+    const gcsImageUrl = await processPatternImageUpload(image, String(id));
+
+    await sql`
+      INSERT INTO patterns (id, name, image)
+      VALUES (${id}, ${name}, ${gcsImageUrl})
+    `;
+
+    const newPattern = { id, name, image: gcsImageUrl };
+    res.status(201).json({ success: true, pattern: newPattern });
+  } catch (err) {
+    console.error('Error creating pattern:', err);
+    res.status(500).json({ success: false, message: (err as Error).message || 'Server error creating pattern' });
   }
-
-  const id = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-  const exists = patternsDatabase.some(p => p.id === id);
-  if (exists) {
-    res.status(400).json({ success: false, message: `Pattern with name '${name}' already exists` });
-    return;
-  }
-
-  const newPattern: PatternSnippet = { id, name, image };
-  patternsDatabase.push(newPattern);
-  saveDb();
-
-  res.status(201).json({ success: true, pattern: newPattern });
 };
 
 // Update pattern
-export const updatePatternController = (req: Request, res: Response): void => {
-  const { id } = req.params;
-  const { name, image } = req.body;
-  
-  const patternIndex = patternsDatabase.findIndex(p => p.id === id);
-  if (patternIndex === -1) {
-    res.status(404).json({ success: false, message: 'Pattern not found' });
-    return;
+export const updatePatternController = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const { name, image } = req.body;
+
+    const existing = await sql`SELECT * FROM patterns WHERE id = ${id}`;
+    if (existing.length === 0) {
+      res.status(404).json({ success: false, message: 'Pattern not found' });
+      return;
+    }
+
+    if (!name || !image) {
+      res.status(400).json({ success: false, message: 'Pattern name and image are required' });
+      return;
+    }
+
+    const gcsImageUrl = await processPatternImageUpload(image, String(id));
+
+    await sql`
+      UPDATE patterns
+      SET name = ${name}, image = ${gcsImageUrl}
+      WHERE id = ${id}
+    `;
+
+    const updatedPattern = { id, name, image: gcsImageUrl };
+    res.json({ success: true, pattern: updatedPattern });
+  } catch (err) {
+    console.error('Error updating pattern:', err);
+    res.status(500).json({ success: false, message: 'Server error updating pattern' });
   }
-
-  if (!name || !image) {
-    res.status(400).json({ success: false, message: 'Pattern name and image are required' });
-    return;
-  }
-
-  patternsDatabase[patternIndex].name = name;
-  patternsDatabase[patternIndex].image = image;
-  saveDb();
-
-  res.json({ success: true, pattern: patternsDatabase[patternIndex] });
 };
 
 // Delete pattern
-export const deletePatternController = (req: Request, res: Response): void => {
-  const { id } = req.params;
-  const patternIndex = patternsDatabase.findIndex(p => p.id === id);
-  if (patternIndex === -1) {
-    res.status(404).json({ success: false, message: 'Pattern not found' });
-    return;
+export const deletePatternController = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const result = await sql`DELETE FROM patterns WHERE id = ${id} RETURNING id`;
+    
+    if (result.length === 0) {
+      res.status(404).json({ success: false, message: 'Pattern not found' });
+      return;
+    }
+
+    res.json({ success: true, message: 'Pattern deleted successfully' });
+  } catch (err) {
+    console.error('Error deleting pattern:', err);
+    res.status(500).json({ success: false, message: 'Server error deleting pattern' });
   }
-
-  patternsDatabase.splice(patternIndex, 1);
-  saveDb();
-
-  res.json({ success: true, message: 'Pattern deleted successfully' });
 };
 
 // Reorder patterns
-export const reorderPatternsController = (req: Request, res: Response): void => {
-  const { orderedIds } = req.body;
-  if (!Array.isArray(orderedIds)) {
-    res.status(400).json({ success: false, message: 'orderedIds must be an array of pattern IDs' });
-    return;
+export const reorderPatternsController = async (_req: Request, res: Response): Promise<void> => {
+  try {
+    const patterns = await sql`SELECT * FROM patterns ORDER BY "createdAt" ASC`;
+    res.json({ success: true, patterns });
+  } catch (err) {
+    console.error('Error reordering patterns:', err);
+    res.status(500).json({ success: false, message: 'Server error' });
   }
-
-  const newOrderMap = new Map(orderedIds.map((id, index) => [id, index]));
-  patternsDatabase.sort((a, b) => {
-    const orderA = newOrderMap.has(a.id) ? newOrderMap.get(a.id)! : 999;
-    const orderB = newOrderMap.has(b.id) ? newOrderMap.get(b.id)! : 999;
-    return orderA - orderB;
-  });
-
-  saveDb();
-  res.json({ success: true, patterns: patternsDatabase });
 };

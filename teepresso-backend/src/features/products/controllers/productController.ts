@@ -1,9 +1,13 @@
 import { Request, Response } from 'express';
-import { productsDatabase, Product, PriceTier } from '../models/productModel.js';
-import { saveDb } from '../../../config/jsonDb.js';
+import { sql } from '../../../config/db.js';
 import { uploadBase64ToGCS } from '../../../config/storageService.js';
 
-// Helper to auto-calculate starting price and price range from tiers
+interface PriceTier {
+  minQty: number;
+  price: number;
+}
+
+// Helper to process pricing tiers
 const processPricing = (tiers: PriceTier[], fallbackStartingPrice: number, fallbackPriceRange: string) => {
   if (!tiers || tiers.length === 0) {
     return {
@@ -13,10 +17,7 @@ const processPricing = (tiers: PriceTier[], fallbackStartingPrice: number, fallb
     };
   }
 
-  // Sort tiers by minimum quantity ascending
   const sortedTiers = [...tiers].sort((a, b) => Number(a.minQty) - Number(b.minQty));
-  
-  // Find highest & lowest prices in tiers
   const prices = sortedTiers.map(t => Number(t.price));
   const minPrice = Math.min(...prices);
   const maxPrice = Math.max(...prices);
@@ -33,162 +34,193 @@ const processPricing = (tiers: PriceTier[], fallbackStartingPrice: number, fallb
   };
 };
 
-// Get all products
-export const getProductsController = (_req: Request, res: Response): void => {
-  res.json({
-    success: true,
-    products: productsDatabase,
-  });
-};
-
-// Get single product by ID
-export const getProductByIdController = (req: Request, res: Response): void => {
-  const { id } = req.params;
-  const product = productsDatabase.find(p => p.id === id);
-  if (!product) {
-    res.status(404).json({ success: false, message: 'Product not found' });
-    return;
-  }
-  res.json({ success: true, product });
-};
-
 // Helper to auto-upload base64 images to GCS
 const processImageUpload = async (imageStr: string | undefined, pathPrefix: string): Promise<string> => {
   if (!imageStr) return '';
-  if (imageStr.startsWith('data:image/') || (imageStr.length > 500 && !imageStr.startsWith('http'))) {
-    try {
-      const fileName = `${pathPrefix}/${Date.now()}_${Math.floor(Math.random() * 1000)}.png`;
-      const gcsUrl = await uploadBase64ToGCS(imageStr, fileName);
-      return gcsUrl;
-    } catch (err) {
-      console.error('Failed to upload image to GCS, storing fallback string:', err);
-    }
+  if (imageStr.startsWith('http://') || imageStr.startsWith('https://')) return imageStr;
+
+  try {
+    const fileName = `${pathPrefix}/prod_${Date.now()}_${Math.floor(Math.random() * 1000)}.webp`;
+    return await uploadBase64ToGCS(imageStr, fileName);
+  } catch (err) {
+    console.error('Failed to upload image to GCS, storing fallback:', err);
+    return imageStr;
   }
-  return imageStr;
+};
+
+// Get all products
+export const getProductsController = async (_req: Request, res: Response): Promise<void> => {
+  try {
+    const products = await sql`SELECT * FROM products ORDER BY "createdAt" DESC`;
+    res.json({
+      success: true,
+      products,
+    });
+  } catch (err) {
+    console.error('Error fetching products:', err);
+    res.status(500).json({ success: false, message: 'Server error fetching products' });
+  }
+};
+
+// Get single product by ID
+export const getProductByIdController = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const products = await sql`SELECT * FROM products WHERE id = ${String(id)}`;
+    if (products.length === 0) {
+      res.status(404).json({ success: false, message: 'Product not found' });
+      return;
+    }
+    res.json({ success: true, product: products[0] });
+  } catch (err) {
+    console.error('Error fetching product:', err);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
 };
 
 // Create product
 export const createProductController = async (req: Request, res: Response): Promise<void> => {
-  const productData: Omit<Product, 'id'> & { id?: string } = req.body;
-  
-  if (!productData.name || !productData.category) {
-    res.status(400).json({ success: false, message: 'Product name and category are required' });
-    return;
+  try {
+    const productData = req.body;
+    if (!productData.name || !productData.category) {
+      res.status(400).json({ success: false, message: 'Product name and category are required' });
+      return;
+    }
+
+    const id = productData.id || productData.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    
+    const existing = await sql`SELECT * FROM products WHERE id = ${id}`;
+    if (existing.length > 0) {
+      res.status(400).json({ success: false, message: `Product with ID '${id}' already exists` });
+      return;
+    }
+
+    const pricing = processPricing(
+      productData.tiers || [], 
+      Number(productData.startingPrice || 0), 
+      productData.priceRange || ''
+    );
+
+    const imageUrl = await processImageUpload(
+      productData.image || 'https://images.unsplash.com/photo-1610996843657-3f82fc464c17?auto=format&fit=crop&q=80&w=800',
+      'products'
+    );
+
+    const colorsJson = JSON.stringify(Array.isArray(productData.colors) ? productData.colors : []);
+    const sizesJson = JSON.stringify(Array.isArray(productData.sizes) ? productData.sizes : []);
+    const patternsJson = JSON.stringify(Array.isArray(productData.patterns) ? productData.patterns : []);
+    const tiersJson = JSON.stringify(pricing.tiers);
+    const sizesStockJson = JSON.stringify(typeof productData.sizesStock === 'object' ? productData.sizesStock : {});
+
+    await sql`
+      INSERT INTO products (
+        id, name, category, "shortDesc", "startingPrice", "priceRange",
+        colors, sizes, patterns, image, "popularFor", "requiresSizes",
+        "requiresColors", "requiresPatterns", "requiresMockup", "applyVolumeDiscount",
+        "isSeasonalKurta", tiers, stock, "sizesStock"
+      ) VALUES (
+        ${id}, ${productData.name}, ${productData.category}, ${productData.shortDesc || ''},
+        ${pricing.startingPrice}, ${pricing.priceRange}, ${colorsJson}::jsonb, ${sizesJson}::jsonb,
+        ${patternsJson}::jsonb, ${imageUrl}, ${productData.popularFor || ''}, ${!!productData.requiresSizes},
+        ${!!productData.requiresColors}, ${!!productData.requiresPatterns}, ${!!productData.requiresMockup},
+        ${!!productData.applyVolumeDiscount}, ${!!productData.isSeasonalKurta}, ${tiersJson}::jsonb,
+        ${productData.stock !== undefined ? Number(productData.stock) : null}, ${sizesStockJson}::jsonb
+      )
+    `;
+
+    const created = await sql`SELECT * FROM products WHERE id = ${id}`;
+    res.status(201).json({ success: true, message: 'Product created successfully', product: created[0] });
+  } catch (err) {
+    console.error('Error creating product:', err);
+    res.status(500).json({ success: false, message: (err as Error).message || 'Server error creating product' });
   }
-
-  const id = productData.id || productData.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-  
-  const exists = productsDatabase.some(p => p.id === id);
-  if (exists) {
-    res.status(400).json({ success: false, message: `Product with ID '${id}' already exists` });
-    return;
-  }
-
-  // Process pricing tiers
-  const pricing = processPricing(
-    productData.tiers || [], 
-    Number(productData.startingPrice || 0), 
-    productData.priceRange || ''
-  );
-
-  // Upload image to GCS if base64
-  const imageUrl = await processImageUpload(
-    productData.image || 'https://images.unsplash.com/photo-1610996843657-3f82fc464c17?auto=format&fit=crop&q=80&w=800',
-    'products'
-  );
-
-  const newProduct: Product = {
-    id,
-    name: productData.name,
-    category: productData.category,
-    shortDesc: productData.shortDesc || '',
-    startingPrice: pricing.startingPrice,
-    priceRange: pricing.priceRange,
-    colors: Array.isArray(productData.colors) ? productData.colors : [],
-    sizes: Array.isArray(productData.sizes) ? productData.sizes : [],
-    image: imageUrl,
-    gallery: Array.isArray(productData.gallery) ? productData.gallery : [],
-    popularFor: productData.popularFor || '',
-    requiresSizes: !!productData.requiresSizes,
-    requiresColors: !!productData.requiresColors,
-    requiresPatterns: !!productData.requiresPatterns,
-    patterns: Array.isArray(productData.patterns) ? productData.patterns : [],
-    requiresMockup: !!productData.requiresMockup,
-    applyVolumeDiscount: !!productData.applyVolumeDiscount,
-    isSeasonalKurta: !!productData.isSeasonalKurta,
-    tiers: pricing.tiers,
-    stock: productData.stock !== undefined ? Number(productData.stock) : undefined,
-    sizesStock: typeof productData.sizesStock === 'object' ? productData.sizesStock : {},
-  };
-
-  productsDatabase.push(newProduct);
-  saveDb();
-
-  res.status(201).json({ success: true, message: 'Product created successfully', product: newProduct });
 };
 
 // Update product
 export const updateProductController = async (req: Request, res: Response): Promise<void> => {
-  const { id } = req.params;
-  const productIndex = productsDatabase.findIndex(p => p.id === id);
-  if (productIndex === -1) {
-    res.status(404).json({ success: false, message: 'Product not found' });
-    return;
+  try {
+    const { id } = req.params;
+    const existing = await sql`SELECT * FROM products WHERE id = ${String(id)}`;
+    if (existing.length === 0) {
+      res.status(404).json({ success: false, message: 'Product not found' });
+      return;
+    }
+
+    const existingProduct = existing[0];
+    const updateData = req.body;
+
+    if (updateData.image) {
+      updateData.image = await processImageUpload(updateData.image, 'products');
+    }
+
+    let pricing = {
+      startingPrice: existingProduct.startingPrice,
+      priceRange: existingProduct.priceRange,
+      tiers: existingProduct.tiers
+    };
+
+    if (updateData.tiers !== undefined) {
+      pricing = processPricing(
+        updateData.tiers, 
+        Number(updateData.startingPrice !== undefined ? updateData.startingPrice : existingProduct.startingPrice), 
+        updateData.priceRange || ''
+      );
+    } else if (updateData.startingPrice !== undefined) {
+      pricing.startingPrice = Number(updateData.startingPrice);
+      pricing.priceRange = updateData.priceRange || `₹${updateData.startingPrice} / pc`;
+      pricing.tiers = [{ minQty: 1, price: pricing.startingPrice }];
+    }
+
+    const colorsJson = updateData.colors ? JSON.stringify(updateData.colors) : null;
+    const sizesJson = updateData.sizes ? JSON.stringify(updateData.sizes) : null;
+    const patternsJson = updateData.patterns ? JSON.stringify(updateData.patterns) : null;
+    const tiersJson = JSON.stringify(pricing.tiers);
+    const sizesStockJson = updateData.sizesStock ? JSON.stringify(updateData.sizesStock) : null;
+
+    await sql`
+      UPDATE products
+      SET name = COALESCE(${updateData.name}, name),
+          category = COALESCE(${updateData.category}, category),
+          "shortDesc" = COALESCE(${updateData.shortDesc}, "shortDesc"),
+          "startingPrice" = ${pricing.startingPrice},
+          "priceRange" = ${pricing.priceRange},
+          colors = COALESCE(${colorsJson}::jsonb, colors),
+          sizes = COALESCE(${sizesJson}::jsonb, sizes),
+          patterns = COALESCE(${patternsJson}::jsonb, patterns),
+          image = COALESCE(${updateData.image}, image),
+          "popularFor" = COALESCE(${updateData.popularFor}, "popularFor"),
+          "requiresSizes" = COALESCE(${updateData.requiresSizes}, "requiresSizes"),
+          "requiresColors" = COALESCE(${updateData.requiresColors}, "requiresColors"),
+          "requiresPatterns" = COALESCE(${updateData.requiresPatterns}, "requiresPatterns"),
+          "requiresMockup" = COALESCE(${updateData.requiresMockup}, "requiresMockup"),
+          "applyVolumeDiscount" = COALESCE(${updateData.applyVolumeDiscount}, "applyVolumeDiscount"),
+          "isSeasonalKurta" = COALESCE(${updateData.isSeasonalKurta}, "isSeasonalKurta"),
+          tiers = ${tiersJson}::jsonb,
+          stock = COALESCE(${updateData.stock !== undefined ? Number(updateData.stock) : null}, stock),
+          "sizesStock" = COALESCE(${sizesStockJson}::jsonb, "sizesStock")
+      WHERE id = ${String(id)}
+    `;
+
+    const updated = await sql`SELECT * FROM products WHERE id = ${String(id)}`;
+    res.json({ success: true, message: 'Product updated successfully', product: updated[0] });
+  } catch (err) {
+    console.error('Error updating product:', err);
+    res.status(500).json({ success: false, message: 'Server error updating product' });
   }
-
-  const updateData: Partial<Product> = req.body;
-  const existingProduct = productsDatabase[productIndex];
-
-  // Upload new image to GCS if base64 provided
-  if (updateData.image) {
-    updateData.image = await processImageUpload(updateData.image, 'products');
-  }
-
-  // Process updated pricing tiers if present
-  let pricing = {
-    startingPrice: existingProduct.startingPrice,
-    priceRange: existingProduct.priceRange,
-    tiers: existingProduct.tiers
-  };
-
-  if (updateData.tiers !== undefined) {
-    pricing = processPricing(
-      updateData.tiers, 
-      Number(updateData.startingPrice !== undefined ? updateData.startingPrice : existingProduct.startingPrice), 
-      updateData.priceRange || ''
-    );
-  } else if (updateData.startingPrice !== undefined) {
-    pricing.startingPrice = Number(updateData.startingPrice);
-    pricing.priceRange = updateData.priceRange || `₹${updateData.startingPrice} / pc`;
-    pricing.tiers = [{ minQty: 1, price: pricing.startingPrice }];
-  }
-
-  const updatedProduct: Product = {
-    ...existingProduct,
-    ...updateData,
-    id: existingProduct.id,
-    startingPrice: pricing.startingPrice,
-    priceRange: pricing.priceRange,
-    tiers: pricing.tiers,
-  };
-
-  productsDatabase[productIndex] = updatedProduct;
-  saveDb();
-
-  res.json({ success: true, message: 'Product updated successfully', product: updatedProduct });
 };
 
 // Delete product
-export const deleteProductController = (req: Request, res: Response): void => {
-  const { id } = req.params;
-  const productIndex = productsDatabase.findIndex(p => p.id === id);
-  if (productIndex === -1) {
-    res.status(404).json({ success: false, message: 'Product not found' });
-    return;
+export const deleteProductController = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const result = await sql`DELETE FROM products WHERE id = ${String(id)} RETURNING id`;
+    if (result.length === 0) {
+      res.status(404).json({ success: false, message: 'Product not found' });
+      return;
+    }
+    res.json({ success: true, message: 'Product deleted successfully' });
+  } catch (err) {
+    console.error('Error deleting product:', err);
+    res.status(500).json({ success: false, message: 'Server error deleting product' });
   }
-
-  productsDatabase.splice(productIndex, 1);
-  saveDb();
-
-  res.json({ success: true, message: 'Product deleted successfully' });
 };
