@@ -8,7 +8,8 @@ import {
   confirmOfflinePaymentController,
   updateOrderStageController,
   updateOrderMockupController,
-  updateDispatchController
+  updateDispatchController,
+  updateOrderFullController
 } from '../controllers/orderController.js';
 
 const router = Router();
@@ -22,5 +23,6 @@ router.post('/:id/confirm-payment', confirmOfflinePaymentController);
 router.put('/:id/stage', updateOrderStageController);
 router.put('/:id/mockup', updateOrderMockupController);
 router.put('/:id/dispatch', updateDispatchController);
+router.put('/:id', updateOrderFullController);
 
 export default router;

@@ -23,8 +23,41 @@ export function ProductPage() {
   const [activeColor, setActiveColor] = useState<string>('');
   
   // Config state
-  const [sizes, setSizes] = useState<SizeQtyMap>({ ...defaultSizes });
+  const [activePattern, setActivePattern] = useState<string>('Standard');
+  const [matrixSizes, setMatrixSizes] = useState<Record<string, SizeQtyMap>>({});
   const [quantity, setQuantity] = useState<number>(0);
+
+  const currentMatrixKey = `${activeColor || 'Default'}_${activePattern || 'Standard'}`;
+  const currentSizes = matrixSizes[currentMatrixKey] || { ...defaultSizes };
+
+  const updateSize = (sz: string, delta: number) => {
+    setMatrixSizes(prev => {
+      const currentMap = prev[currentMatrixKey] || { ...defaultSizes };
+      const currentVal = currentMap[sz] || 0;
+      const newVal = Math.max(0, currentVal + delta);
+      return {
+        ...prev,
+        [currentMatrixKey]: {
+          ...currentMap,
+          [sz]: newVal
+        }
+      };
+    });
+  };
+
+  const setSizeDirect = (sz: string, val: number) => {
+    setMatrixSizes(prev => {
+      const currentMap = prev[currentMatrixKey] || { ...defaultSizes };
+      const newVal = Math.max(0, isNaN(val) ? 0 : val);
+      return {
+        ...prev,
+        [currentMatrixKey]: {
+          ...currentMap,
+          [sz]: newVal
+        }
+      };
+    });
+  };
   
   const [designMode, setDesignMode] = useState<'none' | 'has_design' | 'need_help'>('none');
   const [instructions, setInstructions] = useState('');
@@ -124,8 +157,8 @@ export function ProductPage() {
 
   const allSizes = Object.values(SIZE_GROUPS).flat();
 
-  const totalQty = product.requiresSizes 
-    ? allSizes.reduce((sum, sz) => sum + (sizes[sz] || 0), 0)
+  const totalQty = product?.requiresSizes
+    ? Object.values(matrixSizes).reduce((tot, map) => tot + Object.values(map).reduce((s, v) => s + (v || 0), 0), 0)
     : quantity;
 
   const getEffectivePrice = (qty: number) => {
@@ -154,7 +187,7 @@ export function ProductPage() {
       id: `var-${Date.now()}`,
       color: activeColor,
       colorHex: activeColor.startsWith('#') ? activeColor : '#000000',
-      sizes: { ...sizes },
+      sizes: currentSizes,
       quantity: product.requiresSizes ? 0 : quantity
     };
 
@@ -175,13 +208,7 @@ export function ProductPage() {
     });
   };
 
-  const updateSize = (sz: keyof SizeQtyMap, delta: number) => {
-    setSizes(prev => ({...prev, [sz]: Math.max(0, (prev[sz] || 0) + delta)}));
-  };
 
-  const setSizeDirect = (sz: keyof SizeQtyMap, val: number) => {
-    setSizes(prev => ({...prev, [sz]: Math.max(0, val || 0)}));
-  };
 
   const effectivePrice = getEffectivePrice(totalQty);
 
@@ -270,7 +297,7 @@ export function ProductPage() {
             {product.requiresSizes ? (
               <div className={styles.sizeCategories}>
                 {Object.entries(SIZE_GROUPS).map(([category, categorySizes]) => {
-                  const categoryTotal = categorySizes.reduce((sum, sz) => sum + (sizes[sz] || 0), 0);
+                  const categoryTotal = categorySizes.reduce((sum, sz) => sum + (currentSizes[sz] || 0), 0);
                   return (
                     <details key={category} className={styles.sizeCategoryDetails} open={category === 'Adult Standard'}>
                       <summary className={styles.sizeCategorySummary}>
@@ -287,7 +314,7 @@ export function ProductPage() {
                           </thead>
                           <tbody>
                             {categorySizes.map(sz => {
-                              const qty = sizes[sz] || 0;
+                              const qty = currentSizes[sz] || 0;
                               return (
                                 <tr key={sz}>
                                   <td className={styles.szName}>{sz}</td>

@@ -351,3 +351,34 @@ export const createOrderController = async (req: Request, res: Response): Promis
     res.status(500).json({ success: false, message: 'Server error' });
   }
 };
+
+export const updateOrderFullController = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const { currentStage, paymentStatus, notes, customerName, email, phone, isUrgent } = req.body;
+
+    const existing = await sql`SELECT * FROM orders WHERE id = ${id}`;
+    if (existing.length === 0) {
+      res.status(404).json({ success: false, message: 'Order not found' });
+      return;
+    }
+
+    await sql`
+      UPDATE orders
+      SET "currentStage" = COALESCE(${currentStage}, "currentStage"),
+          "paymentStatus" = COALESCE(${paymentStatus}, "paymentStatus"),
+          notes = COALESCE(${notes}, notes),
+          "customerName" = COALESCE(${customerName}, "customerName"),
+          email = COALESCE(${email}, email),
+          phone = COALESCE(${phone}, phone),
+          "isUrgent" = COALESCE(${isUrgent}, "isUrgent")
+      WHERE id = ${id}
+    `;
+
+    const updated = await sql`SELECT * FROM orders WHERE id = ${id}`;
+    res.json({ success: true, message: 'Order updated successfully', order: updated[0] });
+  } catch (err) {
+    console.error('Error updating order:', err);
+    res.status(500).json({ success: false, message: 'Server error updating order' });
+  }
+};
