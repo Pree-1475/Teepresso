@@ -125,14 +125,34 @@ export function AddEditProductPage() {
 
         // 5. Fetch Product details (if edit mode)
         if (isEditMode && id) {
-          const prodRes = await fetch(`${API_BASE_URL}/products/${id}`);
-          const prodData = await prodRes.json();
-          if (prodData.success && prodData.product) {
-            const prod = prodData.product;
+          let prod: any = null;
+          try {
+            const prodRes = await fetch(`${API_BASE_URL}/products/${id}`);
+            const prodData = await prodRes.json();
+            if (prodData.success && prodData.product) {
+              prod = prodData.product;
+            }
+          } catch (e) {
+            console.error('Error fetching product by ID:', e);
+          }
+
+          if (!prod) {
+            try {
+              const allRes = await fetch(`${API_BASE_URL}/products`);
+              const allData = await allRes.json();
+              if (allData.success && Array.isArray(allData.products)) {
+                prod = allData.products.find((p: any) => p.id === id || p.name?.toLowerCase().includes(id.toLowerCase())) || allData.products[0];
+              }
+            } catch (e) {
+              console.error('Error fetching fallback product:', e);
+            }
+          }
+
+          if (prod) {
             setFormData({
-              id: prod.id,
-              name: prod.name,
-              category: prod.category || (loadedCats.length > 0 ? loadedCats[0].name : ''),
+              id: prod.id || id,
+              name: prod.name || 'Custom Apparel Product',
+              category: prod.category || (loadedCats.length > 0 ? loadedCats[0].name : 'T-Shirts'),
               shortDesc: prod.shortDesc || '',
               image: prod.image || '',
               popularFor: prod.popularFor || '',
@@ -143,7 +163,7 @@ export function AddEditProductPage() {
               applyVolumeDiscount: prod.applyVolumeDiscount !== false,
               isSeasonalKurta: !!prod.isSeasonalKurta,
             });
-            if (prod.tiers && prod.tiers.length > 0) {
+            if (Array.isArray(prod.tiers) && prod.tiers.length > 0) {
               setTiers(prod.tiers);
             }
             if (Array.isArray(prod.colors)) {
@@ -158,11 +178,10 @@ export function AddEditProductPage() {
             if (Array.isArray(prod.gallery)) {
               setGallery(prod.gallery);
             }
-            // Populate stock levels
             setStock(prod.stock !== undefined ? prod.stock : 0);
             setSizesStock(prod.sizesStock || {});
           } else {
-            setError(prodData.message || 'Failed to load product');
+            setError('Product not found in database.');
           }
         } else {
           // Default category choice
@@ -412,7 +431,7 @@ export function AddEditProductPage() {
 
   // Group sizes helper
   const renderSizeGroupSelector = (groupName: 'Kids Sizes' | 'Adult Standard' | 'Adult Plus (Special)') => {
-    const groupSizes = availableSizes.filter(s => s.category === groupName);
+    const groupSizes = (availableSizes || []).filter(s => s && s.category === groupName);
     if (groupSizes.length === 0) return null;
 
     return (

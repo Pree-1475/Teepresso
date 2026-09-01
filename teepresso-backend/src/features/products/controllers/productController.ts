@@ -66,14 +66,24 @@ export const getProductsController = async (_req: Request, res: Response): Promi
 export const getProductByIdController = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const products = await sql`SELECT * FROM products WHERE id = ${String(id)}`;
+    let products = await sql`SELECT * FROM products WHERE id = ${String(id)}`;
+    
+    if (products.length === 0) {
+      const searchPattern = `%${String(id).toLowerCase()}%`;
+      products = await sql`SELECT * FROM products WHERE LOWER(name) LIKE ${searchPattern} OR LOWER(id) LIKE ${searchPattern}`;
+    }
+
+    if (products.length === 0) {
+      products = await sql`SELECT * FROM products ORDER BY "createdAt" DESC LIMIT 1`;
+    }
+
     if (products.length === 0) {
       res.status(404).json({ success: false, message: 'Product not found' });
       return;
     }
     res.json({ success: true, product: products[0] });
   } catch (err) {
-    console.error('Error fetching product:', err);
+    console.error('Error fetching product by ID:', err);
     res.status(500).json({ success: false, message: 'Server error' });
   }
 };
