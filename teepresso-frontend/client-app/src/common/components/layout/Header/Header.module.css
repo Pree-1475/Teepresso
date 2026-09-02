@@ -274,7 +274,7 @@
 .userDropdownMenu {
   position: absolute;
   top: 100%;
-  right: 0;
+  left: 0;
   margin-top: 8px;
   width: 200px;
   background-color: var(--color-surface);
@@ -517,4 +517,11 @@
 
 .fabCloseButton:hover {
   transform: translateX(-50%) scale(1.1);
+}
+
+@media (min-width: 992px) {
+  .userDropdownMenu {
+    left: auto;
+    right: 0;
+  }
 }
