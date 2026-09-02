@@ -33,9 +33,19 @@ export function MockupsQueuePage() {
       const data = await res.json();
       if (data.success && Array.isArray(data.orders)) {
         // Filter orders that have mockup pending
-        const filtered = data.orders.filter((o: Order) => 
-          o.mockupStatus !== 'Approved' && o.currentStage !== 'Delivered'
-        );
+        const filtered = data.orders.filter((o: Order) => {
+          if (o.mockupStatus === 'Approved' || o.currentStage === 'Delivered') return false;
+          let items: any[] = [];
+          if (typeof o.items === 'string') {
+            try { items = JSON.parse(o.items); } catch(e) {}
+          } else if (Array.isArray(o.items)) {
+            items = o.items;
+          }
+          return items.some(item => {
+            if (!item.placements) return false;
+            return Object.values(item.placements).some((p: any) => p && p.previewUrl);
+          });
+        });
         setOrders(filtered);
       }
     } catch (err) {
@@ -137,11 +147,11 @@ export function MockupsQueuePage() {
             }
 
             return (
-              <div key={order.id} className={styles.proofCard} style={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px', overflow: 'hidden' }}>
-                <div style={{ padding: '16px', borderBottom: '1px solid #e5e7eb', backgroundColor: '#f9fafb', display: 'flex', justifyContent: 'space-between' }}>
+              <div key={order.id} className={styles.proofCard} style={{ backgroundColor: 'var(--color-surface-white)', border: '1px solid var(--color-border)', borderRadius: '8px', overflow: 'hidden' }}>
+                <div style={{ padding: '16px', borderBottom: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface-hover)', display: 'flex', justifyContent: 'space-between' }}>
                   <div>
-                    <h3 style={{ margin: 0, fontSize: '16px' }}>{order.orderId}</h3>
-                    <div style={{ fontSize: '12px', color: '#6b7280' }}>{order.customerName} - {order.orgName}</div>
+                    <h3 style={{ margin: 0, fontSize: '16px', color: 'var(--color-text-title)' }}>{order.orderId}</h3>
+                    <div style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>{order.customerName} - {order.orgName}</div>
                   </div>
                   <button onClick={() => handleVerify(order)} className="erp-btn-primary" style={{ padding: '6px 12px', height: 'fit-content' }}>
                     <CheckCircle2 size={14} style={{ marginRight: '6px', display: 'inline-block', verticalAlign: 'middle' }}/> Verify & Approve
@@ -149,9 +159,12 @@ export function MockupsQueuePage() {
                 </div>
                 
                 <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                  {items.map((item, idx) => (
-                    <div key={idx} style={{ border: '1px dashed #d1d5db', borderRadius: '8px', padding: '12px' }}>
-                      <h4 style={{ margin: '0 0 12px 0', fontSize: '14px' }}>{item.name}</h4>
+                  {items.filter(item => {
+                    if (!item.placements) return false;
+                    return Object.values(item.placements).some((p: any) => p && p.previewUrl);
+                  }).map((item, idx) => (
+                    <div key={idx} style={{ border: '1px dashed var(--color-border)', borderRadius: '8px', padding: '12px' }}>
+                      <h4 style={{ margin: '0 0 12px 0', fontSize: '14px', color: 'var(--color-text-title)' }}>{item.name}</h4>
                       
                       {item.placements && Object.keys(item.placements).length > 0 ? (
                         <div style={{ display: 'flex', gap: '16px', overflowX: 'auto' }}>
@@ -159,9 +172,9 @@ export function MockupsQueuePage() {
                             <div key={key} style={{ minWidth: '120px', display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'center' }}>
                               <span style={{ fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase' }}>{key}</span>
                               {placementData?.previewUrl ? (
-                                <img src={placementData.previewUrl} alt={key} style={{ width: '100px', height: '100px', objectFit: 'contain', border: '1px solid #e5e7eb', borderRadius: '4px', backgroundColor: '#f3f4f6' }} />
+                                <img src={placementData.previewUrl} alt={key} style={{ width: '100px', height: '100px', objectFit: 'contain', border: '1px solid var(--color-border)', borderRadius: '4px', backgroundColor: 'var(--color-canvas-bg)' }} />
                               ) : (
-                                <div style={{ width: '100px', height: '100px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f3f4f6', border: '1px solid #e5e7eb', borderRadius: '4px' }}>
+                                <div style={{ width: '100px', height: '100px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'var(--color-canvas-bg)', border: '1px solid var(--color-border)', borderRadius: '4px' }}>
                                   <ImageIcon size={24} color="#9ca3af" />
                                 </div>
                               )}
@@ -174,7 +187,7 @@ export function MockupsQueuePage() {
                           ))}
                         </div>
                       ) : (
-                        <div style={{ fontSize: '12px', color: '#6b7280' }}>No artwork uploaded by client.</div>
+                        <div style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>No artwork uploaded by client.</div>
                       )}
                     </div>
                   ))}
