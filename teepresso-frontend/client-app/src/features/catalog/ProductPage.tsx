@@ -436,7 +436,7 @@ export function ProductPage() {
         </div>
       </div>
 
-      <div className={styles.mainGrid} style={{ gridTemplateColumns: product.requiresMockup !== false ? '1fr 1.2fr 1fr' : '1fr 1.5fr', maxWidth: product.requiresMockup !== false ? '1400px' : '1100px' }}>
+      <div className={`${styles.mainGrid} ${product.requiresMockup === false ? styles.mainGridNoMockup : ''}`}>
         
         {/* Left Column: Product Image & Overview */}
         <div className={styles.leftCol}>
