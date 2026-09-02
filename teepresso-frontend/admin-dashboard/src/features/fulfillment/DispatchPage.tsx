@@ -26,8 +26,7 @@ export function DispatchPage() {
         // Show orders that are approved and not yet delivered/dispatched
         const filtered = data.orders.filter((o: any) => 
           o.mockupStatus === 'Approved' && 
-          o.currentStage !== 'Delivered' && 
-          o.currentStage !== 'In Transit'
+          o.currentStage !== 'Delivered'
         );
         setOrders(filtered);
       }
@@ -42,12 +41,12 @@ export function DispatchPage() {
     fetchOrders();
   }, []);
 
-  const handleDispatch = async (orderId: string) => {
+    const handleUpdateStage = async (orderId: string, stage: string) => {
     try {
       const res = await fetch(`${API_BASE_URL}/orders/${orderId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ currentStage: 'In Transit' })
+        body: JSON.stringify({ currentStage: stage })
       });
       if (res.ok) {
         fetchOrders();
@@ -115,15 +114,24 @@ export function DispatchPage() {
                   </td>
                   <td>{item.totalPieces} pcs</td>
                   <td>
-                    <span className="badge badge-warning">{item.currentStage}</span>
+                    <span className={`badge ${item.currentStage === 'In Transit' ? 'badge-info' : 'badge-warning'}`}>{item.currentStage}</span>
                   </td>
-                  <td style={{ textAlign: 'right' }}>
+                  <td style={{ textAlign: 'right', display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                    {item.currentStage !== 'In Transit' && (
+                      <button 
+                        onClick={() => handleUpdateStage(item.id, 'In Transit')}
+                        className="erp-btn-secondary" 
+                        style={{ padding: '6px 12px' }}
+                      >
+                        <Truck size={14} style={{ marginRight: '6px', verticalAlign: 'middle', display: 'inline-block' }}/> Mark Dispatched
+                      </button>
+                    )}
                     <button 
-                      onClick={() => handleDispatch(item.id)}
+                      onClick={() => handleUpdateStage(item.id, 'Delivered')}
                       className="erp-btn-primary" 
-                      style={{ padding: '6px 12px' }}
+                      style={{ padding: '6px 12px', backgroundColor: '#10b981', borderColor: '#10b981' }}
                     >
-                      <Truck size={14} style={{ marginRight: '6px', verticalAlign: 'middle', display: 'inline-block' }}/> Add to Dispatched
+                      <Check size={14} style={{ marginRight: '6px', verticalAlign: 'middle', display: 'inline-block' }}/> Mark Delivered
                     </button>
                   </td>
                 </tr>
