@@ -116,18 +116,19 @@ export function CheckoutPage() {
 
   if (orderComplete) {
     return (
-      <div className={styles.pageContainer} style={{ textAlign: 'center', paddingTop: '100px' }}>
-        <CheckCircle size={64} color="#10b981" style={{ marginBottom: '24px' }} />
-        <h1 style={{ marginBottom: '16px' }}>Order Confirmed! ({confirmedOrderId})</h1>
-        <p style={{ color: '#666', marginBottom: '32px' }}>
-          Thank you for choosing Teepresso. We have received your order details and saved it to your account.<br/>
+      <div className={styles.pageContainer} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', padding: '24px', textAlign: 'center' }}>
+        <CheckCircle size={80} color="#10b981" style={{ margin: '0 auto 24px auto', display: 'block' }} />
+        <h1 style={{ marginBottom: '16px', fontSize: 'clamp(24px, 5vw, 32px)', lineHeight: '1.2' }}>Order Confirmed!<br/>({confirmedOrderId})</h1>
+        <p style={{ color: '#666', marginBottom: '32px', maxWidth: '400px', margin: '0 auto 32px auto', lineHeight: '1.5' }}>
+          Thank you for choosing Teepresso. We have received your order details and saved it to your account.
+          <br/><br/>
           Our design team will review your specs and send proofing mockups shortly.
         </p>
-        <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
-          <Link to="/my-orders" className="btn-primary" style={{ padding: '12px 24px', textDecoration: 'none', borderRadius: '6px', backgroundColor: 'var(--color-primary-600)', color: '#fff', fontWeight: 600 }}>
-            View Order in My Orders
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%', maxWidth: '300px', margin: '0 auto' }}>
+          <Link to="/my-orders" className="btn-primary" style={{ padding: '14px 24px', textDecoration: 'none', borderRadius: '8px', backgroundColor: 'var(--color-primary-600)', color: '#fff', fontWeight: 600, width: '100%', boxSizing: 'border-box' }}>
+            View My Orders
           </Link>
-          <Link to="/products" className="btn-secondary" style={{ padding: '12px 24px', textDecoration: 'none', borderRadius: '6px', border: '1px solid #ccc', color: '#1a1a1a', fontWeight: 600 }}>
+          <Link to="/products" className="btn-secondary" style={{ padding: '14px 24px', textDecoration: 'none', borderRadius: '8px', border: '1px solid #ccc', color: '#1a1a1a', fontWeight: 600, width: '100%', boxSizing: 'border-box' }}>
             Continue Shopping
           </Link>
         </div>
