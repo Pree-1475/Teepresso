@@ -432,7 +432,7 @@ export function ProductPage() {
         </div>
       </div>
 
-      <div className={styles.mainGrid}>
+      <div className={styles.mainGrid} style={{ gridTemplateColumns: product.requiresMockup !== false ? '1fr 1.2fr 1fr' : '1fr 1.5fr', maxWidth: product.requiresMockup !== false ? '1400px' : '1100px' }}>
         
         {/* Left Column: Product Image & Overview */}
         <div className={styles.leftCol}>
@@ -616,9 +616,8 @@ export function ProductPage() {
         </div>
 
         {/* Right Column: Design & Mockup Preview */}
+        {product.requiresMockup !== false && (
         <div className={styles.rightCol}>
-          {product.requiresMockup !== false && (
-            <>
               <div className={styles.panel} style={{ marginBottom: '16px' }}>
                 <h3 className={styles.panelTitle}>Add Your Design / Artwork</h3>
                 
@@ -678,9 +677,8 @@ export function ProductPage() {
                   </div>
                 )}
               </div>
-            </>
-          )}
-        </div>
+                    </div>
+        )}
 
       </div>
 
