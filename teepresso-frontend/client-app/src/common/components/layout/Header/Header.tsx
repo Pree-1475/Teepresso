@@ -37,6 +37,16 @@ export function Header() {
     router.push('/');
   };
 
+  const signInMarkup = (className: string) => (
+    !isAuthenticated && (
+      <div className={className}>
+        <Link href="/login" className={styles.quoteBtn}>
+          Sign In
+        </Link>
+      </div>
+    )
+  );
+
   const userProfileMarkup = (className: string) => (
     isAuthenticated && (
       <div style={{ position: 'relative' }} className={className}>
@@ -113,6 +123,7 @@ export function Header() {
 
           {/* User Profile Badge (Moved to Left on Mobile Only, hidden on Product Page) */}
           {!isProductPage && userProfileMarkup(styles.mobileOnlyProfile)}
+          {!isProductPage && signInMarkup(styles.mobileOnlyProfile)}
         </nav>
 
         {/* Center Logo */}
@@ -130,12 +141,9 @@ export function Header() {
             </Link>
           </div>
           
-          {!isAuthenticated && (
-            <Link href="/login" className={styles.quoteBtn}>
-              Sign In
-            </Link>
-          )}
+          
 
+          {signInMarkup(styles.desktopOnlyProfile)}
           {/* User Profile Badge (Right on Desktop Only) */}
           {userProfileMarkup(styles.desktopOnlyProfile)}
 
