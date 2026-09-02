@@ -7,6 +7,7 @@ import { API_BASE_URL } from '@/common/config/api';
 
 interface OrderItem {
   name: string;
+  productName?: string;
   artworkMode?: string;
   placements?: Record<string, any>;
 }
@@ -93,7 +94,7 @@ export function MockupsQueuePage() {
                 blob = await res.blob();
               }
               const ext = blob.type.split('/')[1] || 'png';
-              folder.file(`${item.name.replace(/[^a-zA-Z0-9]/g, '_')}_${key}.${ext}`, blob);
+              folder.file(`${(item.name || item.productName || 'product').replace(/[^a-zA-Z0-9]/g, '_')}_${key}.${ext}`, blob);
               hasImages = true;
             } catch (err) {
               console.error('Error fetching image for zip', err);
@@ -222,7 +223,7 @@ export function MockupsQueuePage() {
                     return Object.values(item.placements).some((p: any) => p && p.previewUrl);
                   }).map((item, idx) => (
                     <div key={idx} style={{ border: '1px dashed var(--color-border)', borderRadius: '8px', padding: '12px' }}>
-                      <h4 style={{ margin: '0 0 12px 0', fontSize: '14px', color: 'var(--color-text-title)' }}>{item.name}</h4>
+                      <h4 style={{ margin: '0 0 12px 0', fontSize: '14px', color: 'var(--color-text-title)' }}>{item.name || item.productName}</h4>
                       
                       {item.placements && Object.keys(item.placements).length > 0 ? (
                         <div style={{ display: 'flex', gap: '16px', overflowX: 'auto' }}>
