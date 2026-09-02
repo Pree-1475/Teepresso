@@ -51,11 +51,7 @@ interface Order {
 
 const PRODUCTION_STAGES = [
   'Order Placed',
-  'Design in Progress',
   'Mockup Approved',
-  'Printing',
-  'Quality Check',
-  'Packed',
   'In Transit',
   'Delivered'
 ];

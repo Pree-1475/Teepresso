@@ -1,23 +1,13 @@
 export type OrderStage = 
-  | 'Order Received'
-  | 'Design in Progress'
-  | 'Waiting for Approval'
-  | 'Approved'
-  | 'Printing'
-  | 'Quality Check'
-  | 'Ready for Dispatch'
-  | 'Dispatched'
+  | 'Order Placed'
+  | 'Mockup Approved'
+  | 'In Transit'
   | 'Delivered';
 
 export const TRACKING_STAGES: OrderStage[] = [
-  'Order Received',
-  'Design in Progress',
-  'Waiting for Approval',
-  'Approved',
-  'Printing',
-  'Quality Check',
-  'Ready for Dispatch',
-  'Dispatched',
+  'Order Placed',
+  'Mockup Approved',
+  'In Transit',
   'Delivered',
 ];
 
@@ -49,7 +39,7 @@ export const MOCK_ORDERS_DATABASE: TrackedOrder[] = [
     totalPieces: 75,
     orderDate: 'Aug 06, 2026',
     estimatedDelivery: 'Aug 11, 2026',
-    currentStage: 'Waiting for Approval',
+    currentStage: 'Order Placed',
     isUrgent: false,
     watermarkedMockupUrl: '/images/products/tshirt.png',
     whatsappLink: 'https://wa.me/919876543210?text=Hi%20Teepresso%2C%20I%20am%20reviewing%20mockup%20for%20order%20TP-2026-8842',
@@ -63,7 +53,7 @@ export const MOCK_ORDERS_DATABASE: TrackedOrder[] = [
     totalPieces: 120,
     orderDate: 'Aug 07, 2026',
     estimatedDelivery: 'Aug 10, 2026',
-    currentStage: 'Printing',
+    currentStage: 'In Transit',
     isUrgent: true,
     watermarkedMockupUrl: '/images/kurtas/hero.png',
     whatsappLink: 'https://wa.me/919123456789?text=Hi%20Teepresso%2C%20checking%20order%20TP-2026-1049',

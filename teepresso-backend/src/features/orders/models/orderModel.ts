@@ -14,7 +14,7 @@ export interface Order {
   totalAmount: number;
   orderDate: string;
   estimatedDelivery: string;
-  currentStage: 'Order Placed' | 'Waiting for Approval' | 'Approved' | 'Design in Progress' | 'Printing' | 'Quality Check' | 'Packed' | 'In Transit' | 'Delivered';
+  currentStage: 'Order Placed' | 'Mockup Approved' | 'In Transit' | 'Delivered';
   isUrgent: boolean;
   paymentStatus: 'Paid' | 'Pending' | 'Refunded';
   paymentDetails: {
@@ -56,7 +56,7 @@ export const ordersDatabase: Order[] = [
     totalAmount: 19950,
     orderDate: 'Aug 10, 2026',
     estimatedDelivery: 'Aug 18, 2026',
-    currentStage: 'Waiting for Approval',
+    currentStage: 'Order Placed',
     isUrgent: true,
     paymentStatus: 'Paid',
     paymentDetails: {
@@ -93,7 +93,7 @@ export const ordersDatabase: Order[] = [
     totalAmount: 112000, // > 50,000: triggers E-Way Bill!
     orderDate: 'Aug 11, 2026',
     estimatedDelivery: 'Aug 21, 2026',
-    currentStage: 'Printing',
+    currentStage: 'In Transit',
     isUrgent: false,
     paymentStatus: 'Paid',
     paymentDetails: {
@@ -130,7 +130,7 @@ export const ordersDatabase: Order[] = [
     totalAmount: 38165,
     orderDate: 'Aug 09, 2026',
     estimatedDelivery: 'Aug 16, 2026',
-    currentStage: 'Approved',
+    currentStage: 'Mockup Approved',
     isUrgent: true,
     paymentStatus: 'Paid',
     paymentDetails: {
