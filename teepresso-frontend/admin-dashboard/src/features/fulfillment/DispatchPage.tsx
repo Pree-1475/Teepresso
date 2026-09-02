@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Truck, Check } from 'lucide-react';
+import { Search, Truck, Check, X, AlertCircle } from 'lucide-react';
 import styles from './DispatchPage.module.css';
 import { API_BASE_URL } from '@/common/config/api';
 
@@ -16,6 +16,7 @@ export function DispatchPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
+  const [confirmModal, setConfirmModal] = useState<{ orderId: string, stage: string, orgName: string, ref: string } | null>(null);
 
   const fetchOrders = async () => {
     setLoading(true);
@@ -41,7 +42,7 @@ export function DispatchPage() {
     fetchOrders();
   }, []);
 
-    const handleUpdateStage = async (orderId: string, stage: string) => {
+    const executeUpdateStage = async (orderId: string, stage: string) => {
     try {
       const res = await fetch(`${API_BASE_URL}/orders/${orderId}`, {
         method: 'PUT',
@@ -49,6 +50,7 @@ export function DispatchPage() {
         body: JSON.stringify({ currentStage: stage })
       });
       if (res.ok) {
+        setConfirmModal(null);
         fetchOrders();
       }
     } catch (err) {
@@ -119,7 +121,7 @@ export function DispatchPage() {
                   <td style={{ textAlign: 'right', display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
                     {item.currentStage !== 'In Transit' && (
                       <button 
-                        onClick={() => handleUpdateStage(item.id, 'In Transit')}
+                        onClick={() => setConfirmModal({ orderId: item.id, stage: 'In Transit', orgName: item.orgName, ref: item.orderId })}
                         className="erp-btn-secondary" 
                         style={{ padding: '6px 12px' }}
                       >
@@ -127,7 +129,7 @@ export function DispatchPage() {
                       </button>
                     )}
                     <button 
-                      onClick={() => handleUpdateStage(item.id, 'Delivered')}
+                      onClick={() => setConfirmModal({ orderId: item.id, stage: 'Delivered', orgName: item.orgName, ref: item.orderId })}
                       className="erp-btn-primary" 
                       style={{ padding: '6px 12px', backgroundColor: '#10b981', borderColor: '#10b981' }}
                     >
@@ -140,6 +142,104 @@ export function DispatchPage() {
           </table>
         )}
       </div>
+
+      {/* CONFIRMATION MODAL OVERLAY */}
+      {confirmModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.4)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+          backdropFilter: 'blur(2px)'
+        }}>
+          <div style={{
+            backgroundColor: 'var(--color-surface-white)',
+            border: '1px solid var(--color-border)',
+            borderRadius: 'var(--radius-sm)',
+            width: '100%',
+            maxWidth: '440px',
+            overflow: 'hidden',
+            boxShadow: '0 10px 25px rgba(0, 0, 0, 0.08)'
+          }}>
+            <div style={{
+              padding: '16px 24px',
+              borderBottom: '1px solid var(--color-border)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between'
+            }}>
+              <h3 style={{ margin: 0, fontSize: '15px', fontWeight: 600, color: 'var(--color-text-title)', fontFamily: 'var(--font-mono)' }}>
+                Confirm {confirmModal.stage === 'In Transit' ? 'Dispatch' : 'Delivery'}
+              </h3>
+              <button 
+                type="button" 
+                onClick={() => setConfirmModal(null)}
+                style={{ background: 'transparent', border: 'none', color: 'var(--color-text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '4px' }}
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            <div style={{ padding: '24px' }}>
+              <div style={{
+                backgroundColor: confirmModal.stage === 'Delivered' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(14, 165, 233, 0.08)',
+                borderLeft: confirmModal.stage === 'Delivered' ? '4px solid #10b981' : '4px solid #0ea5e9',
+                padding: '12px 16px',
+                borderRadius: '2px',
+                color: 'var(--color-text-body)',
+                fontSize: '13px',
+                lineHeight: '1.5',
+                marginBottom: '20px'
+              }}>
+                You are about to mark order <strong>{confirmModal.ref}</strong> ({confirmModal.orgName}) as <strong>{confirmModal.stage}</strong>.
+              </div>
+              <p style={{ margin: 0, fontSize: '13px', color: 'var(--color-text-body)', lineHeight: '1.4' }}>
+                {confirmModal.stage === 'In Transit' 
+                  ? 'This indicates the order has been handed over to the courier and is on its way to the client.' 
+                  : 'This indicates the order has successfully reached the client and will clear it from the dispatch radar.'}
+                <br /><br />
+                Are you sure you want to proceed?
+              </p>
+            </div>
+
+            <div style={{
+              padding: '16px 24px',
+              borderTop: '1px solid var(--color-border)',
+              display: 'flex',
+              justifyContent: 'flex-end',
+              gap: '12px'
+            }}>
+              <button
+                type="button"
+                className="erp-btn-secondary"
+                onClick={() => setConfirmModal(null)}
+                style={{ padding: '8px 16px', cursor: 'pointer' }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => executeUpdateStage(confirmModal.orderId, confirmModal.stage)}
+                className="erp-btn-primary"
+                style={{ 
+                  padding: '8px 24px', 
+                  cursor: 'pointer',
+                  backgroundColor: confirmModal.stage === 'Delivered' ? '#10b981' : 'var(--color-primary)',
+                  borderColor: confirmModal.stage === 'Delivered' ? '#10b981' : 'var(--color-primary)',
+                }}
+              >
+                Yes, Mark as {confirmModal.stage}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
