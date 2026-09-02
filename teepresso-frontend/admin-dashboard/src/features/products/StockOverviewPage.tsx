@@ -17,11 +17,13 @@ interface Product {
   startingPrice: number;
   priceRange: string;
   colors: string[];
+  patterns?: string[];
   image: string;
   isSeasonalKurta?: boolean;
   popularFor: string;
   requiresSizes: boolean;
   requiresColors: boolean;
+  requiresPatterns?: boolean;
   requiresMockup: boolean;
   applyVolumeDiscount: boolean;
   tiers?: PriceTier[];
@@ -125,8 +127,8 @@ export function StockOverviewPage() {
     setSaveSuccessId(null);
 
     const updatedPayload = {
-      stock: !p.requiresSizes && !p.requiresColors ? Number(editingStock[p.id] || 0) : undefined,
-      sizesStock: p.requiresSizes || p.requiresColors ? editingSizesStock[p.id] || {} : undefined
+      stock: !p.requiresSizes && !p.requiresColors && !p.requiresPatterns ? Number(editingStock[p.id] || 0) : undefined,
+      sizesStock: p.requiresSizes || p.requiresColors || p.requiresPatterns ? editingSizesStock[p.id] || {} : undefined
     };
 
     try {
@@ -185,10 +187,21 @@ export function StockOverviewPage() {
         affectedCount++;
         markModified(p.id);
 
-        if (!p.requiresSizes && !p.requiresColors) {
+        if (!p.requiresSizes && !p.requiresColors && !p.requiresPatterns) {
           const current = editingStock[p.id] !== undefined ? editingStock[p.id] : (p.stock || 0);
           setEditingStock(prev => ({ ...prev, [p.id]: current + boostAmount }));
-        } else if (p.requiresSizes && p.requiresColors && p.colors && p.sizes) {
+        } else if (p.requiresColors && p.requiresPatterns && p.requiresSizes && p.colors && p.patterns && p.sizes) {
+          const currentMap = editingSizesStock[p.id] ? { ...editingSizesStock[p.id] } : { ...(p.sizesStock || {}) };
+          p.colors.forEach(col => {
+            p.patterns!.forEach(pat => {
+              p.sizes!.forEach(sz => {
+                const key = `${col}_${pat}_${sz}`;
+                const val = currentMap[key] !== undefined ? currentMap[key] : 0;
+                if (val <= 20) currentMap[key] = val + boostAmount;
+              });
+            });
+          });
+          setEditingSizesStock(prev => ({ ...prev, [p.id]: currentMap })); } else if (p.requiresSizes && p.requiresColors && p.colors && p.sizes) {
           const currentMap = editingSizesStock[p.id] ? { ...editingSizesStock[p.id] } : { ...(p.sizesStock || {}) };
           p.colors.forEach(col => {
             p.sizes!.forEach(sz => {
@@ -211,7 +224,7 @@ export function StockOverviewPage() {
           setEditingSizesStock(prev => ({ ...prev, [p.id]: currentMap }));
         } else if (p.requiresSizes && p.sizes) {
           const currentMap = editingSizesStock[p.id] ? { ...editingSizesStock[p.id] } : { ...(p.sizesStock || {}) };
-          p.sizes.forEach(sz => {
+          p.sizes!.forEach(sz => {
             const val = currentMap[sz] !== undefined ? currentMap[sz] : 0;
             if (val <= 20) {
               currentMap[sz] = val + boostAmount;
@@ -232,7 +245,7 @@ export function StockOverviewPage() {
 
   // Helper to determine status
   const isOutOfStock = (p: Product) => {
-    if (!p.requiresSizes && !p.requiresColors) {
+    if (!p.requiresSizes && !p.requiresColors && !p.requiresPatterns) {
       const q = editingStock[p.id] !== undefined ? editingStock[p.id] : (p.stock || 0);
       return q === 0;
     }
@@ -244,7 +257,7 @@ export function StockOverviewPage() {
 
   const isLowStock = (p: Product) => {
     const threshold = 20;
-    if (!p.requiresSizes && !p.requiresColors) {
+    if (!p.requiresSizes && !p.requiresColors && !p.requiresPatterns) {
       const q = editingStock[p.id] !== undefined ? editingStock[p.id] : (p.stock || 0);
       return q > 0 && q <= threshold;
     }
@@ -262,7 +275,7 @@ export function StockOverviewPage() {
   products.forEach(p => {
     const stockMap = editingSizesStock[p.id] || p.sizesStock || {};
     
-    if (!p.requiresSizes && !p.requiresColors) {
+    if (!p.requiresSizes && !p.requiresColors && !p.requiresPatterns) {
       const q = editingStock[p.id] !== undefined ? editingStock[p.id] : (p.stock || 0);
       totalUnits += q;
       if (q === 0) totalOutOfStockCount++;
@@ -285,7 +298,7 @@ export function StockOverviewPage() {
         else if (q <= 20) totalLowStockCount++;
       });
     } else if (p.requiresSizes && p.sizes) {
-      p.sizes.forEach(sz => {
+      p.sizes!.forEach(sz => {
         const q = stockMap[sz] !== undefined ? Number(stockMap[sz]) : 0;
         totalUnits += q;
         if (q === 0) totalOutOfStockCount++;
@@ -592,6 +605,52 @@ export function StockOverviewPage() {
                               <CheckCircle2 size={13} /> Healthy
                             </span>
                           )}
+                        </div>
+                      ) : p.requiresColors && p.requiresPatterns && p.requiresSizes && p.colors && p.patterns && p.sizes ? (
+                        // 3D Matrix: Color + Pattern + Size
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                          {p.colors.map(color => {
+                            const isHex = color.startsWith('#');
+                            const colorLabel = getColorName(color);
+                            return (
+                              <div key={color} style={{ display: 'flex', flexDirection: 'column', gap: '12px', borderLeft: `3px solid ${isHex ? color : '#ccc'}`, paddingLeft: '10px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                  {isHex && <span style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: color, border: '1px solid rgba(0,0,0,0.15)' }} />}
+                                  <span style={{ fontSize: '13px', fontWeight: 800, color: 'var(--color-text-title)' }}>{colorLabel}</span>
+                                </div>
+                                {p.patterns!.map(pat => (
+                                  <div key={pat} style={{ paddingLeft: '16px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#d97706' }}>{pat}</div>
+                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                                      {p.sizes!.map(sz => {
+                                        const key = `${color}_${pat}_${sz}`;
+                                        const val = editingSizesStock[p.id]?.[key] !== undefined ? editingSizesStock[p.id][key] : 0;
+                                        const isOut = val === 0;
+                                        const isLow = val > 0 && val <= 20;
+                                        return (
+                                          <div key={sz} style={{ display: 'flex', alignItems: 'center', gap: '4px', backgroundColor: isOut ? 'rgba(239, 68, 68, 0.08)' : isLow ? 'rgba(245, 158, 11, 0.08)' : 'var(--color-surface-hover)', padding: '4px 8px', borderRadius: '4px', border: isOut ? '1px solid #ef4444' : isLow ? '1px solid #f59e0b' : '1px solid var(--color-border)' }}>
+                                            <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--color-text-muted)' }}>{sz}:</span>
+                                            <input
+                                              type="number"
+                                              min="0"
+                                              value={val}
+                                              onChange={e => {
+                                                const qty = Math.max(0, Number(e.target.value));
+                                                setEditingSizesStock(prev => ({ ...prev, [p.id]: { ...(prev[p.id] || {}), [key]: qty } }));
+                                                markModified(p.id);
+                                              }}
+                                              className={styles.formInput}
+                                              style={{ width: '56px', padding: '2px 4px', fontSize: '11px', fontWeight: 'bold', margin: 0 }}
+                                            />
+                                          </div>
+                                        );
+                                      })}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            );
+                          })}
                         </div>
                       ) : p.requiresColors && p.colors && p.colors.length > 0 ? (
                         // Color + Size or Color-only variant grid
