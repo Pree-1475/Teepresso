@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { RefreshCw, CheckCircle2, AlertCircle, UploadCloud, Save, Image as ImageIcon, DownloadCloud, ExternalLink } from 'lucide-react';
+import { RefreshCw, CheckCircle2, AlertCircle, UploadCloud, Save, Image as ImageIcon, DownloadCloud } from 'lucide-react';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 import styles from './MockupsQueuePage.module.css';
@@ -206,9 +206,7 @@ export function MockupsQueuePage() {
                     <div style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>{order.customerName} - {order.orgName}</div>
                   </div>
                   <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                    <a href="https://www.canva.com/" target="_blank" rel="noopener noreferrer" className="erp-btn-secondary" style={{ padding: '6px 12px', height: 'fit-content', textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
-                      <ExternalLink size={14} style={{ marginRight: '6px' }}/> Export to Canva
-                    </a>
+                    
                     <button onClick={() => handleDownloadZip(order)} className="erp-btn-secondary" style={{ padding: '6px 12px', height: 'fit-content', display: 'flex', alignItems: 'center' }}>
                       <DownloadCloud size={14} style={{ marginRight: '6px' }}/> Download Zip
                     </button>
