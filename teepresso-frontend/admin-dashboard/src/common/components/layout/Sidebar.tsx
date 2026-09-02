@@ -14,7 +14,6 @@ import {
   ChevronRight,
   ChevronUp,
   ClipboardList,
-  TrendingUp,
   Box,
   Shield,
   Sliders,
@@ -83,7 +82,6 @@ export function Sidebar({ onLogout }: SidebarProps) {
     { label: 'Stock Overview', path: '/stock-overview', icon: Warehouse },
     { label: 'Customers', path: '/customers', icon: Users },
     { label: 'Offline POS', path: '/offline-orders', icon: ClipboardList },
-    { label: 'Reports', path: '/reports', icon: TrendingUp },
     { label: 'Snippets', path: '/snippets', icon: Sliders },
     { label: 'Settings', path: '/settings', icon: Settings },
   ];

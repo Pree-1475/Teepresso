@@ -16,7 +16,6 @@ import { AnalyticsPage } from '@/features/analytics/AnalyticsPage';
 import { InventoryPage } from '@/features/inventory/InventoryPage';
 import { DispatchPage } from '@/features/fulfillment/DispatchPage';
 import { AttendancePage } from '@/features/attendance/AttendancePage';
-import { ReportsPage } from '@/features/reports/ReportsPage';
 import { UsersPage } from '@/features/auth/UsersPage';
 import { CategoriesSnippetPage } from '@/features/snippets/CategoriesSnippetPage';
 import { ColorsSnippetPage } from '@/features/snippets/ColorsSnippetPage';
@@ -47,8 +46,7 @@ function AnimatedRoutes() {
         <Route path="/inventory" element={<InventoryPage />} />
         <Route path="/dispatch" element={<DispatchPage />} />
         <Route path="/attendance" element={<AttendancePage />} />
-        <Route path="/reports" element={<ReportsPage />} />
-        <Route path="/analytics" element={<AnalyticsPage />} />
+                <Route path="/analytics" element={<AnalyticsPage />} />
         <Route path="/users" element={<UsersPage />} />
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="*" element={<DashboardPage />} />
