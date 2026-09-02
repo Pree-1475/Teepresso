@@ -164,8 +164,8 @@ export function OrdersPage() {
       {/* Header */}
       <div className={styles.header} style={{ marginBottom: '24px' }}>
         <div>
-          <h1 className={styles.title}>Production & Order Management</h1>
-          <p className={styles.subtitle}>Track live order status, update manufacturing stages, and inspect customer specifications.</p>
+          <h1 className={styles.title}>Orders Queue</h1>
+          <p className={styles.subtitle}>View newly placed orders and track overall progress.</p>
         </div>
       </div>
 

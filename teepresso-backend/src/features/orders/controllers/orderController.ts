@@ -2,6 +2,20 @@ import { uploadBase64ToGCS } from '../../../config/storageService.js';
 import { Request, Response } from 'express';
 import { sql } from '../../../config/db.js';
 
+
+const processImageUpload = async (imageStr: string | undefined, pathPrefix: string): Promise<string> => {
+  if (!imageStr) return '';
+  if (imageStr.startsWith('http://') || imageStr.startsWith('https://')) return imageStr;
+
+  try {
+    const fileName = `${pathPrefix}/ord_${Date.now()}_${Math.floor(Math.random() * 1000)}.webp`;
+    return await uploadBase64ToGCS(imageStr, fileName);
+  } catch (err) {
+    console.error('Failed to upload image to GCS, storing fallback:', err);
+    return imageStr;
+  }
+};
+
 export const getOrdersController = async (_req: Request, res: Response): Promise<void> => {
   try {
     const orders = await sql`SELECT * FROM orders ORDER BY "createdAt" DESC`;
@@ -14,7 +28,20 @@ export const getOrdersController = async (_req: Request, res: Response): Promise
 
 export const createOfflineOrderController = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { customerName, phone, orgName, productName, category, totalPieces, totalAmount, paymentStatus, items, notes } = req.body;
+    const { customerName, phone, orgName, productName, category, totalPieces, totalAmount, paymentStatus,  notes } = req.body;
+
+    const processedItems = await Promise.all((Array.isArray(req.body.items) ? req.body.items : []).map(async (item: any) => {
+      if (item.placements && typeof item.placements === 'object') {
+        for (const key of Object.keys(item.placements)) {
+          if (item.placements[key] && item.placements[key].previewUrl) {
+             item.placements[key].previewUrl = await processImageUpload(item.placements[key].previewUrl, 'mockups');
+          }
+        }
+      }
+      return item;
+    }));
+    const items = processedItems;
+    
 
     const orderId = `TP-${new Date().getFullYear()}-OFFLINE-${Math.floor(1000 + Math.random() * 9000)}`;
     const dateStr = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
@@ -286,7 +313,20 @@ export const trackOrderController = async (req: Request, res: Response): Promise
 
 export const createOrderController = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { customerName, email, phone, orgName, orgType, productName, category, totalPieces, totalAmount, items, notes } = req.body;
+    const { customerName, email, phone, orgName, orgType, productName, category, totalPieces, totalAmount,  notes } = req.body;
+
+    const processedItems = await Promise.all((Array.isArray(req.body.items) ? req.body.items : []).map(async (item: any) => {
+      if (item.placements && typeof item.placements === 'object') {
+        for (const key of Object.keys(item.placements)) {
+          if (item.placements[key] && item.placements[key].previewUrl) {
+             item.placements[key].previewUrl = await processImageUpload(item.placements[key].previewUrl, 'mockups');
+          }
+        }
+      }
+      return item;
+    }));
+    const items = processedItems;
+    
     const orderId = `TP-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
     const dateStr = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     const deliveryDate = new Date();
@@ -355,7 +395,23 @@ export const createOrderController = async (req: Request, res: Response): Promis
 export const updateOrderFullController = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const { currentStage, paymentStatus, notes, customerName, email, phone, isUrgent } = req.body;
+    const { currentStage, paymentStatus, notes, customerName, email, phone, isUrgent, mockupStatus } = req.body;
+    let items = req.body.items;
+
+
+    
+    if (items) {
+      items = await Promise.all((Array.isArray(items) ? items : []).map(async (item: any) => {
+        if (item.placements && typeof item.placements === 'object') {
+          for (const key of Object.keys(item.placements)) {
+            if (item.placements[key] && item.placements[key].previewUrl) {
+               item.placements[key].previewUrl = await processImageUpload(item.placements[key].previewUrl, 'mockups');
+            }
+          }
+        }
+        return item;
+      }));
+    }
 
     const existing = await sql`SELECT * FROM orders WHERE id = ${id}`;
     if (existing.length === 0) {
@@ -371,7 +427,9 @@ export const updateOrderFullController = async (req: Request, res: Response): Pr
           "customerName" = COALESCE(${customerName}, "customerName"),
           email = COALESCE(${email}, email),
           phone = COALESCE(${phone}, phone),
-          "isUrgent" = COALESCE(${isUrgent}, "isUrgent")
+          "isUrgent" = COALESCE(${isUrgent}, "isUrgent"),
+          "mockupStatus" = COALESCE(${mockupStatus}, "mockupStatus"),
+          items = COALESCE(${items ? JSON.stringify(items) : null}::jsonb, items)
       WHERE id = ${id}
     `;
 

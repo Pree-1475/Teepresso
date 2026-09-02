@@ -51,6 +51,28 @@ export function ReportsPage() {
   const [selectedMonth, setSelectedMonth] = useState<MonthlySalesData>(MOCK_REPORTS[0]);
 
   return (
+    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+      {/* OVERLAY */}
+      <div style={{
+        position: 'absolute',
+        top: 0, left: 0, right: 0, bottom: 0,
+        backgroundColor: 'rgba(255, 255, 255, 0.7)',
+        backdropFilter: 'blur(4px)',
+        zIndex: 9999,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: '#b45309',
+        textAlign: 'center',
+        padding: '24px'
+      }}>
+        <div style={{ backgroundColor: '#fffbeb', padding: '24px 32px', borderRadius: '12px', border: '2px dashed #f59e0b', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
+          <h2 style={{ margin: '0 0 12px 0', fontSize: '24px', fontWeight: 800 }}>Yet to be improved..</h2>
+          <p style={{ margin: 0, fontSize: '16px', fontWeight: 600 }}>This page is currently under development.</p>
+        </div>
+      </div>
+
     <div className={styles.workspace}>
       
       {/* Header */}
@@ -196,6 +218,7 @@ export function ReportsPage() {
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 }

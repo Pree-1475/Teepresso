@@ -1,119 +1,190 @@
-import React, { useState } from 'react';
-import { RefreshCw, CheckCircle2, AlertCircle, Download, Send, Image } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { RefreshCw, CheckCircle2, AlertCircle, UploadCloud, Save, Image as ImageIcon } from 'lucide-react';
 import styles from './MockupsQueuePage.module.css';
+import { API_BASE_URL } from '@/common/config/api';
+
+interface OrderItem {
+  name: string;
+  artworkMode?: string;
+  placements?: Record<string, any>;
+}
 
 interface Order {
   id: string;
   orderId: string;
   customerName: string;
-  phone: string;
   orgName: string;
   productName: string;
-  category: string;
-  totalPieces: number;
-  mockupStatus: 'Pending Editing' | 'Customer Approval Pending' | 'Approved' | 'Revision Requested';
+  mockupStatus: string;
+  currentStage: string;
+  items: OrderItem[] | string;
 }
 
-const MOCKUP_ORDERS: Order[] = [
-  {
-    id: '1',
-    orderId: 'TP-2026-8842',
-    customerName: 'Rahul Sharma',
-    phone: '+91 98765 43210',
-    orgName: 'IIT Bombay TechFest',
-    productName: 'Custom Kurta Seasonal Batch',
-    category: 'Kurtas',
-    totalPieces: 50,
-    mockupStatus: 'Customer Approval Pending'
-  },
-  {
-    id: '2',
-    orderId: 'TP-2026-9011',
-    customerName: 'Ananya Verma',
-    phone: '+91 87654 32109',
-    orgName: 'ZettaScale Tech Inc.',
-    productName: 'Heavyweight Oversized Tee',
-    category: 'T-Shirts',
-    totalPieces: 320,
-    mockupStatus: 'Pending Editing'
-  },
-  {
-    id: '3',
-    orderId: 'TP-2026-9104',
-    customerName: 'Vikramaditya Roy',
-    phone: '+91 76543 21098',
-    orgName: 'Greenwood Heights RWA',
-    productName: 'Festive Printed Kurta',
-    category: 'Kurtas',
-    totalPieces: 85,
-    mockupStatus: 'Approved'
-  }
-];
-
 export function MockupsQueuePage() {
-  const [orders] = useState<Order[]>(MOCKUP_ORDERS);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [uploadingItem, setUploadingItem] = useState<{orderId: string, itemIdx: number, placementKey: string} | null>(null);
+
+  const fetchOrders = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`${API_BASE_URL}/orders`);
+      const data = await res.json();
+      if (data.success && Array.isArray(data.orders)) {
+        // Filter orders that have mockup pending
+        const filtered = data.orders.filter((o: Order) => 
+          o.mockupStatus !== 'Approved' && o.currentStage !== 'Delivered'
+        );
+        setOrders(filtered);
+      }
+    } catch (err) {
+      setError('Failed to fetch orders');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchOrders();
+  }, []);
+
+  const handleVerify = async (order: Order) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/orders/${order.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mockupStatus: 'Approved', currentStage: 'Mockup Approved' })
+      });
+      if (res.ok) {
+        fetchOrders();
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // For simplicity, we just use a File input to convert to base64, then send PUT request to update the order's items array
+  const handleReplaceDesign = (e: React.ChangeEvent<HTMLInputElement>, order: Order, itemIdx: number, placementKey: string) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingItem({ orderId: order.id, itemIdx, placementKey });
+
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      const base64 = reader.result as string;
+      
+      // We need to parse items, update the specific placement, and save
+      let itemsArr: any[] = [];
+      if (typeof order.items === 'string') {
+        try { itemsArr = JSON.parse(order.items); } catch(e) {}
+      } else if (Array.isArray(order.items)) {
+        itemsArr = [...order.items];
+      }
+
+      if (itemsArr[itemIdx] && itemsArr[itemIdx].placements && itemsArr[itemIdx].placements[placementKey]) {
+        itemsArr[itemIdx].placements[placementKey].previewUrl = base64;
+      } else {
+        // Init placement if somehow missing
+        if (!itemsArr[itemIdx]) itemsArr[itemIdx] = {};
+        if (!itemsArr[itemIdx].placements) itemsArr[itemIdx].placements = {};
+        itemsArr[itemIdx].placements[placementKey] = { previewUrl: base64 };
+      }
+
+      try {
+        await fetch(`${API_BASE_URL}/orders/${order.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ items: itemsArr }) // Note: our backend API might not process base64 to GCS on PUT /orders/:id out of the box, we may need to fix that or let it stay base64
+        });
+        fetchOrders();
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setUploadingItem(null);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
 
   return (
     <div className={styles.workspace}>
-      {/* Header */}
       <div className={styles.header}>
         <div>
-          <h1 className={styles.title}>Proofing & Design Queue</h1>
-          <p className={styles.subtitle}>Manage artwork vectors and client mockups before production.</p>
+          <h1 className={styles.title}>Mockup Verification</h1>
+          <p className={styles.subtitle}>Review client uploaded designs, replace artwork, and approve for production.</p>
         </div>
-        <div className={styles.actions}>
-          <button className="erp-btn-secondary" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-            <RefreshCw size={14} />
-            <span>Sync Assets</span>
-          </button>
-        </div>
+        <button onClick={fetchOrders} className="erp-btn-secondary" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <RefreshCw size={14} /><span>Refresh Queue</span>
+        </button>
       </div>
 
-      {/* Grid of Design Tasks */}
-      <div className={styles.proofsGrid}>
-        {orders.map(item => (
-          <div key={item.id} className={styles.proofCard}>
-            
-            <div className={styles.cardHeader}>
-              <div>
-                <span className="text-mono text-muted">{item.orderId}</span>
-                <h3 className={styles.orgText}>{item.orgName}</h3>
+      {loading ? (
+        <div style={{ padding: '24px' }}>Loading mockups...</div>
+      ) : error ? (
+        <div style={{ padding: '24px', color: 'red' }}>{error}</div>
+      ) : orders.length === 0 ? (
+        <div style={{ padding: '24px' }}>No orders waiting for mockup verification!</div>
+      ) : (
+        <div className={styles.proofsGrid}>
+          {orders.map(order => {
+            let items: OrderItem[] = [];
+            if (typeof order.items === 'string') {
+              try { items = JSON.parse(order.items); } catch(e) {}
+            } else if (Array.isArray(order.items)) {
+              items = order.items;
+            }
+
+            return (
+              <div key={order.id} className={styles.proofCard} style={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px', overflow: 'hidden' }}>
+                <div style={{ padding: '16px', borderBottom: '1px solid #e5e7eb', backgroundColor: '#f9fafb', display: 'flex', justifyContent: 'space-between' }}>
+                  <div>
+                    <h3 style={{ margin: 0, fontSize: '16px' }}>{order.orderId}</h3>
+                    <div style={{ fontSize: '12px', color: '#6b7280' }}>{order.customerName} - {order.orgName}</div>
+                  </div>
+                  <button onClick={() => handleVerify(order)} className="erp-btn-primary" style={{ padding: '6px 12px', height: 'fit-content' }}>
+                    <CheckCircle2 size={14} style={{ marginRight: '6px', display: 'inline-block', verticalAlign: 'middle' }}/> Verify & Approve
+                  </button>
+                </div>
+                
+                <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  {items.map((item, idx) => (
+                    <div key={idx} style={{ border: '1px dashed #d1d5db', borderRadius: '8px', padding: '12px' }}>
+                      <h4 style={{ margin: '0 0 12px 0', fontSize: '14px' }}>{item.name}</h4>
+                      
+                      {item.placements && Object.keys(item.placements).length > 0 ? (
+                        <div style={{ display: 'flex', gap: '16px', overflowX: 'auto' }}>
+                          {Object.entries(item.placements).map(([key, placementData]: [string, any]) => (
+                            <div key={key} style={{ minWidth: '120px', display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'center' }}>
+                              <span style={{ fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase' }}>{key}</span>
+                              {placementData?.previewUrl ? (
+                                <img src={placementData.previewUrl} alt={key} style={{ width: '100px', height: '100px', objectFit: 'contain', border: '1px solid #e5e7eb', borderRadius: '4px', backgroundColor: '#f3f4f6' }} />
+                              ) : (
+                                <div style={{ width: '100px', height: '100px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f3f4f6', border: '1px solid #e5e7eb', borderRadius: '4px' }}>
+                                  <ImageIcon size={24} color="#9ca3af" />
+                                </div>
+                              )}
+                              
+                              <label style={{ fontSize: '11px', color: '#2563eb', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <UploadCloud size={12} /> Replace
+                                <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => handleReplaceDesign(e, order, idx, key)} disabled={uploadingItem?.orderId === order.id && uploadingItem?.itemIdx === idx} />
+                              </label>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div style={{ fontSize: '12px', color: '#6b7280' }}>No artwork uploaded by client.</div>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
-              <span className={`badge ${
-                item.mockupStatus === 'Approved' ? 'badge-success' : 
-                item.mockupStatus === 'Pending Editing' ? 'badge-danger' : 'badge-warning'
-              }`}>
-                {item.mockupStatus}
-              </span>
-            </div>
-
-            <div className={styles.imageStagePlaceholder}>
-              <Image size={24} color="var(--color-text-muted)" />
-              <span className="text-muted" style={{ fontSize: '11px', marginTop: '4px' }}>Mockup Preview</span>
-            </div>
-
-            <div className={styles.cardBody}>
-              <div className={styles.infoRow}>
-                <span className="text-muted">Customer:</span>
-                <strong>{item.customerName}</strong>
-              </div>
-              <div className={styles.infoRow}>
-                <span className="text-muted">Product:</span>
-                <span>{item.totalPieces} Pcs • {item.productName}</span>
-              </div>
-            </div>
-
-            <div className={styles.cardActions}>
-              <button className="erp-btn-primary" style={{ width: '100%' }}>
-                Open Workspace
-              </button>
-            </div>
-
-          </div>
-        ))}
-      </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
-
 export default MockupsQueuePage;
