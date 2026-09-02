@@ -5,7 +5,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useStorefront } from '@/common/context/StorefrontContext';
 import { useCart, SizeQtyMap, ArtworkData, MockupState } from '@/features/cart/context/CartContext';
 import styles from './ProductPage.module.css';
-import { ShoppingBag, ArrowLeft, UploadCloud, ShieldCheck, Box, HelpCircle, ChevronDown, ChevronUp, Bookmark, Sparkles, Check } from 'lucide-react';
+import { ShoppingBag, ArrowLeft, UploadCloud, ShieldCheck, Box, HelpCircle, ChevronDown, ChevronUp, Bookmark, Sparkles, Check, ChevronLeft, ChevronRight } from 'lucide-react';
 import { API_BASE_URL } from '@/common/config/api';
 import { MockupCanvasEditor } from './components/MockupCanvasEditor';
 
@@ -441,23 +441,48 @@ export function ProductPage() {
               <img src={selectedImage || product.image || '/images/mockups/tshirt-blank.svg'} className={styles.mainImage} alt={product.name} />
             </div>
             {Array.isArray(product.gallery) && product.gallery.length > 0 && (
-              <div style={{ display: 'flex', gap: '8px', marginTop: '12px', overflowX: 'auto' }}>
-                {[product.image, ...product.gallery].map((imgUrl, idx) => (
-                  <img
-                    key={idx}
-                    src={imgUrl}
-                    alt={`View ${idx}`}
-                    onClick={() => setSelectedImage(imgUrl)}
-                    style={{
-                      width: '60px',
-                      height: '60px',
-                      objectFit: 'cover',
-                      borderRadius: '6px',
-                      border: selectedImage === imgUrl ? '2px solid var(--color-primary-600)' : '1px solid #e5e7eb',
-                      cursor: 'pointer'
-                    }}
-                  />
-                ))}
+              <div style={{ display: 'flex', alignItems: 'center', marginTop: '12px', gap: '8px', position: 'relative' }}>
+                <button 
+                  onClick={() => {
+                    const container = document.getElementById('product-gallery-scroll');
+                    if (container) container.scrollBy({ left: -100, behavior: 'smooth' });
+                  }}
+                  style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0, boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}
+                >
+                  <ChevronLeft size={16} />
+                </button>
+                <div 
+                  id="product-gallery-scroll"
+                  style={{ display: 'flex', gap: '8px', overflowX: 'auto', scrollBehavior: 'smooth', flex: 1, padding: '4px 0', scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                >
+                  <style>{`#product-gallery-scroll::-webkit-scrollbar { display: none; }`}</style>
+                  {[product.image, ...product.gallery].filter(Boolean).map((imgUrl, idx) => (
+                    <img
+                      key={idx}
+                      src={imgUrl}
+                      alt={`View ${idx}`}
+                      onClick={() => setSelectedImage(imgUrl)}
+                      style={{
+                        width: '60px',
+                        height: '60px',
+                        objectFit: 'cover',
+                        borderRadius: '6px',
+                        border: (selectedImage || product.image) === imgUrl ? '2px solid var(--color-primary-600)' : '1px solid #e5e7eb',
+                        cursor: 'pointer',
+                        flexShrink: 0
+                      }}
+                    />
+                  ))}
+                </div>
+                <button 
+                  onClick={() => {
+                    const container = document.getElementById('product-gallery-scroll');
+                    if (container) container.scrollBy({ left: 100, behavior: 'smooth' });
+                  }}
+                  style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0, boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}
+                >
+                  <ChevronRight size={16} />
+                </button>
               </div>
             )}
           </div>
