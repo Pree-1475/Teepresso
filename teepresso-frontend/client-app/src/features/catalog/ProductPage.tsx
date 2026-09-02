@@ -253,6 +253,44 @@ export function ProductPage() {
     if (!product || totalQty <= 0) return;
     const unitPrice = getEffectivePrice(totalQty);
 
+    const colorVariantsList: any[] = [];
+
+    if (product.requiresSizes && Object.keys(matrixSizes).length > 0) {
+      Object.entries(matrixSizes).forEach(([matrixKey, sizesMap]) => {
+        if (!sizesMap || typeof sizesMap !== 'object') return;
+        const mapTotal = Object.values(sizesMap).reduce((s, v) => s + (v || 0), 0);
+        if (mapTotal > 0) {
+          const parts = matrixKey.split('_');
+          const colName = parts[0] || activeColor || 'Default';
+          const patName = parts[1] || activePattern || 'Standard';
+
+          const colSnippet = allColors.find(c => c.name.toLowerCase() === colName.toLowerCase());
+          const hexVal = colSnippet?.hex || (colName.startsWith('#') ? colName : '#1a1a1a');
+
+          colorVariantsList.push({
+            id: `cv_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+            color: colSnippet?.name || colName,
+            colorHex: hexVal,
+            pattern: patName !== 'Standard' ? patName : undefined,
+            sizes: sizesMap
+          });
+        }
+      });
+    }
+
+    if (colorVariantsList.length === 0) {
+      const colSnippet = allColors.find(c => c.name.toLowerCase() === activeColor.toLowerCase());
+      const hexVal = colSnippet?.hex || (activeColor.startsWith('#') ? activeColor : '#1a1a1a');
+
+      colorVariantsList.push({
+        id: `cv_${Date.now()}`,
+        color: colSnippet?.name || activeColor || 'Default',
+        colorHex: hexVal,
+        pattern: activePattern !== 'Standard' ? activePattern : undefined,
+        sizes: currentSizes
+      });
+    }
+
     addToCart({
       productId: product.id,
       name: product.name,
@@ -262,14 +300,7 @@ export function ProductPage() {
       requiresColors: !!product.requiresColors,
       requiresMockup: !!product.requiresMockup,
       applyVolumeDiscount: !!product.applyVolumeDiscount,
-      colorVariants: [
-        {
-          id: `cv_${Date.now()}`,
-          color: activeColor || 'Default',
-          colorHex: activeColor || '#000000',
-          sizes: currentSizes
-        }
-      ],
+      colorVariants: colorVariantsList,
       artwork: {
         file: artwork.file || null,
         previewUrl: artwork.previewUrl || '',
@@ -279,7 +310,7 @@ export function ProductPage() {
       }
     });
 
-    navigate('/cart');
+    // Automatically opens CartDrawer in CartContext (No unwanted page redirection!)
   };
 
   const handleGlobalFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {

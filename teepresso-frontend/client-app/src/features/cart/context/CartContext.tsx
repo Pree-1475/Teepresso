@@ -9,6 +9,7 @@ export interface ColorVariant {
   id: string;
   color: string;
   colorHex: string;
+  pattern?: string;
   sizes: SizeQtyMap;
   quantity?: number; // Used if requiresSizes is false
 }
