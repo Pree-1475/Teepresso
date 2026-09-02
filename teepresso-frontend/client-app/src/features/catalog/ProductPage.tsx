@@ -316,7 +316,9 @@ export function ProductPage() {
   const handleGlobalFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const previewUrl = URL.createObjectURL(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const previewUrl = reader.result as string;
       setArtwork(prev => ({
         ...prev,
         file,
@@ -337,6 +339,8 @@ export function ProductPage() {
       }));
       setDesignMode('has_design');
       setIsMockupOpen(true);
+      };
+      reader.readAsDataURL(file);
     }
   };
 

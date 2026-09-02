@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { RefreshCw, CheckCircle2, AlertCircle, UploadCloud, Save, Image as ImageIcon } from 'lucide-react';
+import { RefreshCw, CheckCircle2, AlertCircle, UploadCloud, Save, Image as ImageIcon, DownloadCloud, ExternalLink } from 'lucide-react';
+import JSZip from 'jszip';
+import { saveAs } from 'file-saver';
 import styles from './MockupsQueuePage.module.css';
 import { API_BASE_URL } from '@/common/config/api';
 
@@ -58,6 +60,56 @@ export function MockupsQueuePage() {
   useEffect(() => {
     fetchOrders();
   }, []);
+
+  
+  const handleDownloadZip = async (order: Order) => {
+    let itemsArr: any[] = [];
+    if (typeof order.items === 'string') {
+      try { itemsArr = JSON.parse(order.items); } catch(e) {}
+    } else if (Array.isArray(order.items)) {
+      itemsArr = order.items;
+    }
+
+    const zip = new JSZip();
+    const folder = zip.folder(`Order_${order.orderId}_Artworks`);
+    if (!folder) return;
+
+    let hasImages = false;
+
+    for (const [idx, item] of itemsArr.entries()) {
+      if (item.placements) {
+        for (const [key, placementData] of Object.entries(item.placements)) {
+          const url = (placementData as any)?.previewUrl;
+          if (url) {
+            try {
+              let blob: Blob;
+              if (url.startsWith('data:')) {
+                // Base64
+                const res = await fetch(url);
+                blob = await res.blob();
+              } else {
+                // Remote URL
+                const res = await fetch(url);
+                blob = await res.blob();
+              }
+              const ext = blob.type.split('/')[1] || 'png';
+              folder.file(`${item.name.replace(/[^a-zA-Z0-9]/g, '_')}_${key}.${ext}`, blob);
+              hasImages = true;
+            } catch (err) {
+              console.error('Error fetching image for zip', err);
+            }
+          }
+        }
+      }
+    }
+
+    if (hasImages) {
+      const content = await zip.generateAsync({ type: 'blob' });
+      saveAs(content, `${order.orderId}_Artworks.zip`);
+    } else {
+      alert('No valid artworks found to download.');
+    }
+  };
 
   const handleVerify = async (order: Order) => {
     try {
@@ -153,9 +205,17 @@ export function MockupsQueuePage() {
                     <h3 style={{ margin: 0, fontSize: '16px', color: 'var(--color-text-title)' }}>{order.orderId}</h3>
                     <div style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>{order.customerName} - {order.orgName}</div>
                   </div>
-                  <button onClick={() => handleVerify(order)} className="erp-btn-primary" style={{ padding: '6px 12px', height: 'fit-content' }}>
-                    <CheckCircle2 size={14} style={{ marginRight: '6px', display: 'inline-block', verticalAlign: 'middle' }}/> Verify & Approve
-                  </button>
+                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                    <a href="https://www.canva.com/" target="_blank" rel="noopener noreferrer" className="erp-btn-secondary" style={{ padding: '6px 12px', height: 'fit-content', textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
+                      <ExternalLink size={14} style={{ marginRight: '6px' }}/> Export to Canva
+                    </a>
+                    <button onClick={() => handleDownloadZip(order)} className="erp-btn-secondary" style={{ padding: '6px 12px', height: 'fit-content', display: 'flex', alignItems: 'center' }}>
+                      <DownloadCloud size={14} style={{ marginRight: '6px' }}/> Download Zip
+                    </button>
+                    <button onClick={() => handleVerify(order)} className="erp-btn-primary" style={{ padding: '6px 12px', height: 'fit-content', display: 'flex', alignItems: 'center' }}>
+                      <CheckCircle2 size={14} style={{ marginRight: '6px' }}/> Verify & Approve
+                    </button>
+                  </div>
                 </div>
                 
                 <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '16px' }}>

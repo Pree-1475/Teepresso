@@ -43,7 +43,9 @@ export function MockupCanvasEditor({ productId, artwork, mockup, setArtwork, set
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const previewUrl = URL.createObjectURL(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const previewUrl = reader.result as string;
       setArtwork(prev => ({
         ...prev,
         file,
@@ -64,6 +66,8 @@ export function MockupCanvasEditor({ productId, artwork, mockup, setArtwork, set
       }));
       setShowPopover(false);
       if (onPopoverStateChange) onPopoverStateChange(false);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
