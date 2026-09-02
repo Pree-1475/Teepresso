@@ -7,6 +7,7 @@ interface StorefrontContextType {
   upiVpa: string;
   payeeName: string;
   contactPhone: string;
+  festiveRecommendationProductId: string | null;
   refreshSettings: () => Promise<void>;
 }
 
@@ -28,11 +29,19 @@ const getInitialPhone = (): string => {
   return '919390771123';
 };
 
+const getInitialRecId = (): string | null => {
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem('teepresso_festive_rec_id');
+  }
+  return null;
+};
+
 const StorefrontContext = createContext<StorefrontContextType>({
   storefrontMode: getInitialMode(),
   upiVpa: '9390771123@axl',
   payeeName: 'Teepresso Enterprise',
   contactPhone: getInitialPhone(),
+  festiveRecommendationProductId: getInitialRecId(),
   refreshSettings: async () => {}
 });
 
@@ -41,6 +50,7 @@ export const StorefrontProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [upiVpa, setUpiVpa] = useState('9390771123@axl');
   const [payeeName, setPayeeName] = useState('Teepresso Enterprise');
   const [contactPhone, setContactPhone] = useState(getInitialPhone);
+  const [festiveRecommendationProductId, setFestiveRecommendationProductId] = useState<string | null>(getInitialRecId);
 
   const fetchSettings = async () => {
     try {
@@ -54,6 +64,10 @@ export const StorefrontProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         }
         if (data.settings.upiVpa) setUpiVpa(data.settings.upiVpa);
         if (data.settings.payeeName) setPayeeName(data.settings.payeeName);
+        if (data.settings.festiveRecommendationProductId) {
+          setFestiveRecommendationProductId(data.settings.festiveRecommendationProductId);
+          localStorage.setItem('teepresso_festive_rec_id', data.settings.festiveRecommendationProductId);
+        }
         if (data.settings.contactPhone) {
           setContactPhone(String(data.settings.contactPhone));
           localStorage.setItem('teepresso_contact_phone', String(data.settings.contactPhone));
@@ -74,6 +88,9 @@ export const StorefrontProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       if (e.key === 'teepresso_contact_phone' && e.newValue) {
         setContactPhone(e.newValue);
       }
+      if (e.key === 'teepresso_festive_rec_id' && e.newValue) {
+        setFestiveRecommendationProductId(e.newValue);
+      }
     };
 
     window.addEventListener('storage', handleStorageChange);
@@ -81,7 +98,7 @@ export const StorefrontProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   }, []);
 
   return (
-    <StorefrontContext.Provider value={{ storefrontMode, upiVpa, payeeName, contactPhone, refreshSettings: fetchSettings }}>
+    <StorefrontContext.Provider value={{ storefrontMode, upiVpa, payeeName, contactPhone, festiveRecommendationProductId, refreshSettings: fetchSettings }}>
       {children}
     </StorefrontContext.Provider>
   );

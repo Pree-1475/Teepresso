@@ -1,14 +1,31 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useCart } from '../context/CartContext';
+import { useStorefront } from '@/common/context/StorefrontContext';
 import styles from './CartDrawer.module.css';
 import { X, ShoppingBag, ArrowRight, Sparkles, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { API_BASE_URL } from '@/common/config/api';
 
 export function CartDrawer() {
   const { cart, isCartDrawerOpen, setIsCartDrawerOpen, removeFromCart, addToCart } = useCart();
+  const { festiveRecommendationProductId } = useStorefront();
   const navigate = useNavigate();
+
+  const [recProduct, setRecProduct] = useState<any>(null);
+
+  useEffect(() => {
+    if (!festiveRecommendationProductId) return;
+    fetch(`${API_BASE_URL}/products/${festiveRecommendationProductId}`)
+      .then(r => r.json())
+      .then(data => {
+        if (data?.success && data?.product) {
+          setRecProduct(data.product);
+        }
+      })
+      .catch(() => null);
+  }, [festiveRecommendationProductId]);
 
   if (!isCartDrawerOpen) return null;
 
@@ -23,19 +40,25 @@ export function CartDrawer() {
     item.name.toLowerCase().includes('kurta')
   );
 
+  const targetRecId = recProduct?.id || 'royal-festive-pagdi';
+
   const hasPagdi = cart.items.some(item => 
-    item.productId.includes('pagdi') || 
+    item.productId === targetRecId || 
     item.name.toLowerCase().includes('pagdi')
   );
 
   const shouldRecommendPagdi = hasKurta && !hasPagdi;
 
   const handleAddPagdi = () => {
+    const pName = recProduct?.name || 'Royal Bandhani Festive Pagdi';
+    const pPrice = Number(recProduct?.startingPrice || 299);
+    const pCat = recProduct?.category || 'Accessories';
+
     addToCart({
-      productId: 'royal-festive-pagdi',
-      name: 'Royal Bandhani Festive Pagdi',
-      category: 'Accessories',
-      pricePerUnit: 299,
+      productId: targetRecId,
+      name: pName,
+      category: pCat,
+      pricePerUnit: pPrice,
       requiresSizes: false,
       requiresColors: true,
       requiresMockup: false,
@@ -57,6 +80,12 @@ export function CartDrawer() {
       }
     });
   };
+
+  const pTitle = recProduct?.name || 'Royal Bandhani Festive Pagdi';
+  const pSubheading = recProduct?.shortDesc?.includes('Pagdi') ? 'Royal Bandhani Pagdi' : (recProduct?.name || 'Royal Bandhani Pagdi');
+  const pDesc = recProduct?.shortDesc || 'Traditional handcrafted Rajasthani Zari Safah.';
+  const pPrice = Number(recProduct?.startingPrice || 299);
+  const pImg = recProduct?.image || 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=600&auto=format&fit=crop&q=80';
 
   return (
     <>
@@ -88,7 +117,7 @@ export function CartDrawer() {
             cart.items.map(item => (
               <div key={item.id} className={styles.cartItem}>
                 <img 
-                  src={item.name.toLowerCase().includes('pagdi') ? 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=600&auto=format&fit=crop&q=80' : '/images/mockups/tshirt-blank.svg'} 
+                  src={item.name.toLowerCase().includes('pagdi') ? pImg : '/images/mockups/tshirt-blank.svg'} 
                   alt={item.name} 
                   className={styles.itemImage} 
                 />
@@ -130,37 +159,58 @@ export function CartDrawer() {
             ))
           )}
 
-          {/* FESTIVE PAGDI CROSS-SELL RECOMMENDATION */}
+          {/* DYNAMIC FESTIVE CROSS-SELL RECOMMENDATION */}
           {cart.items.length > 0 && shouldRecommendPagdi && (
             <div className={styles.recommendationBox} style={{
               backgroundColor: '#fffbeb',
               border: '1.5px dashed #f59e0b',
-              borderRadius: '10px',
-              padding: '14px',
+              borderRadius: '12px',
+              padding: '16px',
               marginTop: '16px',
               marginBottom: '16px'
             }}>
-              <div className={styles.recommendationHeader} style={{
+              {/* Badge */}
+              <div style={{
                 fontSize: '12px',
-                fontWeight: 700,
+                fontWeight: 800,
                 color: '#b45309',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
-                marginBottom: '10px'
+                marginBottom: '8px',
+                textTransform: 'uppercase',
+                letterSpacing: '0.04em'
               }}>
                 <Sparkles size={14} color="#d97706" /> Complete Your Royal Festive Outfit!
               </div>
 
-              <div className={styles.recommendationContent} style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+              {/* Subheading */}
+              <div 
+                style={{ fontSize: '11px', fontWeight: 600, color: '#92400e', marginBottom: '8px', cursor: 'pointer' }}
+                onClick={() => { setIsCartDrawerOpen(false); navigate(`/product/${targetRecId}`); }}
+              >
+                Royal Bandhani Pagdi
+              </div>
+
+              <div className={styles.recommendationContent} style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>
                 <img 
-                  src="https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=600&auto=format&fit=crop&q=80" 
-                  alt="Royal Bandhani Pagdi" 
-                  style={{ width: '56px', height: '56px', objectFit: 'cover', borderRadius: '6px', border: '1px solid #fcd34d' }} 
+                  src={pImg} 
+                  alt={pTitle} 
+                  style={{ width: '64px', height: '64px', objectFit: 'cover', borderRadius: '8px', border: '1px solid #fcd34d', cursor: 'pointer' }} 
+                  onClick={() => { setIsCartDrawerOpen(false); navigate(`/product/${targetRecId}`); }}
                 />
                 <div className={styles.recommendationInfo} style={{ flex: 1 }}>
-                  <h4 style={{ margin: 0, fontSize: '13px', color: '#78350f', fontWeight: 700 }}>Royal Bandhani Festive Pagdi</h4>
-                  <p style={{ margin: '2px 0 6px 0', fontSize: '11px', color: '#92400e' }}>Traditional handcrafted Rajasthani Zari Safah.</p>
+                  {/* Product Title */}
+                  <h4 
+                    style={{ margin: 0, fontSize: '14px', color: '#78350f', fontWeight: 800, cursor: 'pointer' }}
+                    onClick={() => { setIsCartDrawerOpen(false); navigate(`/product/${targetRecId}`); }}
+                  >
+                    {pTitle}
+                  </h4>
+                  {/* Description */}
+                  <p style={{ margin: '4px 0 8px 0', fontSize: '11px', color: '#92400e', lineHeight: '1.3' }}>{pDesc}</p>
+                  
+                  {/* Action Button */}
                   <button 
                     className={styles.recommendationBtn}
                     onClick={handleAddPagdi}
@@ -168,9 +218,9 @@ export function CartDrawer() {
                       backgroundColor: '#d97706',
                       color: '#ffffff',
                       border: 'none',
-                      padding: '6px 12px',
+                      padding: '7px 14px',
                       borderRadius: '6px',
-                      fontSize: '11px',
+                      fontSize: '12px',
                       fontWeight: 700,
                       cursor: 'pointer',
                       display: 'inline-flex',
@@ -178,7 +228,7 @@ export function CartDrawer() {
                       gap: '4px'
                     }}
                   >
-                    <Plus size={12} /> Add Pagdi (₹299)
+                    <Plus size={14} /> Add Pagdi (₹{pPrice})
                   </button>
                 </div>
               </div>

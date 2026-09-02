@@ -19,11 +19,11 @@ export const createSizeController = async (req: Request, res: Response): Promise
       return;
     }
 
-    const id = `sz_${Date.now()}`;
+    const id = `sz_\${Date.now()}`;
 
     await sql`
       INSERT INTO sizes (id, name, category, chest, length)
-      VALUES (${id}, ${name}, ${category}, ${chest || ''}, ${length || ''})
+      VALUES (\${id}, \${name}, \${category}, \${chest || ''}, \${length || ''})
     `;
 
     const newSize = { id, name, category, chest: chest || '', length: length || '' };
@@ -39,7 +39,7 @@ export const updateSizeController = async (req: Request, res: Response): Promise
     const { id } = req.params;
     const { name, category, chest, length } = req.body;
 
-    const existing = await sql`SELECT * FROM sizes WHERE id = ${String(id)}`;
+    const existing = await sql`SELECT * FROM sizes WHERE id = \${String(id)}`;
     if (existing.length === 0) {
       res.status(404).json({ success: false, message: 'Size not found' });
       return;
@@ -47,14 +47,14 @@ export const updateSizeController = async (req: Request, res: Response): Promise
 
     await sql`
       UPDATE sizes
-      SET name = COALESCE(${name}, name),
-          category = COALESCE(${category}, category),
-          chest = COALESCE(${chest}, chest),
-          length = COALESCE(${length}, length)
-      WHERE id = ${String(id)}
+      SET name = COALESCE(\${name}, name),
+          category = COALESCE(\${category}, category),
+          chest = COALESCE(\${chest}, chest),
+          length = COALESCE(\${length}, length)
+      WHERE id = \${String(id)}
     `;
 
-    const updated = await sql`SELECT * FROM sizes WHERE id = ${String(id)}`;
+    const updated = await sql`SELECT * FROM sizes WHERE id = \${String(id)}`;
     res.json({ success: true, size: updated[0] });
   } catch (err) {
     console.error('Error updating size:', err);
@@ -65,11 +65,31 @@ export const updateSizeController = async (req: Request, res: Response): Promise
 export const deleteSizeController = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const result = await sql`DELETE FROM sizes WHERE id = ${String(id)} RETURNING id`;
     
-    if (result.length === 0) {
+    const size = await sql`SELECT * FROM sizes WHERE id = \${String(id)}`;
+    if (size.length === 0) {
       res.status(404).json({ success: false, message: 'Size not found' });
       return;
+    }
+    
+    const name = size[0].name;
+
+    const result = await sql`DELETE FROM sizes WHERE id = \${String(id)} RETURNING id`;
+    
+    if (result.length > 0) {
+      try {
+        await sql`
+          UPDATE products
+          SET sizes = (
+            SELECT COALESCE(jsonb_agg(elem), '[]'::jsonb)
+            FROM jsonb_array_elements_text(sizes) elem
+            WHERE elem <> \${name}
+          )
+          WHERE sizes @> concat('"', \${name}::text, '"')::jsonb
+        `;
+      } catch (cascadeErr) {
+        console.error('Error cascading size deletion to products:', cascadeErr);
+      }
     }
 
     res.json({ success: true, message: 'Size deleted successfully' });

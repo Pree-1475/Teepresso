@@ -7,6 +7,8 @@ export function SettingsPage() {
   const [storefrontMode, setStorefrontMode] = useState<'STANDARD' | 'FESTIVE'>('FESTIVE');
   const [upiVpa, setUpiVpa] = useState('9390771123@axl');
   const [payeeName, setPayeeName] = useState('Teepresso Enterprise');
+  const [festiveRecommendationProductId, setFestiveRecommendationProductId] = useState('royal-festive-pagdi');
+  const [productsList, setProductsList] = useState<{ id: string; name: string }[]>([]);
   const [contactPhone, setContactPhone] = useState('919390771123');
   const [loading, setLoading] = useState(true);
   const [savingKey, setSavingKey] = useState<string | null>(null);
@@ -23,6 +25,16 @@ export function SettingsPage() {
         if (data.settings.storefrontMode) setStorefrontMode(data.settings.storefrontMode);
         if (data.settings.upiVpa) setUpiVpa(data.settings.upiVpa);
         if (data.settings.payeeName) setPayeeName(data.settings.payeeName);
+        if (data.settings.festiveRecommendationProductId) setFestiveRecommendationProductId(data.settings.festiveRecommendationProductId);
+
+        // Fetch products list for dropdown
+        try {
+          const pRes = await fetch(`${API_BASE_URL}/products`);
+          const pData = await pRes.json();
+          if (pData.success && Array.isArray(pData.products)) {
+            setProductsList(pData.products.map((p: any) => ({ id: p.id, name: p.name })));
+          }
+        } catch(e) {}
         if (data.settings.contactPhone) setContactPhone(data.settings.contactPhone);
       }
     } catch (err) {
@@ -170,6 +182,46 @@ export function SettingsPage() {
 
             <div style={{ fontSize: '12px', color: 'var(--color-text-muted)', backgroundColor: 'var(--color-canvas-bg)', padding: '10px 12px', borderRadius: '4px', borderLeft: '3px solid var(--color-primary)' }}>
               <strong>Current Status:</strong> Frontends are currently running in <strong>{storefrontMode}</strong> mode.
+            </div>
+          </div>
+
+          {/* Card 1.5: Festive Cart Recommendation Product Settings */}
+          <div style={{ backgroundColor: 'var(--color-surface-white)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', padding: '24px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
+              <div style={{ width: '36px', height: '36px', borderRadius: '8px', backgroundColor: 'rgba(245, 158, 11, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#d97706' }}>
+                <Sparkles size={18} />
+              </div>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '16px', color: 'var(--color-text-title)' }}>Cart Festive Cross-Sell Product</h3>
+                <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>Select which item is recommended in the cart when festive products are added</span>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div>
+                <label className={styles.formLabel}>Cart Festive Recommendation Product *</label>
+                <select
+                  value={festiveRecommendationProductId}
+                  onChange={e => setFestiveRecommendationProductId(e.target.value)}
+                  className={styles.formInput}
+                >
+                  <option value="royal-festive-pagdi">Royal Bandhani Festive Pagdi (Default)</option>
+                  {productsList.map(p => (
+                    <option key={p.id} value={p.id}>{p.name} ({p.id})</option>
+                  ))}
+                </select>
+                <span className={styles.formHelp}>When a customer adds a Kurta or Festive apparel to their cart, this item appears in the cart drawer cross-sell box.</span>
+                <button
+                  type="button"
+                  onClick={() => handleUpdateSetting('festiveRecommendationProductId', festiveRecommendationProductId)}
+                  disabled={savingKey === 'festiveRecommendationProductId'}
+                  className="erp-btn-primary"
+                  style={{ marginTop: '10px', padding: '6px 14px', fontSize: '12px', display: 'inline-flex', gap: '6px', alignItems: 'center', cursor: 'pointer' }}
+                >
+                  <Save size={12} />
+                  <span>{savingKey === 'festiveRecommendationProductId' ? 'Saving...' : 'Save Festive Recommendation Product'}</span>
+                </button>
+              </div>
             </div>
           </div>
 

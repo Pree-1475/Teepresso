@@ -1,122 +1,108 @@
 import { Request, Response } from 'express';
 import { sql } from '../../../config/db.js';
-import { uploadBase64ToGCS } from '../../../config/storageService.js';
 
-// Helper to auto-upload base64 pattern swatches to GCS
-const processPatternImageUpload = async (imageStr: string, patternId: string): Promise<string> => {
-  if (!imageStr) return '';
-  if (imageStr.startsWith('http://') || imageStr.startsWith('https://')) {
-    return imageStr;
-  }
-
-  try {
-    const fileName = `patterns/pattern_${patternId}_${Date.now()}.webp`;
-    const gcsUrl = await uploadBase64ToGCS(imageStr, fileName);
-    return gcsUrl;
-  } catch (err) {
-    console.error('Failed to upload pattern image to GCS:', err);
-    return imageStr;
-  }
-};
-
-// Get all patterns
 export const getPatternsController = async (_req: Request, res: Response): Promise<void> => {
   try {
     const patterns = await sql`SELECT * FROM patterns ORDER BY "createdAt" ASC`;
-    res.json({
-      success: true,
-      patterns,
-    });
+    res.json({ success: true, patterns });
   } catch (err) {
     console.error('Error fetching patterns:', err);
     res.status(500).json({ success: false, message: 'Server error fetching patterns' });
   }
 };
 
-// Create pattern
 export const createPatternController = async (req: Request, res: Response): Promise<void> => {
   try {
     const { name, image } = req.body;
-    if (!name || !image) {
-      res.status(400).json({ success: false, message: 'Pattern name and image are required' });
+    if (!name) {
+      res.status(400).json({ success: false, message: 'Pattern name is required' });
       return;
     }
 
-    const id = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-    
-    const existing = await sql`SELECT * FROM patterns WHERE id = ${id} OR name = ${name}`;
+    const id = `pat_\${Date.now()}`;
+
+    const existing = await sql`SELECT * FROM patterns WHERE name = \${name}`;
     if (existing.length > 0) {
-      res.status(400).json({ success: false, message: `Pattern with name '${name}' already exists` });
+      res.status(400).json({ success: false, message: `Pattern '\${name}' already exists` });
       return;
     }
-
-    const gcsImageUrl = await processPatternImageUpload(image, String(id));
 
     await sql`
       INSERT INTO patterns (id, name, image)
-      VALUES (${id}, ${name}, ${gcsImageUrl})
+      VALUES (\${id}, \${name}, \${image || null})
     `;
 
-    const newPattern = { id, name, image: gcsImageUrl };
+    const newPattern = { id, name, image: image || null };
     res.status(201).json({ success: true, pattern: newPattern });
   } catch (err) {
     console.error('Error creating pattern:', err);
-    res.status(500).json({ success: false, message: (err as Error).message || 'Server error creating pattern' });
+    res.status(500).json({ success: false, message: (err as Error).message || 'Server error' });
   }
 };
 
-// Update pattern
 export const updatePatternController = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const { name, image } = req.body;
 
-    const existing = await sql`SELECT * FROM patterns WHERE id = ${id}`;
+    const existing = await sql`SELECT * FROM patterns WHERE id = \${String(id)}`;
     if (existing.length === 0) {
       res.status(404).json({ success: false, message: 'Pattern not found' });
       return;
     }
 
-    if (!name || !image) {
-      res.status(400).json({ success: false, message: 'Pattern name and image are required' });
-      return;
-    }
-
-    const gcsImageUrl = await processPatternImageUpload(image, String(id));
-
     await sql`
       UPDATE patterns
-      SET name = ${name}, image = ${gcsImageUrl}
-      WHERE id = ${id}
+      SET name = COALESCE(\${name}, name),
+          image = COALESCE(\${image}, image)
+      WHERE id = \${String(id)}
     `;
 
-    const updatedPattern = { id, name, image: gcsImageUrl };
-    res.json({ success: true, pattern: updatedPattern });
+    const updated = await sql`SELECT * FROM patterns WHERE id = \${String(id)}`;
+    res.json({ success: true, pattern: updated[0] });
   } catch (err) {
     console.error('Error updating pattern:', err);
-    res.status(500).json({ success: false, message: 'Server error updating pattern' });
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 };
 
-// Delete pattern
 export const deletePatternController = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const result = await sql`DELETE FROM patterns WHERE id = ${id} RETURNING id`;
     
-    if (result.length === 0) {
+    const pattern = await sql`SELECT * FROM patterns WHERE id = \${String(id)}`;
+    if (pattern.length === 0) {
       res.status(404).json({ success: false, message: 'Pattern not found' });
       return;
+    }
+    
+    const name = pattern[0].name;
+
+    const result = await sql`DELETE FROM patterns WHERE id = \${String(id)} RETURNING id`;
+    
+    if (result.length > 0) {
+      try {
+        await sql`
+          UPDATE products
+          SET patterns = (
+            SELECT COALESCE(jsonb_agg(elem), '[]'::jsonb)
+            FROM jsonb_array_elements_text(patterns) elem
+            WHERE elem <> \${name}
+          )
+          WHERE patterns @> concat('"', \${name}::text, '"')::jsonb
+        `;
+      } catch (cascadeErr) {
+        console.error('Error cascading pattern deletion to products:', cascadeErr);
+      }
     }
 
     res.json({ success: true, message: 'Pattern deleted successfully' });
   } catch (err) {
     console.error('Error deleting pattern:', err);
-    res.status(500).json({ success: false, message: 'Server error deleting pattern' });
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 };
 
-// Reorder patterns
 export const reorderPatternsController = async (_req: Request, res: Response): Promise<void> => {
   try {
     const patterns = await sql`SELECT * FROM patterns ORDER BY "createdAt" ASC`;
