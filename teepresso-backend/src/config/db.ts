@@ -35,6 +35,10 @@ export const initNeonDatabase = async () => {
     `;
 
     // 2. Products Table
+    
+    // Add gallery column if it doesn't exist
+    await sql`ALTER TABLE products ADD COLUMN IF NOT EXISTS gallery JSONB;`;
+
     await sql`
       CREATE TABLE IF NOT EXISTS products (
         id VARCHAR(100) PRIMARY KEY,

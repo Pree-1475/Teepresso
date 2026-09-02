@@ -40,18 +40,18 @@ export function CartDrawer() {
     item.name.toLowerCase().includes('kurta')
   );
 
-  const targetRecId = recProduct?.id || 'royal-festive-pagdi';
+  const targetRecId = recProduct?.id;
 
   const hasPagdi = cart.items.some(item => 
     item.productId === targetRecId || 
     item.name.toLowerCase().includes('pagdi')
   );
 
-  const shouldRecommendPagdi = hasKurta && !hasPagdi;
+  const shouldRecommendPagdi = Boolean(hasKurta && !hasPagdi && targetRecId && recProduct);
 
   const handleAddPagdi = () => {
     const pName = recProduct?.name || 'Royal Bandhani Festive Pagdi';
-    const pPrice = Number(recProduct?.startingPrice || 299);
+    const pPrice = Number(recProduct?.startingPrice || 0);
     const pCat = recProduct?.category || 'Accessories';
 
     addToCart({
@@ -81,11 +81,11 @@ export function CartDrawer() {
     });
   };
 
-  const pTitle = recProduct?.name || 'Royal Bandhani Festive Pagdi';
-  const pSubheading = recProduct?.shortDesc?.includes('Pagdi') ? 'Royal Bandhani Pagdi' : (recProduct?.name || 'Royal Bandhani Pagdi');
-  const pDesc = recProduct?.shortDesc || 'Traditional handcrafted Rajasthani Zari Safah.';
-  const pPrice = Number(recProduct?.startingPrice || 299);
-  const pImg = recProduct?.image || 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=600&auto=format&fit=crop&q=80';
+  const pTitle = recProduct?.name;
+  const pSubheading = recProduct?.shortDesc || recProduct?.name;
+  const pDesc = recProduct?.shortDesc || '';
+  const pPrice = Number(recProduct?.startingPrice || 0);
+  const pImg = recProduct?.image || '';
 
   return (
     <>
@@ -181,7 +181,7 @@ export function CartDrawer() {
                 textTransform: 'uppercase',
                 letterSpacing: '0.04em'
               }}>
-                <Sparkles size={14} color="#d97706" /> Complete Your Royal Festive Outfit!
+                <Sparkles size={14} color="#d97706" /> Recommended Match
               </div>
 
               {/* Subheading */}
@@ -189,7 +189,7 @@ export function CartDrawer() {
                 style={{ fontSize: '11px', fontWeight: 600, color: '#92400e', marginBottom: '8px', cursor: 'pointer' }}
                 onClick={() => { setIsCartDrawerOpen(false); navigate(`/product/${targetRecId}`); }}
               >
-                Royal Bandhani Pagdi
+                {pSubheading}
               </div>
 
               <div className={styles.recommendationContent} style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>
@@ -213,7 +213,7 @@ export function CartDrawer() {
                   {/* Action Button */}
                   <button 
                     className={styles.recommendationBtn}
-                    onClick={handleAddPagdi}
+                    onClick={() => { setIsCartDrawerOpen(false); navigate(`/product/${targetRecId}`); }}
                     style={{
                       backgroundColor: '#d97706',
                       color: '#ffffff',
@@ -228,7 +228,7 @@ export function CartDrawer() {
                       gap: '4px'
                     }}
                   >
-                    <Plus size={14} /> Add Pagdi (₹{pPrice})
+                    View & Customize
                   </button>
                 </div>
               </div>

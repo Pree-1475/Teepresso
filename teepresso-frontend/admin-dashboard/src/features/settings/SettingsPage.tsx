@@ -205,7 +205,7 @@ export function SettingsPage() {
                   onChange={e => setFestiveRecommendationProductId(e.target.value)}
                   className={styles.formInput}
                 >
-                  <option value="royal-festive-pagdi">Royal Bandhani Festive Pagdi (Default)</option>
+                  <option value="">-- No Cross-Sell / Select an Item --</option>
                   {productsList.map(p => (
                     <option key={p.id} value={p.id}>{p.name} ({p.id})</option>
                   ))}

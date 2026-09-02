@@ -116,7 +116,19 @@ export const createProductController = async (req: Request, res: Response): Prom
       'products'
     );
 
-    const colorsJson = JSON.stringify(Array.isArray(productData.colors) ? productData.colors : []);
+    
+    let galleryUrls = [];
+    if (Array.isArray(productData.gallery)) {
+      galleryUrls = await Promise.all(
+        productData.gallery.map(async (img: any) => {
+          if (typeof img === 'string' && img.startsWith('data:')) {
+            return await processImageUpload(img, 'products/gallery');
+          }
+          return img;
+        })
+      );
+    }
+  const colorsJson = JSON.stringify(Array.isArray(productData.colors) ? productData.colors : []);
     const sizesJson = JSON.stringify(Array.isArray(productData.sizes) ? productData.sizes : []);
     const patternsJson = JSON.stringify(Array.isArray(productData.patterns) ? productData.patterns : []);
     const tiersJson = JSON.stringify(pricing.tiers);
@@ -125,13 +137,13 @@ export const createProductController = async (req: Request, res: Response): Prom
     await sql`
       INSERT INTO products (
         id, name, category, "shortDesc", "startingPrice", "priceRange",
-        colors, sizes, patterns, image, "popularFor", "requiresSizes",
+        colors, sizes, patterns, image, gallery, "popularFor", "requiresSizes",
         "requiresColors", "requiresPatterns", "requiresMockup", "applyVolumeDiscount",
         "isSeasonalKurta", tiers, stock, "sizesStock"
       ) VALUES (
         ${id}, ${productData.name}, ${productData.category}, ${productData.shortDesc || ''},
         ${pricing.startingPrice}, ${pricing.priceRange}, ${colorsJson}::jsonb, ${sizesJson}::jsonb,
-        ${patternsJson}::jsonb, ${imageUrl}, ${productData.popularFor || ''}, ${!!productData.requiresSizes},
+        ${patternsJson}::jsonb, ${imageUrl}, ${JSON.stringify(galleryUrls)}::jsonb, ${productData.popularFor || ''}, ${!!productData.requiresSizes},
         ${!!productData.requiresColors}, ${!!productData.requiresPatterns}, ${!!productData.requiresMockup},
         ${!!productData.applyVolumeDiscount}, ${!!productData.isSeasonalKurta}, ${tiersJson}::jsonb,
         ${productData.stock !== undefined ? Number(productData.stock) : null}, ${sizesStockJson}::jsonb
@@ -162,6 +174,23 @@ export const updateProductController = async (req: Request, res: Response): Prom
     if (updateData.image) {
       updateData.image = await processImageUpload(updateData.image, 'products');
     }
+    let newGalleryJson = null;
+    if (updateData.gallery !== undefined) {
+      if (Array.isArray(updateData.gallery)) {
+        const processed = await Promise.all(
+          updateData.gallery.map(async (img: any) => {
+            if (typeof img === 'string' && img.startsWith('data:')) {
+              return await processImageUpload(img, 'products/gallery');
+            }
+            return img;
+          })
+        );
+        newGalleryJson = JSON.stringify(processed);
+      } else {
+        newGalleryJson = JSON.stringify([]);
+      }
+    }
+  
 
     let pricing = {
       startingPrice: existingProduct.startingPrice,
@@ -198,6 +227,7 @@ export const updateProductController = async (req: Request, res: Response): Prom
           sizes = COALESCE(${sizesJson}::jsonb, sizes),
           patterns = COALESCE(${patternsJson}::jsonb, patterns),
           image = COALESCE(${updateData.image}, image),
+          gallery = COALESCE(${newGalleryJson}::jsonb, gallery),
           "popularFor" = COALESCE(${updateData.popularFor}, "popularFor"),
           "requiresSizes" = COALESCE(${updateData.requiresSizes}, "requiresSizes"),
           "requiresColors" = COALESCE(${updateData.requiresColors}, "requiresColors"),
