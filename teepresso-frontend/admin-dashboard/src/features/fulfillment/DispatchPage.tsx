@@ -119,19 +119,26 @@ export function DispatchPage() {
                     <span className={`badge ${item.currentStage === 'In Transit' ? 'badge-info' : 'badge-warning'}`}>{item.currentStage}</span>
                   </td>
                   <td style={{ textAlign: 'right', display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                    {item.currentStage !== 'In Transit' && (
-                      <button 
-                        onClick={() => setConfirmModal({ orderId: item.id, stage: 'In Transit', orgName: item.orgName, ref: item.orderId })}
-                        className="erp-btn-secondary" 
-                        style={{ padding: '6px 12px' }}
-                      >
-                        <Truck size={14} style={{ marginRight: '6px', verticalAlign: 'middle', display: 'inline-block' }}/> Mark Dispatched
-                      </button>
-                    )}
+                    <button 
+                      onClick={() => setConfirmModal({ orderId: item.id, stage: 'In Transit', orgName: item.orgName, ref: item.orderId })}
+                      className="erp-btn-secondary" 
+                      disabled={item.currentStage === 'In Transit'}
+                      style={{ padding: '6px 12px', opacity: item.currentStage === 'In Transit' ? 0.5 : 1, cursor: item.currentStage === 'In Transit' ? 'not-allowed' : 'pointer' }}
+                    >
+                      <Truck size={14} style={{ marginRight: '6px', verticalAlign: 'middle', display: 'inline-block' }}/> Mark Dispatched
+                    </button>
                     <button 
                       onClick={() => setConfirmModal({ orderId: item.id, stage: 'Delivered', orgName: item.orgName, ref: item.orderId })}
                       className="erp-btn-primary" 
-                      style={{ padding: '6px 12px', backgroundColor: '#10b981', borderColor: '#10b981' }}
+                      disabled={item.currentStage !== 'In Transit'}
+                      style={{ 
+                        padding: '6px 12px', 
+                        backgroundColor: item.currentStage !== 'In Transit' ? '#6ee7b7' : '#10b981', 
+                        borderColor: item.currentStage !== 'In Transit' ? '#6ee7b7' : '#10b981',
+                        opacity: item.currentStage !== 'In Transit' ? 0.6 : 1,
+                        cursor: item.currentStage !== 'In Transit' ? 'not-allowed' : 'pointer',
+                        color: '#fff'
+                      }}
                     >
                       <Check size={14} style={{ marginRight: '6px', verticalAlign: 'middle', display: 'inline-block' }}/> Mark Delivered
                     </button>
