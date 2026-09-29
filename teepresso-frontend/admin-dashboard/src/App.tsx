@@ -22,6 +22,7 @@ import { ColorsSnippetPage } from '@/features/snippets/ColorsSnippetPage';
 import { SizesSnippetPage } from '@/features/snippets/SizesSnippetPage';
 import { PatternsSnippetPage } from '@/features/snippets/PatternsSnippetPage';
 import { SnippetsDashboardPage } from '@/features/snippets/SnippetsDashboardPage';
+import { InternalNotesWidget } from '@/common/components/widgets/InternalNotesWidget';
 
 function AnimatedRoutes() {
   const location = useLocation();
@@ -88,6 +89,9 @@ export function App() {
             <AnimatedRoutes />
           </main>
         </div>
+
+        {/* Global Internal Notes Widget */}
+        <InternalNotesWidget userRole={user.role} />
       </div>
     </BrowserRouter>
   );

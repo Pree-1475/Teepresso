@@ -19,18 +19,18 @@ export const createColorController = async (req: Request, res: Response): Promis
       return;
     }
 
-    const id = `col_\${Date.now()}`;
+    const id = `col_${Date.now()}`;
     const cleanHex = hex.trim().toLowerCase();
 
-    const existing = await sql`SELECT * FROM colors WHERE hex = \${cleanHex} OR name = \${name}`;
+    const existing = await sql`SELECT * FROM colors WHERE hex = ${cleanHex} OR name = ${name}`;
     if (existing.length > 0) {
-      res.status(400).json({ success: false, message: `Color '\${name}' (\${hex}) already exists` });
+      res.status(400).json({ success: false, message: `Color '${name}' (${hex}) already exists` });
       return;
     }
 
     await sql`
       INSERT INTO colors (id, name, hex)
-      VALUES (\${id}, \${name}, \${cleanHex})
+      VALUES (${id}, ${name}, ${cleanHex})
     `;
 
     const newColor = { id, name, hex: cleanHex };
@@ -46,7 +46,7 @@ export const updateColorController = async (req: Request, res: Response): Promis
     const { id } = req.params;
     const { name, hex } = req.body;
 
-    const existing = await sql`SELECT * FROM colors WHERE id = \${String(id)}`;
+    const existing = await sql`SELECT * FROM colors WHERE id = ${String(id)}`;
     if (existing.length === 0) {
       res.status(404).json({ success: false, message: 'Color not found' });
       return;
@@ -56,12 +56,12 @@ export const updateColorController = async (req: Request, res: Response): Promis
 
     await sql`
       UPDATE colors
-      SET name = COALESCE(\${name}, name),
-          hex = \${cleanHex}
-      WHERE id = \${String(id)}
+      SET name = COALESCE(${name}, name),
+          hex = ${cleanHex}
+      WHERE id = ${String(id)}
     `;
 
-    const updated = await sql`SELECT * FROM colors WHERE id = \${String(id)}`;
+    const updated = await sql`SELECT * FROM colors WHERE id = ${String(id)}`;
     res.json({ success: true, color: updated[0] });
   } catch (err) {
     console.error('Error updating color:', err);
@@ -74,7 +74,7 @@ export const deleteColorController = async (req: Request, res: Response): Promis
     const { id } = req.params;
     
     // First get the color to know its hex/name
-    const color = await sql`SELECT * FROM colors WHERE id = \${String(id)}`;
+    const color = await sql`SELECT * FROM colors WHERE id = ${String(id)}`;
     if (color.length === 0) {
       res.status(404).json({ success: false, message: 'Color not found' });
       return;
@@ -83,7 +83,7 @@ export const deleteColorController = async (req: Request, res: Response): Promis
     const hex = color[0].hex;
     const name = color[0].name;
 
-    const result = await sql`DELETE FROM colors WHERE id = \${String(id)} RETURNING id`;
+    const result = await sql`DELETE FROM colors WHERE id = ${String(id)} RETURNING id`;
     
     if (result.length > 0) {
       // Remove references from products where colors JSONB array contains this hex or name
@@ -93,10 +93,10 @@ export const deleteColorController = async (req: Request, res: Response): Promis
           SET colors = (
             SELECT COALESCE(jsonb_agg(elem), '[]'::jsonb)
             FROM jsonb_array_elements_text(colors) elem
-            WHERE elem <> \${hex} AND elem <> \${name}
+            WHERE elem <> ${hex} AND elem <> ${name}
           )
-          WHERE colors @> concat('"', \${hex}::text, '"')::jsonb 
-             OR colors @> concat('"', \${name}::text, '"')::jsonb
+          WHERE colors @> concat('"', ${hex}::text, '"')::jsonb 
+             OR colors @> concat('"', ${name}::text, '"')::jsonb
         `;
       } catch (cascadeErr) {
         console.error('Error cascading color deletion to products:', cascadeErr);
