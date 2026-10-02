@@ -21,7 +21,7 @@
   align-items: center;
   
   /* Use padding to nudge content precisely into the neck hole */
-  padding-top: 22vh; 
+  padding-top: 15vh; 
   padding-bottom: 5vh;
   overflow: hidden;
   position: relative; 
@@ -76,7 +76,7 @@
   font-size: var(--text-4xl);
   line-height: 1.1; 
   font-weight: 500;
-  margin: 0 0 36px 0; /* Increased margin for more space */
+  margin: 0 0 24px 0; /* Increased margin for more space */
   letter-spacing: -0.02em;
   color: #FFFFFF;
 }
@@ -94,29 +94,31 @@
 
 .actions {
   display: flex;
-  /* Side by side on mobile */
   flex-direction: row;
   justify-content: center;
-  gap: var(--spacing-2);
+  gap: 12px;
   width: 100%;
+  max-width: 340px;
+  margin: 0 auto;
 }
 
 .btnPrimary {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--spacing-2);
+  gap: 8px;
   background-color: var(--color-accent-teal);
   color: #FFFFFF;
   border: none;
   font-family: var(--font-body);
-  font-size: 13px; /* Slightly smaller for mobile */
+  font-size: 14px;
   font-weight: 600;
-  padding: 12px 16px; /* Less padding to fit side by side */
+  padding: 12px 16px;
   border-radius: 40px; 
   text-decoration: none;
   transition: all 0.3s ease;
-  flex: 1; /* Take up half space */
+  flex: 1;
+  white-space: nowrap;
   box-shadow: 0 4px 14px rgba(13, 148, 136, 0.25);
 }
 
@@ -127,20 +129,22 @@
 }
 
 .btnOutline {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
+  gap: 8px;
   background-color: transparent;
   color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.8);
   font-family: var(--font-body);
   font-size: 14px;
-  font-weight: 500;
-  padding: 14px 36px;
+  font-weight: 600;
+  padding: 12px 16px;
   border-radius: 40px; 
-  border: 1px solid rgba(255,255,255,0.7);
   text-decoration: none;
   transition: all 0.3s ease;
-  width: 100%; /* Full width on mobile */
+  flex: 1;
+  white-space: nowrap;
 }
 
 .btnOutline:hover {
@@ -197,5 +201,16 @@
   .btnPrimary,
   .btnOutline {
     width: auto; /* Reset back to intrinsic width on desktop */
+    flex: none;
+    padding: 14px 36px;
+    font-size: 16px;
   }
+}
+
+.mobileTitle { display: block; }
+.desktopTitle { display: none; }
+
+@media (min-width: 768px) {
+  .mobileTitle { display: none; }
+  .desktopTitle { display: block; }
 }

@@ -17,8 +17,8 @@ export function HeroSection() {
           </span>
           
           <h1 className={styles.title}>
-            Custom T-Shirts<br />
-            Made for Every Team
+            <span className={styles.mobileTitle}>Custom T-Shirts<br />Made For All!</span>
+            <span className={styles.desktopTitle}>Custom T-Shirts<br />Made for Every Team</span>
           </h1>
           
           
@@ -27,7 +27,7 @@ export function HeroSection() {
             <Link href="/products" className={styles.btnPrimary}>
               Explore Gallery
             </Link>
-            <Link href="#instant-quote" className={styles.btnOutline} style={{ color: '#fff', borderColor: '#fff' }}>
+            <Link href="#instant-quote" className={styles.btnOutline}>
               Get a Quote <ArrowRight size={16} />
             </Link>
           </div>
