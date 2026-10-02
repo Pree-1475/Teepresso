@@ -19,6 +19,12 @@
 }
 
 @media (min-width: 1024px) {
+  .leftColumn {
+    order: 1;
+  }
+  .rightColumn {
+    order: 2;
+  }
   .gridContainer {
     grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
     gap: 80px;
@@ -32,6 +38,7 @@
 .leftColumn {
   display: flex;
   flex-direction: column;
+  order: 2;
 }
 
 /* Header */
@@ -428,8 +435,9 @@
    ============================================ */
 .rightColumn {
   position: relative;
-  max-width: 100%; /* Prevent horizontal blowout */
+  max-width: 100%;
   min-width: 0;
+  order: 1;
 }
 
 .stickyCalculator {

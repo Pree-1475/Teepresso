@@ -3,12 +3,12 @@ import { ImageIcon } from 'lucide-react';
 import styles from './GallerySection.module.css';
 
 const galleryItems = [
-  { id: 1, category: 'University Merch', size: 'large' },
-  { id: 2, category: 'Corporate Event', size: 'small' },
-  { id: 3, category: 'Sports Team', size: 'medium' },
+  { id: 1, category: 'IIT Hyderabad', size: 'large' },
+  { id: 2, category: 'TEDx Events', size: 'small' },
+  { id: 3, category: 'Anurag University', size: 'medium' },
   { id: 4, category: 'Startup Swag', size: 'small' },
-  { id: 5, category: 'NGO Campaign', size: 'medium' },
-  { id: 6, category: 'Restaurant Uniforms', size: 'large' },
+  { id: 5, category: 'Corporate Merch', size: 'medium' },
+  { id: 6, category: 'Tech Fest Unforms', size: 'large' },
 ];
 
 export function GallerySection() {

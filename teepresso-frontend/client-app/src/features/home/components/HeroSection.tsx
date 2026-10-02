@@ -21,10 +21,7 @@ export function HeroSection() {
             Made for Every Team
           </h1>
           
-          <p className={styles.description}>
-            From schools to societies, events to enterprises &ndash;<br />
-            we create custom tees that speak for you.
-          </p>
+          
           
           <div className={styles.actions}>
             <Link href="/products" className={styles.btnPrimary}>

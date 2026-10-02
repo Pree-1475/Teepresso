@@ -37,15 +37,16 @@ export function Header() {
     router.push('/');
   };
 
-  const signInMarkup = (className: string) => (
-    !isAuthenticated && (
+  const signInMarkup = (className: string) => {
+    if (pathname === '/login') return null;
+    return !isAuthenticated && (
       <div className={className}>
         <Link href="/login" className={styles.quoteBtn}>
           Sign In
         </Link>
       </div>
-    )
-  );
+    );
+  };
 
   const userProfileMarkup = (className: string) => (
     isAuthenticated && (
@@ -117,7 +118,11 @@ export function Header() {
               onClick={() => setIsMobileMenuOpen(true)}
               aria-label="Open menu"
             >
-              <Menu size={24} strokeWidth={1.5} color="#1a1a1a" />
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="4" y1="6" x2="20" y2="6" strokeDasharray="4 3"/>
+                <line x1="4" y1="12" x2="20" y2="12" strokeDasharray="4 3"/>
+                <line x1="4" y1="18" x2="20" y2="18" strokeDasharray="4 3"/>
+              </svg>
             </button>
           )}
 
@@ -171,7 +176,11 @@ export function Header() {
           onClick={() => setIsMobileMenuOpen(true)}
           aria-label="Open menu"
         >
-          <Menu size={16} strokeWidth={2.5} /> MENU
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="4" y1="6" x2="20" y2="6" strokeDasharray="4 3"/>
+            <line x1="4" y1="12" x2="20" y2="12" strokeDasharray="4 3"/>
+            <line x1="4" y1="18" x2="20" y2="18" strokeDasharray="4 3"/>
+          </svg> MENU
         </button>
       )}
 

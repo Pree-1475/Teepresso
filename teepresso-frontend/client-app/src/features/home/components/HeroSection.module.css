@@ -94,10 +94,11 @@
 
 .actions {
   display: flex;
-  /* Stack vertically on mobile */
-  flex-direction: column;
-  gap: var(--spacing-3);
-  width: 100%; /* Full width for stacking */
+  /* Side by side on mobile */
+  flex-direction: row;
+  justify-content: center;
+  gap: var(--spacing-2);
+  width: 100%;
 }
 
 .btnPrimary {
@@ -109,13 +110,13 @@
   color: #FFFFFF;
   border: none;
   font-family: var(--font-body);
-  font-size: 14px;
+  font-size: 13px; /* Slightly smaller for mobile */
   font-weight: 600;
-  padding: 14px 32px;
+  padding: 12px 16px; /* Less padding to fit side by side */
   border-radius: 40px; 
   text-decoration: none;
   transition: all 0.3s ease;
-  width: 100%; /* Full width on mobile */
+  flex: 1; /* Take up half space */
   box-shadow: 0 4px 14px rgba(13, 148, 136, 0.25);
 }
 
