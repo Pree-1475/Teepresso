@@ -17,8 +17,8 @@ export function HeroSection() {
           </span>
           
           <h1 className={styles.title}>
-            <span className={styles.mobileTitle}>Custom T-Shirts<br />Made For All!</span>
-            <span className={styles.desktopTitle}>Custom T-Shirts<br />Made for Every Team</span>
+            Custom T-Shirts<br />
+            Made for Every Team
           </h1>
           
           
