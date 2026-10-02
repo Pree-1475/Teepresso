@@ -21,7 +21,7 @@
   align-items: center;
   
   /* Use padding to nudge content precisely into the neck hole */
-  padding-top: 10vh; 
+  padding-top: 4vh; 
   padding-bottom: 5vh;
   overflow: hidden;
   position: relative; 
@@ -212,6 +212,13 @@
 @media (min-width: 768px) and (max-width: 1024px) {
   .title {
     font-size: 84px;
+    line-height: 1.1;
+  }
+}
+
+@media (min-width: 500px) and (max-width: 767px) {
+  .title {
+    font-size: 56px;
     line-height: 1.1;
   }
 }
