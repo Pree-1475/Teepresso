@@ -25,10 +25,10 @@ export function HeroSection() {
           
           <div className={styles.actions}>
             <Link href="/products" className={styles.btnPrimary}>
-              Start Designing <ArrowRight size={16} />
-            </Link>
-            <Link href="/gallery" className={styles.btnOutline}>
               Explore Gallery
+            </Link>
+            <Link href="#instant-quote" className={styles.btnOutline} style={{ color: '#fff', borderColor: '#fff' }}>
+              Get a Quote <ArrowRight size={16} />
             </Link>
           </div>
           

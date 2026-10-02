@@ -113,7 +113,7 @@ export function HowItWorksSection() {
   const ratingCounter = useCountUp(49, 1200);
 
   return (
-    <section className={styles.wrapper}>
+    <section className={styles.wrapper} id="instant-quote">
       <div className="container">
         
         <div className={styles.gridContainer}>

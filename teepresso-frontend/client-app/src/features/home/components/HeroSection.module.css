@@ -21,7 +21,7 @@
   align-items: center;
   
   /* Use padding to nudge content precisely into the neck hole */
-  padding-top: 30vh; 
+  padding-top: 22vh; 
   padding-bottom: 5vh;
   overflow: hidden;
   position: relative; 
@@ -76,7 +76,7 @@
   font-size: var(--text-4xl);
   line-height: 1.1; 
   font-weight: 500;
-  margin: 0 0 var(--spacing-4) 0;
+  margin: 0 0 36px 0; /* Increased margin for more space */
   letter-spacing: -0.02em;
   color: #FFFFFF;
 }
