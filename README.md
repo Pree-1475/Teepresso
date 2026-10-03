@@ -9,3 +9,7 @@ Custom apparel platform with modular architecture.
 
 ## Production Endpoints
 - API Backend: `https://teepresso-2426456693.asia-south1.run.app/api/v1`
+
+
+## Update
+- Random change applied as requested.
