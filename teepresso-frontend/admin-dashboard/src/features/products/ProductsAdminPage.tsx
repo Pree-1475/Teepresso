@@ -29,10 +29,21 @@ export function ProductsAdminPage() {
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [featuredProductIds, setFeaturedProductIds] = useState<string[]>([]);
   const navigate = useNavigate();
 
   // Load products from backend on mount
   useEffect(() => {
+    // Load settings to know featured products
+    fetch(`${API_BASE_URL}/settings`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && Array.isArray(data.settings?.featuredProductIds)) {
+          setFeaturedProductIds(data.settings.featuredProductIds);
+        }
+      })
+      .catch(err => console.error('Failed to load featured products setting:', err));
+
     fetch(`${API_BASE_URL}/products`)
       .then(res => res.json())
       .then(data => {
@@ -56,6 +67,25 @@ export function ProductsAdminPage() {
   );
 
   // CSV Export Handler
+  const toggleFeatured = async (productId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const isCurrentlyFeatured = featuredProductIds.includes(productId);
+    const updated = isCurrentlyFeatured
+      ? featuredProductIds.filter(id => id !== productId)
+      : [...featuredProductIds, productId];
+
+    setFeaturedProductIds(updated);
+    try {
+      await fetch(`${API_BASE_URL}/settings`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: 'featuredProductIds', value: updated })
+      });
+    } catch (err) {
+      console.error('Failed to toggle featured setting:', err);
+    }
+  };
+
   const handleExport = () => {
     if (products.length === 0) {
       alert('No products to export');
@@ -152,6 +182,7 @@ export function ProductsAdminPage() {
           <table className="erp-table">
             <thead>
               <tr>
+                <th>Homepage Catalog</th>
                 <th>Product Name</th>
                 <th>Category</th>
                 <th>Starting Price</th>
@@ -167,7 +198,29 @@ export function ProductsAdminPage() {
                   onClick={() => navigate(`/products/edit/${p.id}`)}
                   style={{ cursor: 'pointer' }}
                 >
-                  <td>
+                                    <td>
+                    <button
+                      type="button"
+                      onClick={(e) => toggleFeatured(p.id, e)}
+                      title={featuredProductIds.includes(p.id) ? "Click to remove from homepage catalog" : "Click to feature in homepage catalog"}
+                      style={{
+                        background: featuredProductIds.includes(p.id) ? 'rgba(140, 91, 69, 0.12)' : 'transparent',
+                        border: featuredProductIds.includes(p.id) ? '1px solid var(--color-primary)' : '1px solid rgba(0,0,0,0.15)',
+                        borderRadius: '20px',
+                        padding: '4px 10px',
+                        fontSize: '11px',
+                        fontWeight: 600,
+                        color: featuredProductIds.includes(p.id) ? 'var(--color-primary)' : 'var(--color-text-muted)',
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '4px'
+                      }}
+                    >
+                      {featuredProductIds.includes(p.id) ? '★ In Catalog' : '☆ Not in Catalog'}
+                    </button>
+                  </td>
+<td>
                     <span style={{ fontWeight: 600, color: 'var(--color-primary)' }}>
                       {p.name}
                     </span>

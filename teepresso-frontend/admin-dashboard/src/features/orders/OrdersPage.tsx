@@ -7,7 +7,7 @@ const getUser = () => {
     return { role: 'admin' };
   }
 };
-import { Search, Filter, Download, ShieldAlert, X, CheckCircle, Clock, Save, Truck, CreditCard, Package } from 'lucide-react';
+import { Search, Filter, Download, ShieldAlert, X, CheckCircle, Clock, Save, Truck, CreditCard, Package, Mic } from 'lucide-react';
 import styles from './OrdersPage.module.css';
 import { API_BASE_URL } from '@/common/config/api';
 
@@ -47,6 +47,8 @@ interface Order {
   notes: string;
   items: OrderItem[] | string;
   dispatchDetails?: any;
+  voiceNoteUrl?: string;
+  voiceNoteDuration?: number;
 }
 
 const PRODUCTION_STAGES = [
@@ -145,6 +147,22 @@ export function OrdersPage() {
     );
   });
 
+  const getOrderVoiceNote = (order: Order): { url: string; duration?: number } | null => {
+    if (order.voiceNoteUrl) {
+      return { url: order.voiceNoteUrl, duration: order.voiceNoteDuration };
+    }
+    const items = parsedItems(order.items);
+    for (const it of items) {
+      if ((it as any).voiceNote || (it as any).artwork?.voiceNote) {
+        return {
+          url: (it as any).voiceNote || (it as any).artwork?.voiceNote,
+          duration: (it as any).voiceNoteDuration || (it as any).artwork?.voiceNoteDuration
+        };
+      }
+    }
+    return null;
+  };
+
   const parsedItems = (items: OrderItem[] | string | undefined): OrderItem[] => {
     if (!items) return [];
     if (Array.isArray(items)) return items;
@@ -225,6 +243,24 @@ export function OrdersPage() {
                   <td>
                     <div style={{ fontWeight: 500 }}>{item.productName || 'Custom Apparel'}</div>
                     <div className="text-muted" style={{ fontSize: '11px' }}>{item.category || 'Bulk Order'}</div>
+                    {getOrderVoiceNote(item) && (
+                      <div style={{ marginTop: '4px' }}>
+                        <span style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                          backgroundColor: '#ECFDF5',
+                          color: '#065F46',
+                          border: '1px solid #A7F3D0',
+                          borderRadius: '9999px',
+                          padding: '2px 8px',
+                          fontSize: '11px',
+                          fontWeight: 600
+                        }}>
+                          <Mic size={10} color="#059669" /> Voice Note
+                        </span>
+                      </div>
+                    )}
                   </td>
                   <td><strong>{item.totalPieces || 0}</strong> pcs</td>
                   <td style={{ fontWeight: 700 }}>₹{Number(item.totalAmount || 0).toLocaleString('en-IN')}</td>
@@ -450,6 +486,78 @@ export function OrdersPage() {
                 </table>
               )}
             </div>
+
+            {/* Customer Voice Note Player */}
+            {selectedOrder && getOrderVoiceNote(selectedOrder) && (() => {
+              const voice = getOrderVoiceNote(selectedOrder)!;
+              return (
+              <div style={{
+                backgroundColor: '#F8F6F3',
+                border: '1px solid rgba(140, 91, 69, 0.25)',
+                borderRadius: '8px',
+                padding: '16px',
+                marginBottom: '24px'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{
+                      width: '28px',
+                      height: '28px',
+                      borderRadius: '50%',
+                      backgroundColor: 'rgba(140, 91, 69, 0.15)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: 'var(--color-primary, #8C5B45)'
+                    }}>
+                      <Mic size={15} />
+                    </div>
+                    <div>
+                      <h4 style={{ margin: 0, fontSize: '13.5px', fontWeight: 700, color: 'var(--color-text-title)' }}>
+                        Customer Voice Note
+                      </h4>
+                      <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>
+                        Recorded by customer during checkout
+                        {voice.duration ? ` (${Math.floor(voice.duration / 60)}:${(voice.duration % 60).toString().padStart(2, '0')})` : ''}
+                      </span>
+                    </div>
+                  </div>
+                  <a
+                    href={voice.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    download={`voicenote_${selectedOrder.orderId || selectedOrder.id}.webm`}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      fontSize: '11.5px',
+                      fontWeight: 600,
+                      color: 'var(--color-primary, #8C5B45)',
+                      textDecoration: 'none',
+                      padding: '4px 10px',
+                      backgroundColor: '#FFFFFF',
+                      border: '1px solid rgba(140, 91, 69, 0.2)',
+                      borderRadius: '4px'
+                    }}
+                  >
+                    <Download size={12} /> Download Audio
+                  </a>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+                  <audio
+                    controls
+                    src={voice.url}
+                    preload="metadata"
+                    style={{ width: '100%', height: '40px', outline: 'none' }}
+                  >
+                    Your browser does not support the audio element.
+                  </audio>
+                </div>
+              </div>
+                );
+              })()}
 
             {/* Notes Section */}
             <div style={{ marginBottom: '24px' }}>

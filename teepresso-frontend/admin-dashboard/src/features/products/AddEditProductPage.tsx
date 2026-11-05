@@ -54,7 +54,9 @@ export function AddEditProductPage() {
     isSeasonalKurta: false,
   });
 
+  const [isFeatured, setIsFeatured] = useState<boolean>(false);
   const [tiers, setTiers] = useState<PriceTier[]>([
+
     { minQty: 1, price: 199 }
   ]);
 
@@ -121,6 +123,19 @@ export function AddEditProductPage() {
           }
         } catch (e) {
           console.error('Failed to load patterns snippets:', e);
+        }
+
+        // 4b. Fetch Settings to check featured status
+        try {
+          const setRes = await fetch(`${API_BASE_URL}/settings`);
+          const setData = await setRes.json();
+          if (setData.success && Array.isArray(setData.settings?.featuredProductIds)) {
+            if (id && setData.settings.featuredProductIds.includes(id)) {
+              setIsFeatured(true);
+            }
+          }
+        } catch (e) {
+          console.error('Failed to load featured status:', e);
         }
 
         // 5. Fetch Product details (if edit mode)
@@ -396,6 +411,32 @@ export function AddEditProductPage() {
       const data = await res.json();
 
       if (data.success) {
+        // Sync featured status in settings
+        try {
+          const productId = isEditMode ? id : (data.product?.id || productPayload.id);
+          const setRes = await fetch(`${API_BASE_URL}/settings`);
+          const setData = await setRes.json();
+          let currentFeatured: string[] = [];
+          if (setData.success && Array.isArray(setData.settings?.featuredProductIds)) {
+            currentFeatured = setData.settings.featuredProductIds;
+          }
+          let updatedFeatured: string[];
+          if (isFeatured) {
+            updatedFeatured = currentFeatured.includes(productId)
+              ? currentFeatured
+              : [...currentFeatured, productId];
+          } else {
+            updatedFeatured = currentFeatured.filter((pid: string) => pid !== productId);
+          }
+          await fetch(`${API_BASE_URL}/settings`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ key: 'featuredProductIds', value: updatedFeatured })
+          });
+        } catch (err) {
+          console.error('Failed to sync featured setting:', err);
+        }
+
         navigate('/products');
       } else {
         setError(data.message || 'Failed to save product');
@@ -840,6 +881,19 @@ export function AddEditProductPage() {
                   className={styles.formCheckboxInput}
                 />
                 <span>Mark as seasonal item</span>
+              </label>
+
+              <label className={styles.formCheckboxLabel} style={{ backgroundColor: isFeatured ? 'rgba(140, 91, 69, 0.12)' : 'transparent', padding: '8px 12px', borderRadius: '6px', border: isFeatured ? '1px solid var(--color-primary)' : '1px dashed var(--color-border)', marginTop: '8px', cursor: 'pointer' }}>
+                <input
+                  type="checkbox"
+                  name="isFeatured"
+                  checked={isFeatured}
+                  onChange={(e) => setIsFeatured(e.target.checked)}
+                  className={styles.formCheckboxInput}
+                />
+                <span style={{ fontWeight: 600, color: isFeatured ? 'var(--color-primary)' : 'inherit' }}>
+                  ⭐ Feature in Homepage Catalog (Visible in the homepage Catalog section)
+                </span>
               </label>
             </div>
 

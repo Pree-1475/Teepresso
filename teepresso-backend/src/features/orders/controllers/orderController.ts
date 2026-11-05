@@ -1,4 +1,4 @@
-import { uploadBase64ToGCS } from '../../../config/storageService.js';
+import { uploadBase64ToGCS, processVoiceNoteUpload } from '../../../config/storageService.js';
 import { Request, Response } from 'express';
 import { sql } from '../../../config/db.js';
 
@@ -313,7 +313,7 @@ export const trackOrderController = async (req: Request, res: Response): Promise
 
 export const createOrderController = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { customerName, email, phone, orgName, orgType, productName, category, totalPieces, totalAmount,  notes } = req.body;
+    const { customerName, email, phone, orgName, orgType, productName, category, totalPieces, totalAmount, notes, voiceNote, voiceNoteDuration } = req.body;
 
     const processedItems = await Promise.all((Array.isArray(req.body.items) ? req.body.items : []).map(async (item: any) => {
       if (item.placements && typeof item.placements === 'object') {
@@ -327,6 +327,18 @@ export const createOrderController = async (req: Request, res: Response): Promis
     }));
     const items = processedItems;
     
+    // Process optional voice note recording
+    let finalVoiceNoteUrl: string | null = null;
+    if (voiceNote) {
+      try {
+        finalVoiceNoteUrl = await processVoiceNoteUpload(voiceNote, 'online');
+      } catch (voiceErr) {
+        console.error('Failed to upload voice note to storage:', voiceErr);
+        // Fallback to storing as data URI
+        finalVoiceNoteUrl = voiceNote;
+      }
+    }
+
     const orderId = `TP-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
     const dateStr = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     const deliveryDate = new Date();
@@ -366,7 +378,9 @@ export const createOrderController = async (req: Request, res: Response): Promis
         trackingNumber: '',
       }),
       notes: notes || 'Online Order',
-      items: JSON.stringify(Array.isArray(items) ? items : [])
+      items: JSON.stringify(Array.isArray(items) ? items : []),
+      voiceNoteUrl: finalVoiceNoteUrl,
+      voiceNoteDuration: voiceNoteDuration ? Number(voiceNoteDuration) : null,
     };
 
     await sql`
@@ -375,13 +389,15 @@ export const createOrderController = async (req: Request, res: Response): Promis
         "productName", category, "totalPieces", "totalAmount", "orderDate",
         "estimatedDelivery", "currentStage", "isUrgent", "paymentStatus",
         "paymentDetails", "mockupUrl", "mockupStatus", "softCopyUrl",
-        "hasWatermark", "whatsappNotificationSent", "dispatchDetails", notes, items
+        "hasWatermark", "whatsappNotificationSent", "dispatchDetails", notes, items,
+        "voiceNoteUrl", "voiceNoteDuration"
       ) VALUES (
         ${newOrder.id}, ${newOrder.orderId}, ${newOrder.customerName}, ${newOrder.email}, ${newOrder.phone}, ${newOrder.orgName}, ${newOrder.orgType},
         ${newOrder.productName}, ${newOrder.category}, ${newOrder.totalPieces}, ${newOrder.totalAmount}, ${newOrder.orderDate},
         ${newOrder.estimatedDelivery}, ${newOrder.currentStage}, ${newOrder.isUrgent}, ${newOrder.paymentStatus},
         ${newOrder.paymentDetails}, ${newOrder.mockupUrl}, ${newOrder.mockupStatus}, ${newOrder.softCopyUrl},
-        ${newOrder.hasWatermark}, ${newOrder.whatsappNotificationSent}, ${newOrder.dispatchDetails}::jsonb, ${newOrder.notes}, ${newOrder.items}::jsonb
+        ${newOrder.hasWatermark}, ${newOrder.whatsappNotificationSent}, ${newOrder.dispatchDetails}::jsonb, ${newOrder.notes}, ${newOrder.items}::jsonb,
+        ${newOrder.voiceNoteUrl}, ${newOrder.voiceNoteDuration}
       )
     `;
 
@@ -389,6 +405,25 @@ export const createOrderController = async (req: Request, res: Response): Promis
   } catch (err) {
     console.error('Error creating order:', err);
     res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
+export const uploadVoiceNoteController = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { audioData, duration, orderId } = req.body;
+    if (!audioData) {
+      res.status(400).json({ success: false, message: 'Audio data is required' });
+      return;
+    }
+    const voiceNoteUrl = await processVoiceNoteUpload(audioData, orderId || 'voice');
+    res.json({
+      success: true,
+      voiceNoteUrl,
+      duration: duration ? Number(duration) : null
+    });
+  } catch (err: any) {
+    console.error('Error in uploadVoiceNoteController:', err);
+    res.status(400).json({ success: false, message: err.message || 'Error processing audio upload' });
   }
 };
 

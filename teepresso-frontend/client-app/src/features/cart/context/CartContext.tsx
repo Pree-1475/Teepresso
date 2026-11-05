@@ -45,6 +45,8 @@ export interface ArtworkData {
   mode: 'has_design' | 'need_help' | 'none';
   instructions: string;
   placements: Record<string, PlacementArtworkData>;
+  voiceNote?: string | null;
+  voiceNoteDuration?: number | null;
 }
 
 export interface CartItem {
@@ -61,6 +63,8 @@ export interface CartItem {
 
   colorVariants: ColorVariant[];
   artwork: ArtworkData;
+  voiceNote?: string | null;
+  voiceNoteDuration?: number | null;
   
   totalItemQuantity: number;
   totalItemPrice: number;

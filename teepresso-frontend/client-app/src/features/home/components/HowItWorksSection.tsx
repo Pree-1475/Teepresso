@@ -2,44 +2,42 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
-import {
-  CheckCircle2, Star, Clock
-} from 'lucide-react';
+import { CheckCircle2, Star, Clock } from 'lucide-react';
 import { useScrollReveal } from '@/common/hooks/useScrollReveal';
 import styles from './HowItWorksSection.module.css';
 import { InstantQuoteSection } from './InstantQuoteSection';
 
 /* ──────────────────────────────────────────────
-   DATA
+   DATA (Crisp & Concise)
    ────────────────────────────────────────────── */
 const steps = [
   {
-    title: 'Submit\nRequirements',
-    description: 'Tell us what you need. Select apparel types, colors, sizes and quantities for your bulk order.',
+    title: 'Submit Requirements',
+    description: 'Select apparel styles, colors, and quantities for your bulk custom order.',
     image: '/images/process/step1.png',
     time: '≈ 5 Minutes',
   },
   {
-    title: 'Upload\nArtwork',
-    description: 'Provide your logo or design. Our experts review it for print readiness or help you create one.',
+    title: 'Upload Artwork',
+    description: 'Provide your logo or artwork. Our team reviews it for print readiness or assists with design.',
     image: '/images/process/step2.png',
     time: 'Within 6 Hours',
   },
   {
-    title: 'Approve\nMockup',
-    description: 'Review the digital proof we send. We never proceed to print without your final sign-off.',
+    title: 'Approve Mockup',
+    description: 'Review digital 3D proof. Production only begins after your final sign-off.',
     image: '/images/process/step3.png',
     time: 'Same Day',
   },
   {
-    title: 'Production\nBegins',
-    description: 'Your order is printed using high-quality techniques and undergoes strict quality control.',
+    title: 'Production Begins',
+    description: 'Crafted with premium fabrics using precision screen or sublimation printing.',
     image: '/images/process/step4.png',
     time: '2 – 4 Days',
   },
   {
-    title: 'Order\nDelivered',
-    description: 'Fast, reliable nationwide shipping directly to your organization on the promised date.',
+    title: 'Order Delivered',
+    description: 'Reliable nationwide doorstep delivery directly to your organization on schedule.',
     image: '/images/process/step5.png',
     time: '5 – 7 Days',
   },
@@ -52,8 +50,6 @@ const trustBadges = [
   { text: 'Quality Checked', icon: CheckCircle2 },
   { text: 'Pan India Delivery', icon: CheckCircle2 },
 ];
-
-
 
 /* ──────────────────────────────────────────────
    ANIMATED COUNTER HOOK
@@ -93,21 +89,9 @@ function useCountUp(end: number, duration = 1800) {
 }
 
 /* ──────────────────────────────────────────────
-   CHEVRON SVG
-   ────────────────────────────────────────────── */
-const ChevronUpDown = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="7 15 12 20 17 15" />
-    <polyline points="7 9 12 4 17 9" />
-  </svg>
-);
-
-/* ──────────────────────────────────────────────
    COMPONENT
    ────────────────────────────────────────────── */
 export function HowItWorksSection() {
-  const [expandedStep, setExpandedStep] = useState<number | null>(0);
-
   const { ref: headerRef, isVisible: isHeaderVisible } = useScrollReveal({ threshold: 0.5 });
   const ordersCounter = useCountUp(12438);
   const ratingCounter = useCountUp(49, 1200);
@@ -119,7 +103,16 @@ export function HowItWorksSection() {
         <div className={styles.gridContainer}>
           
           {/* ═══════════════════════════════════════════
-              LEFT COLUMN — HEADER & VERTICAL TIMELINE
+              LEFT COLUMN — INSTANT QUOTE CALCULATOR (LOCKED)
+              ═══════════════════════════════════════════ */}
+          <div className={styles.rightColumn}>
+            <div className={styles.stickyCalculator}>
+              <InstantQuoteSection embedded={true} />
+            </div>
+          </div>
+
+          {/* ═══════════════════════════════════════════
+              RIGHT COLUMN — ORDER JOURNEY TIMELINE (SCROLLING)
               ═══════════════════════════════════════════ */}
           <div className={styles.leftColumn}>
             
@@ -147,7 +140,7 @@ export function HowItWorksSection() {
                   const Icon = b.icon;
                   return (
                     <div key={i} className={styles.topBadge}>
-                      <Icon size={15} className={styles.topBadgeIcon} />
+                      <Icon size={13} className={styles.topBadgeIcon} />
                       <span>{b.text}</span>
                     </div>
                   );
@@ -156,52 +149,34 @@ export function HowItWorksSection() {
             </div>
 
             <div className={styles.verticalTimeline}>
-              {steps.map((step, idx) => {
-                const isExpanded = expandedStep === idx;
-                return (
-                  <div 
-                    key={idx} 
-                    className={`${styles.timelineStep} ${isExpanded ? styles.isExpanded : ''}`}
-                    onClick={() => setExpandedStep(isExpanded ? null : idx)}
-                  >
-                    <div className={styles.timelineNode}>
-                      {String(idx + 1).padStart(2, '0')}
+              {steps.map((step, idx) => (
+                <div key={idx} className={styles.timelineStep}>
+                  <div className={styles.timelineNode}>
+                    {String(idx + 1).padStart(2, '0')}
+                  </div>
+                  
+                  <div className={styles.timelineCard}>
+                    <div className={styles.timelineIconWrapper}>
+                      <Image
+                        src={step.image}
+                        alt={step.title}
+                        width={36}
+                        height={36}
+                        style={{ objectFit: 'contain' }}
+                        unoptimized={true}
+                      />
                     </div>
-                    
-                    <div className={styles.timelineContent} data-step={String(idx + 1).padStart(2, '0')}>
-                      <div className={styles.timelineIconWrapper}>
-                        <Image
-                          src={`${step.image}?v=${Date.now()}`}
-                          alt={step.title.replace('\n', ' ')}
-                          width={60}
-                          height={60}
-                          style={{ objectFit: 'contain' }}
-                          unoptimized={true}
-                        />
-                      </div>
-                      <div className={styles.timelineText}>
-                        <div className={styles.stepTitleRow}>
-                          <h3 className={styles.stepTitle}>
-                            {step.title.replace('\n', ' ')}
-                          </h3>
-                          <div className={styles.accordionChevron}>
-                            <ChevronUpDown />
-                          </div>
-                        </div>
-                        <div className={styles.accordionBody}>
-                          <div className={styles.accordionInner}>
-                            <p className={styles.stepDesc}>{step.description}</p>
-                            <div className={styles.timePill}>
-                              <Clock size={12} />
-                              {step.time}
-                            </div>
-                          </div>
-                        </div>
+                    <div className={styles.timelineText}>
+                      <h3 className={styles.stepTitle}>{step.title}</h3>
+                      <p className={styles.stepDesc}>{step.description}</p>
+                      <div className={styles.timePill}>
+                        <Clock size={11} />
+                        <span>{step.time}</span>
                       </div>
                     </div>
                   </div>
-                );
-              })}
+                </div>
+              ))}
             </div>
 
             <div className={styles.statsBarContainer}>
@@ -218,7 +193,7 @@ export function HowItWorksSection() {
                 <div className={styles.statItem} ref={ratingCounter.ref}>
                   <div className={styles.ratingStars}>
                     {[...Array(5)].map((_, i) => (
-                      <Star key={i} size={16} fill="#F59E0B" color="#F59E0B" />
+                      <Star key={i} size={15} fill="#F59E0B" color="#F59E0B" />
                     ))}
                     <span className={styles.statValue}>
                       {(ratingCounter.value / 10).toFixed(1)}/5
@@ -231,17 +206,10 @@ export function HowItWorksSection() {
 
           </div>
 
-          {/* ═══════════════════════════════════════════
-              RIGHT COLUMN — INSTANT QUOTE CALCULATOR
-              ═══════════════════════════════════════════ */}
-          <div className={styles.rightColumn}>
-            <div className={styles.stickyCalculator}>
-              <InstantQuoteSection embedded={true} />
-            </div>
-          </div>
-
         </div>
       </div>
     </section>
   );
 }
+
+export default HowItWorksSection;

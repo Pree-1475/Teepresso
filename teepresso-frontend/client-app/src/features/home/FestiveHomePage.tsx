@@ -3,7 +3,6 @@ import { FestiveHero } from '@/features/home/components/festive/FestiveHero';
 import { TrustBar } from '@/features/home/components/TrustBar';
 import { IndustriesSection } from '@/features/home/components/IndustriesSection';
 import { HowItWorksSection } from '@/features/home/components/HowItWorksSection';
-import { SeasonalKurtaSection } from '@/features/home/components/SeasonalKurtaSection';
 import { FeaturedProducts } from '@/features/home/components/FeaturedProducts';
 import { TrustAndReviewsSection } from '@/features/home/components/TrustAndReviewsSection';
 import { GallerySection } from '@/features/home/components/GallerySection';
@@ -17,8 +16,6 @@ export function FestiveHomePage() {
       <TrustBar />
       <div className="doubleStitchDivider" />
       <IndustriesSection />
-      <div className="doubleStitchDivider" />
-      <SeasonalKurtaSection />
       <div className="doubleStitchDivider" />
       <FeaturedProducts />
       <div className="doubleStitchDivider" />

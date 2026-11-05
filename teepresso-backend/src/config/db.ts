@@ -93,9 +93,14 @@ export const initNeonDatabase = async () => {
         "dispatchDetails" JSONB,
         notes TEXT,
         items JSONB,
+        "voiceNoteUrl" TEXT,
+        "voiceNoteDuration" INT,
         "createdAt" TIMESTAMP DEFAULT NOW()
       );
     `;
+
+    await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS "voiceNoteUrl" TEXT;`;
+    await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS "voiceNoteDuration" INT;`;
 
     // 4. Inventory Table
     await sql`

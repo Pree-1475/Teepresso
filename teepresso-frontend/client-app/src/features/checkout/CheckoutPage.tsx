@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useCart } from '@/features/cart/context/CartContext';
 import { useAuth } from '@/features/auth/context/AuthContext';
-import { CheckCircle, ShieldCheck, ArrowLeft, PackageCheck } from 'lucide-react';
+import { CheckCircle, ShieldCheck, ArrowLeft, Mic } from 'lucide-react';
 import styles from './CheckoutPage.module.css';
 import { API_BASE_URL } from '@/common/config/api';
 
@@ -25,6 +25,7 @@ export function CheckoutPage() {
     pincode: ''
   });
 
+  const [customNotes, setCustomNotes] = useState('');
   const [isUrgent, setIsUrgent] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderComplete, setOrderComplete] = useState(false);
@@ -54,6 +55,11 @@ export function CheckoutPage() {
   const urgentFee = isUrgent ? Math.round(cart.subtotal * 0.2) : 0;
   const grandTotal = cart.subtotal + urgentFee;
 
+  // Retrieve voice notes attached to cart items during product configuration
+  const itemWithVoice = cart.items.find(i => i.voiceNote || i.artwork?.voiceNote);
+  const orderVoiceNote = itemWithVoice?.voiceNote || itemWithVoice?.artwork?.voiceNote || null;
+  const orderVoiceNoteDuration = itemWithVoice?.voiceNoteDuration || itemWithVoice?.artwork?.voiceNoteDuration || null;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -70,10 +76,16 @@ export function CheckoutPage() {
       color: item.colorVariants?.[0]?.color || 'Default',
       colorHex: item.colorVariants?.[0]?.color || '',
       artworkMode: item.artwork?.mode || 'none',
-      placements: item.artwork?.placements || {}
+      placements: item.artwork?.placements || {},
+      voiceNote: item.voiceNote || item.artwork?.voiceNote || null,
+      voiceNoteDuration: item.voiceNoteDuration || item.artwork?.voiceNoteDuration || null,
     }));
 
     const totalPieces = cart.items.reduce((sum, item) => sum + item.totalItemQuantity, 0);
+
+    const notesContent = customNotes.trim()
+      ? `${customNotes.trim()}${isUrgent ? ' [URGENT PROCESSING REQUESTED]' : ''}`
+      : `Online Order placed via Storefront Checkout. ${isUrgent ? '[URGENT PROCESSING REQUESTED]' : ''}`;
 
     const payload = {
       customerName: customerInfo.name.trim(),
@@ -88,7 +100,9 @@ export function CheckoutPage() {
       isUrgent,
       items: formattedItems,
       deliveryAddress: `${deliveryInfo.address}, ${deliveryInfo.city}, ${deliveryInfo.state} - ${deliveryInfo.pincode}`,
-      notes: `Online Order placed via Storefront Checkout. ${isUrgent ? '[URGENT PROCESSING REQUESTED]' : ''}`
+      notes: notesContent,
+      voiceNote: orderVoiceNote,
+      voiceNoteDuration: orderVoiceNoteDuration
     };
 
     try {
@@ -210,6 +224,53 @@ export function CheckoutPage() {
               </div>
             </div>
 
+            {/* Customization & Additional Instructions */}
+            <div className={styles.sectionBlock}>
+              <h2 className={styles.sectionTitle}>Customization & Delivery Instructions</h2>
+              
+              {orderVoiceNote && (
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  backgroundColor: '#F0FDF4',
+                  border: '1px solid #DCFCE7',
+                  padding: '10px 14px',
+                  borderRadius: '8px',
+                  marginBottom: '14px',
+                  fontSize: '13px',
+                  color: '#15803D',
+                  fontWeight: 600
+                }}>
+                  <Mic size={16} />
+                  <span>
+                    Voice Note recorded during product customisation is attached with this order
+                    {orderVoiceNoteDuration ? ` (${Math.floor(orderVoiceNoteDuration / 60)}:${(orderVoiceNoteDuration % 60).toString().padStart(2, '0')})` : ''}
+                  </span>
+                </div>
+              )}
+
+              <div className={styles.inputGroup}>
+                <label>Additional Notes (Optional)</label>
+                <textarea
+                  rows={3}
+                  value={customNotes}
+                  onChange={e => setCustomNotes(e.target.value)}
+                  placeholder="Any final delivery remarks, billing requirements, or special packaging notes..."
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    borderRadius: '8px',
+                    border: '1px solid var(--color-border, #E5E7EB)',
+                    fontSize: '13.5px',
+                    fontFamily: 'inherit',
+                    lineHeight: '1.5',
+                    resize: 'vertical'
+                  }}
+                />
+              </div>
+            </div>
+
             <div className={styles.sectionBlock}>
               <h2 className={styles.sectionTitle}>Processing Speed</h2>
               <label className={styles.urgentToggle}>
@@ -233,9 +294,16 @@ export function CheckoutPage() {
                     <strong>{item.totalItemQuantity}x {item.name}</strong>
                     <span>₹{item.totalItemPrice.toLocaleString('en-IN')}</span>
                   </div>
-                  <span style={{ fontSize: '0.85rem', color: '#6b7280' }}>
-                    {item.artwork.mode === 'has_design' ? '✓ Design Attached' : item.artwork.mode === 'need_help' ? '✓ Design Help Requested' : 'No Design'}
-                  </span>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '0.85rem', color: '#6b7280' }}>
+                    <span>
+                      {item.artwork.mode === 'has_design' ? '✓ Design Attached' : item.artwork.mode === 'need_help' ? '✓ Design Help Requested' : 'No Design'}
+                    </span>
+                    {(item.voiceNote || item.artwork?.voiceNote) && (
+                      <span style={{ color: '#15803D', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                        <Mic size={12} /> Voice Note Attached
+                      </span>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>

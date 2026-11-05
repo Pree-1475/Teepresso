@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/features/auth/context/AuthContext';
-import { PackageCheck, Clock, CheckCircle2, ShoppingBag, Eye } from 'lucide-react';
+import { PackageCheck, Clock, CheckCircle2, ShoppingBag, Eye, Mic } from 'lucide-react';
 import { Button } from '@/common/components/ui/Button/Button';
 import styles from './track-order.module.css';
 import { API_BASE_URL } from '@/common/config/api';
@@ -21,6 +21,8 @@ interface LiveOrder {
   currentStage: string;
   mockupUrl: string;
   mockupStatus: string;
+  voiceNoteUrl?: string;
+  voiceNoteDuration?: number;
 }
 
 export function MyOrdersPage() {
@@ -155,6 +157,24 @@ export function MyOrdersPage() {
                       <div style={{ fontSize: '0.85rem', color: '#6b7280', marginTop: '2px' }}>
                         Est. Delivery: <strong>{order.estimatedDelivery || '5-7 Days'}</strong>
                       </div>
+                      {order.voiceNoteUrl && (
+                        <div style={{ marginTop: '6px' }}>
+                          <span style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            backgroundColor: '#F0FDF4',
+                            color: '#15803D',
+                            border: '1px solid #DCFCE7',
+                            padding: '2px 8px',
+                            borderRadius: '9999px',
+                            fontSize: '11px',
+                            fontWeight: 600
+                          }}>
+                            <Mic size={10} /> Voice Note Attached
+                          </span>
+                        </div>
+                      )}
                     </div>
 
                     <div style={{ textAlign: 'right' }}>

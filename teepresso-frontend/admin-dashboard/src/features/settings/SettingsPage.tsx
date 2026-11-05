@@ -9,6 +9,7 @@ export function SettingsPage() {
   const [payeeName, setPayeeName] = useState('Teepresso Enterprise');
   const [festiveRecommendationProductId, setFestiveRecommendationProductId] = useState('royal-festive-pagdi');
   const [productsList, setProductsList] = useState<{ id: string; name: string }[]>([]);
+  const [featuredProductIds, setFeaturedProductIds] = useState<string[]>([]);
   const [contactPhone, setContactPhone] = useState('919390771123');
   const [loading, setLoading] = useState(true);
   const [savingKey, setSavingKey] = useState<string | null>(null);
@@ -26,6 +27,7 @@ export function SettingsPage() {
         if (data.settings.upiVpa) setUpiVpa(data.settings.upiVpa);
         if (data.settings.payeeName) setPayeeName(data.settings.payeeName);
         if (data.settings.festiveRecommendationProductId) setFestiveRecommendationProductId(data.settings.festiveRecommendationProductId);
+        if (Array.isArray(data.settings.featuredProductIds)) setFeaturedProductIds(data.settings.featuredProductIds);
 
         // Fetch products list for dropdown
         try {
@@ -72,6 +74,15 @@ export function SettingsPage() {
     } finally {
       setSavingKey(null);
     }
+  };
+
+  
+  const handleToggleFeatured = async (productId: string) => {
+    const updated = featuredProductIds.includes(productId)
+      ? featuredProductIds.filter(id => id !== productId)
+      : [...featuredProductIds, productId];
+    setFeaturedProductIds(updated);
+    await handleUpdateSetting('featuredProductIds', updated);
   };
 
   const handleModeToggle = async (mode: 'STANDARD' | 'FESTIVE') => {
@@ -222,6 +233,57 @@ export function SettingsPage() {
                   <span>{savingKey === 'festiveRecommendationProductId' ? 'Saving...' : 'Save Festive Recommendation Product'}</span>
                 </button>
               </div>
+            </div>
+          </div>
+
+          {/* Card: Homepage Featured Catalog */}
+          <div style={{ backgroundColor: 'var(--color-surface-white)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', padding: '24px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
+              <div style={{ width: '36px', height: '36px', borderRadius: '8px', backgroundColor: 'rgba(140, 91, 69, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-primary)' }}>
+                <Sparkles size={18} />
+              </div>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '16px', color: 'var(--color-text-title)' }}>Homepage Featured Catalog</h3>
+                <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>Select which products are displayed in the Catalog section on the homepage</span>
+              </div>
+            </div>
+
+            <p style={{ fontSize: '13px', color: 'var(--color-text-body)', marginBottom: '14px' }}>
+              Checked items appear directly in the homepage Catalog section. You can also toggle this inside any product's edit page.
+            </p>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '10px' }}>
+              {productsList.map(p => {
+                const isSelected = featuredProductIds.includes(p.id);
+                return (
+                  <div
+                    key={p.id}
+                    onClick={() => handleToggleFeatured(p.id)}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '10px',
+                      padding: '10px 14px',
+                      borderRadius: '8px',
+                      border: isSelected ? '1.5px solid var(--color-primary)' : '1px solid var(--color-border)',
+                      backgroundColor: isSelected ? 'rgba(140, 91, 69, 0.08)' : 'transparent',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease'
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      readOnly
+                      style={{ cursor: 'pointer', accentColor: 'var(--color-primary)' }}
+                    />
+                    <div style={{ overflow: 'hidden' }}>
+                      <strong style={{ fontSize: '13px', display: 'block', color: 'var(--color-text-title)', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{p.name}</strong>
+                      <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>ID: {p.id}</span>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
 

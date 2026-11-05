@@ -135,26 +135,13 @@ export function ProductsPage() {
                     src={product.image}
                     alt={product.name}
                     className={styles.productImg}
+                    loading="lazy"
                   />
                 </div>
 
                 <div className={styles.cardBody}>
                   <h2 className={styles.productTitle}>{product.name}</h2>
-                  <div className={styles.priceRow}>
-                    <span className={styles.productPriceText}>{product.priceRange || `₹${product.startingPrice} / pc`}</span>
-                    <div className={styles.swatchGroup} title="Available colors">
-                      {Array.isArray(product.colors) && product.colors.slice(0, 5).map((colorHex, idx) => (
-                        <span
-                          key={idx}
-                          className={styles.swatchDot}
-                          style={{ backgroundColor: colorHex.startsWith('#') ? colorHex : '#e0e0e0' }}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                  <span className={styles.globalOrderBtn}>
-                    Customize & Order <ArrowRight size={14} />
-                  </span>
+                  <span className={styles.productPriceText}>From ₹{product.startingPrice}</span>
                 </div>
               </Link>
             ))}

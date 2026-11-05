@@ -9,7 +9,8 @@ import {
   updateOrderStageController,
   updateOrderMockupController,
   updateDispatchController,
-  updateOrderFullController
+  updateOrderFullController,
+  uploadVoiceNoteController
 } from '../controllers/orderController.js';
 
 const router = Router();
@@ -18,6 +19,7 @@ router.get('/', getOrdersController);
 router.get('/track', trackOrderController);
 router.post('/create', createOrderController);
 router.post('/offline', createOfflineOrderController);
+router.post('/upload-voice', uploadVoiceNoteController);
 router.get('/:id/payment-qr', collectQRPaymentController);
 router.post('/:id/confirm-payment', confirmOfflinePaymentController);
 router.put('/:id/stage', updateOrderStageController);

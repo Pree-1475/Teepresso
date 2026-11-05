@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useCart } from '../context/CartContext';
 import { useStorefront } from '@/common/context/StorefrontContext';
 import styles from './CartDrawer.module.css';
-import { X, ShoppingBag, ArrowRight, Sparkles, Plus } from 'lucide-react';
+import { X, ShoppingBag, ArrowRight, Sparkles, Plus, Mic } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from '@/common/config/api';
 
@@ -148,6 +148,11 @@ export function CartDrawer() {
                   <div className={styles.itemMeta} style={{ margin: '4px 0' }}>
                     {item.artwork.mode === 'has_design' && <span style={{ color: '#10b981', fontSize: '11px', fontWeight: 600 }}>✓ Custom Artwork Included</span>}
                     {item.artwork.mode === 'need_help' && <span style={{ color: '#f59e0b', fontSize: '11px', fontWeight: 600 }}>✓ Design Assistance Requested</span>}
+                    {(item.voiceNote || item.artwork?.voiceNote) && (
+                      <span style={{ color: '#059669', fontSize: '11px', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
+                        <Mic size={11} /> Voice Note Attached
+                      </span>
+                    )}
                   </div>
 
                   <div className={styles.itemPriceRow}>

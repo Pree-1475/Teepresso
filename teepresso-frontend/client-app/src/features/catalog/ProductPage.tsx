@@ -5,9 +5,10 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useStorefront } from '@/common/context/StorefrontContext';
 import { useCart, SizeQtyMap, ArtworkData, MockupState } from '@/features/cart/context/CartContext';
 import styles from './ProductPage.module.css';
-import { ShoppingBag, ArrowLeft, UploadCloud, ShieldCheck, Box, HelpCircle, ChevronDown, ChevronUp, Bookmark, Sparkles, Check, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ShoppingBag, ArrowLeft, UploadCloud, ShieldCheck, Box, HelpCircle, ChevronDown, ChevronUp, Bookmark, Sparkles, Check, ChevronLeft, ChevronRight, Mic } from 'lucide-react';
 import { API_BASE_URL } from '@/common/config/api';
 import { MockupCanvasEditor } from './components/MockupCanvasEditor';
+import { VoiceNoteRecorder } from '@/features/checkout/components/VoiceNoteRecorder';
 
 interface ColorSnippet {
   id: string;
@@ -75,6 +76,8 @@ export function ProductPage() {
 
   const [designMode, setDesignMode] = useState<'none' | 'has_design' | 'need_help'>('none');
   const [instructions, setInstructions] = useState('');
+  const [voiceNote, setVoiceNote] = useState<string | null>(null);
+  const [voiceNoteDuration, setVoiceNoteDuration] = useState<number>(0);
   
   const [artwork, setArtwork] = useState<ArtworkData>({
     file: null,
@@ -306,8 +309,12 @@ export function ProductPage() {
         previewUrl: artwork.previewUrl || '',
         mode: designMode,
         instructions,
-        placements: artwork.placements || {}
-      }
+        placements: artwork.placements || {},
+        voiceNote: voiceNote || null,
+        voiceNoteDuration: voiceNote ? voiceNoteDuration : null,
+      },
+      voiceNote: voiceNote || null,
+      voiceNoteDuration: voiceNote ? voiceNoteDuration : null,
     });
 
     // Automatically opens CartDrawer in CartContext (No unwanted page redirection!)
@@ -562,12 +569,17 @@ export function ProductPage() {
             </div>
           )}
 
-          {/* DYNAMIC COLORS SELECTOR */}
+          {/* DYNAMIC COLORS SELECTOR (Compact) */}
           {(product.requiresColors || (product.colors && product.colors.length > 0)) && (
-            <div className={styles.panel} style={{ marginBottom: '16px' }}>
-              <h3 className={styles.panelTitle}>
-                {(product.requiresPatterns || (product.patterns && product.patterns.length > 0)) ? '2. Choose Colour' : '1. Choose Colour'}
-              </h3>
+            <div className={`${styles.panel} ${styles.colorPanel}`}>
+              <div className={styles.colorHeaderRow}>
+                <h3 className={styles.panelTitle} style={{ marginBottom: 0, fontSize: '0.95rem' }}>
+                  {(product.requiresPatterns || (product.patterns && product.patterns.length > 0)) ? '2. Choose Colour' : '1. Choose Colour'}
+                </h3>
+                <span className={styles.selectedColorPill}>
+                  {allColors.find(c => c.name.toLowerCase() === activeColor.toLowerCase() || c.hex.toLowerCase() === activeColor.toLowerCase())?.name || activeColor}
+                </span>
+              </div>
               <div className={styles.colorGrid}>
                 {(product.colors && product.colors.length > 0 ? product.colors : allColors.map(c => c.name)).map(colName => {
                   const colSnippet = allColors.find(c => c.name.toLowerCase() === colName.toLowerCase() || c.hex.toLowerCase() === colName.toLowerCase());
@@ -575,12 +587,21 @@ export function ProductPage() {
                   const isSelected = activeColor === colName;
 
                   return (
-                    <div key={colName} className={styles.colorItem} onClick={() => setActiveColor(colName)}>
-                      <div className={`${styles.colorCircle} ${isSelected ? styles.colorCircleActive : ''}`} style={{ backgroundColor: hexVal }}>
-                        {isSelected && <ShieldCheck size={14} color={hexVal.toLowerCase() === '#ffffff' ? '#000' : '#fff'} />}
-                      </div>
-                      <span className={styles.colorName}>{colSnippet?.name || colName}</span>
-                    </div>
+                    <button
+                      type="button"
+                      key={colName}
+                      className={styles.colorItem}
+                      onClick={() => setActiveColor(colName)}
+                      title={colSnippet?.name || colName}
+                      aria-label={colSnippet?.name || colName}
+                    >
+                      <span
+                        className={`${styles.colorCircle} ${isSelected ? styles.colorCircleActive : ''}`}
+                        style={{ backgroundColor: hexVal }}
+                      >
+                        {isSelected && <Check size={12} strokeWidth={3} color={hexVal.toLowerCase() === '#ffffff' || hexVal.toLowerCase() === '#fff' || hexVal.toLowerCase() === '#f8f8f8' ? '#000' : '#fff'} />}
+                      </span>
+                    </button>
                   );
                 })}
               </div>
@@ -642,6 +663,17 @@ export function ProductPage() {
                </div>
             )}
           </div>
+
+          {product.requiresMockup === false && (
+            <div style={{ marginBottom: '16px' }}>
+              <VoiceNoteRecorder
+                onVoiceNoteChange={(dataUrl, duration) => {
+                  setVoiceNote(dataUrl);
+                  setVoiceNoteDuration(duration);
+                }}
+              />
+            </div>
+          )}
         </div>
 
         {/* Right Column: Design & Mockup Preview */}
@@ -683,6 +715,16 @@ export function ProductPage() {
                     </a>
                   </div>
                 </div>
+              </div>
+
+              {/* Optional Voice Note Recorder for Customization */}
+              <div style={{ marginBottom: '16px' }}>
+                <VoiceNoteRecorder
+                  onVoiceNoteChange={(dataUrl, duration) => {
+                    setVoiceNote(dataUrl);
+                    setVoiceNoteDuration(duration);
+                  }}
+                />
               </div>
 
               <div className={styles.panel}>
@@ -731,6 +773,11 @@ export function ProductPage() {
               </div>
             </div>
             <div className={styles.bottomActions}>
+              {voiceNote && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', backgroundColor: '#F0FDF4', border: '1px solid #DCFCE7', padding: '6px 12px', borderRadius: '9999px', fontSize: '12px', color: '#15803D', fontWeight: 600 }}>
+                  <Mic size={14} /> Voice note included
+                </div>
+              )}
               <button className={styles.saveBtn} onClick={() => navigate('/products')}>
                 <Bookmark size={18} /> Continue Shopping
               </button>
