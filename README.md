@@ -19,6 +19,6 @@ This repository is structured as a monorepo containing the following core compon
 - **Backend:** Node.js, Express.js, PostgreSQL (Neon), Google Cloud Storage
 - **Frontend:** Next.js / React (Customer Storefront & Admin Dashboard)
 
-## 🏃 Getting Started
+## 🏃 Getting Started.
 
 *More detailed instructions on running the project locally will be added here.*
