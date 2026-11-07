@@ -142,6 +142,7 @@
   color: #2D1A13; /* Dark brown matching inside shirt */
   letter-spacing: -0.05em;
   text-decoration: none;
+  transition: color var(--transition-normal);
 }
 
 /* Right Navigation */
@@ -220,6 +221,27 @@
   color: #1A1A1A;
   cursor: pointer;
   padding: 4px;
+  transition: color var(--transition-normal);
+}
+
+.cartBadge {
+  position: absolute;
+  top: -4px;
+  right: -6px;
+  background-color: var(--color-primary-500, #8C5B45);
+  color: #FFFFFF;
+  font-family: var(--font-body, 'Inter', sans-serif);
+  font-size: 10px;
+  font-weight: 700;
+  min-width: 17px;
+  height: 17px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  line-height: 1;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
 }
 
 /* User Profile Badge */
@@ -523,5 +545,46 @@
   .userDropdownMenu {
     left: auto;
     right: 0;
+  }
+}
+
+/* =========================================================================
+   ON DARK MOBILE HERO NAVBAR CONTRAST (HOMEPAGE TOP)
+   ========================================================================= */
+
+@media (max-width: 767px) {
+  .onDarkHero .logoText {
+    color: #FAF6F0 !important;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+  }
+
+  .onDarkHero .bagBtn {
+    color: #FAF6F0 !important;
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.45));
+  }
+
+  .onDarkHero .quoteBtn {
+    background: rgba(255, 255, 255, 0.16) !important;
+    border: 1px solid rgba(250, 246, 240, 0.55) !important;
+    color: #FAF6F0 !important;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+    font-weight: 600;
+  }
+
+  .onDarkHero .quoteBtn:hover {
+    background: rgba(255, 255, 255, 0.25) !important;
+    border-color: rgba(250, 246, 240, 0.85) !important;
+    color: #FFFFFF !important;
+  }
+
+  .onDarkHero .userProfileBtn {
+    background-color: rgba(255, 255, 255, 0.16) !important;
+    border: 1px solid rgba(250, 246, 240, 0.5) !important;
+    color: #FAF6F0 !important;
+  }
+
+  .onDarkHero .userNameText {
+    color: #FAF6F0 !important;
   }
 }

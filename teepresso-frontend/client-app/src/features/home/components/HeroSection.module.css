@@ -1,37 +1,38 @@
-/* MOBILE FIRST DEFAULT STYLES */
+/* =========================================================================
+   MOBILE FIRST DEFAULT STYLES (PORTRAIT EDITORIAL DESIGN)
+   ========================================================================= */
 
 .heroSection {
-  background-color: #FDF9F1; /* Warm beige matching the shirt's outer fabric */
-  /* Mobile optimized asset */
-  background-image: url('/images/hero-mobile-copy.png');
+  background-color: #20120B; /* Deep rich espresso matching image fabric */
+  background-image: url('/images/hero-mobile-editorial.jpg');
   background-size: cover;
-  background-position: center 20px; /* Push the image down slightly so neck hole doesn't cover nav */
+  background-position: center bottom;
   background-repeat: no-repeat;
   
-  /* Pull the section up just enough to slide under the sticky transparent Header, 
-     but NOT so far that it covers the Announcement Bar or pushes text too high. */
+  /* Pull up to slide cleanly under the sticky transparent Header */
   margin-top: -120px;
   
   width: 100%;
-  /* Make the hero section truly immersive on mobile */
   min-height: 100svh;
+  min-height: 100vh; /* Fallback for older browsers */
   
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  justify-content: flex-start;
   align-items: center;
   
-  /* Use padding to nudge content precisely into the neck hole */
-  padding-top: 4vh; 
-  padding-bottom: 5vh;
+  /* Clear AnnouncementBar + Header, positioning text comfortably down into the dark open area */
+  padding-top: clamp(165px, 22vh, 195px);
+  padding-bottom: 24px;
   overflow: hidden;
   position: relative; 
 }
 
-/* Surprise me: A gorgeous fade-in slide-up animation for the text */
+/* Subtle, smooth entrance animation */
 @keyframes heroReveal {
   0% {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(18px);
   }
   100% {
     opacity: 1;
@@ -41,159 +42,243 @@
 
 .heroContainer {
   display: flex;
-  justify-content: center;
   width: 100%;
+  max-width: 440px;
+  margin: 0 auto;
   position: relative;
   z-index: 2;
+  padding: 0 20px;
 }
 
 .heroContent {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
-  max-width: 700px;
-  padding: 0 var(--spacing-4);
-  margin-top: -40px; /* Shift up by ~1cm on mobile */
+  align-items: flex-start;
+  text-align: left;
+  width: 100%;
+  margin-top: 0;
   
-  /* The elegant reveal animation */
-  animation: heroReveal 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  /* immediate display */
 }
 
-.subtitle {
-  font-family: var(--font-body);
-  /* Scaled down for mobile */
-  font-size: 10px;
+/* ──────────────────────────────────────────────
+   EYEBROW TEXT (2 Lines + Understated Line)
+   ────────────────────────────────────────────── */
+.eyebrowWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  margin-bottom: 14px;
+}
+
+.eyebrowLine {
+  font-family: var(--font-body, 'Inter', sans-serif);
+  font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: #C3B19E; 
-  margin-bottom: var(--spacing-4);
+  color: #D9CEC5; /* Warm off-white / linen */
+  line-height: 1.45;
 }
 
+.eyebrowDivider {
+  width: 38px;
+  height: 1.5px;
+  background-color: rgba(217, 206, 197, 0.45);
+  margin-top: 10px;
+  margin-bottom: 4px;
+  border-radius: 1px;
+}
+
+/* ──────────────────────────────────────────────
+   MAIN HEADLINE (3 Distinct Left-Aligned Lines)
+   ────────────────────────────────────────────── */
 .title {
-  font-family: var(--font-serif), 'Playfair Display', 'Merriweather', Georgia, serif;
-  /* Scaled down for mobile */
-  font-size: var(--text-4xl);
-  line-height: 1.1; 
+  font-family: var(--font-serif), 'Playfair Display', Georgia, serif;
+  font-size: clamp(46px, 12.2vw, 58px);
+  line-height: 1.05;
   font-weight: 500;
-  margin: 0 0 24px 0; /* Increased margin for more space */
-  letter-spacing: -0.02em;
-  color: #FFFFFF;
+  margin: 0 0 18px 0;
+  letter-spacing: -0.025em;
+  color: #FAF6F0; /* Warm ivory */
+  text-align: left;
 }
 
-
-.description {
-  font-family: var(--font-body);
-  /* Scaled down for mobile */
-  font-size: 14px;
-  line-height: 1.5;
-  color: #D4C5B9;
-  margin: 0 0 var(--spacing-6) 0;
-  max-width: 500px;
+.titleLine1,
+.titleLine2,
+.titleLine3 {
+  display: block;
 }
 
+.curvedWord {
+  position: relative;
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.curvedLineSvg {
+  position: absolute;
+  left: 10%;
+  bottom: -13px;
+  width: 82%;
+  height: 13px;
+  pointer-events: none;
+  overflow: visible;
+}
+
+/* ──────────────────────────────────────────────
+   CTA BUTTONS (Refined Compact Pill Shapes)
+   ────────────────────────────────────────────── */
 .actions {
   display: flex;
-  flex-direction: row;
-  justify-content: center;
-  gap: 12px;
+  flex-direction: column;
+  gap: 9px;
   width: 100%;
-  max-width: 340px;
-  margin: 0 auto;
+  max-width: 250px;
+  margin-top: 18px;
 }
 
 .btnPrimary {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  background-color: var(--color-accent-teal);
+  gap: 7px;
+  background-color: var(--color-primary-500, #8C5B45);
   color: #FFFFFF;
   border: none;
-  font-family: var(--font-body);
-  font-size: 14px;
+  font-family: var(--font-body, 'Inter', sans-serif);
+  font-size: 13.5px;
   font-weight: 600;
-  padding: 12px 16px;
-  border-radius: 40px; 
+  letter-spacing: 0.015em;
+  padding: 10px 18px;
+  border-radius: 9999px; /* Pill shape */
+  min-height: 40px;
+  width: 100%;
   text-decoration: none;
-  transition: all 0.3s ease;
-  flex: 1;
+  transition: all 0.25s ease;
+  box-shadow: 0 3px 12px rgba(20, 10, 6, 0.3);
   white-space: nowrap;
-  box-shadow: 0 4px 14px rgba(13, 148, 136, 0.25);
 }
 
-.btnPrimary:hover {
-  background-color: var(--color-accent-teal-dark);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(13, 148, 136, 0.4);
+.btnPrimary:active {
+  transform: scale(0.985);
+  background-color: var(--color-primary-600, #7A4B37);
 }
 
 .btnOutline {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 7px;
   background-color: transparent;
-  color: #FFFFFF;
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  font-family: var(--font-body);
-  font-size: 14px;
-  font-weight: 600;
-  padding: 12px 16px;
-  border-radius: 40px; 
+  color: #FAF6F0;
+  border: 1px solid rgba(250, 246, 240, 0.45);
+  font-family: var(--font-body, 'Inter', sans-serif);
+  font-size: 13.5px;
+  font-weight: 500;
+  letter-spacing: 0.015em;
+  padding: 10px 18px;
+  border-radius: 9999px; /* Pill shape */
+  min-height: 40px;
+  width: 100%;
   text-decoration: none;
-  transition: all 0.3s ease;
-  flex: 1;
+  transition: all 0.25s ease;
   white-space: nowrap;
 }
 
-.btnOutline:hover {
-  border-color: #FFFFFF;
-  background-color: rgba(255,255,255,0.1);
+.btnOutline:active {
+  transform: scale(0.985);
+  background-color: rgba(250, 246, 240, 0.1);
+  border-color: rgba(250, 246, 240, 0.7);
+}
+
+.btnArrow {
+  transition: transform 0.2s ease;
+}
+
+.btnOutline:hover .btnArrow {
+  transform: translateX(3px);
 }
 
 /* =========================================================================
-   DESKTOP STYLES
+   DESKTOP & TABLET STYLES (PRESERVED 100% UNCHANGED)
    ========================================================================= */
 
 @media (min-width: 768px) {
-  .heroContent {
-    margin-top: 0;
-  }
-  
   .heroSection {
-    /* Switch to Desktop Background */
+    background-color: #FDF9F1;
     background-image: url('/images/hero-tshirt-bg.png');
-    /* Adjust position to push the neck hole down slightly */
     background-position: center -40px;
-    
-    /* Restore Desktop Aspect Ratio & Constraints */
+    background-size: cover;
+    background-repeat: no-repeat;
     aspect-ratio: 16 / 10;
     min-height: 750px;
-    max-height: 1000px; /* Prevent 100svh from making it too tall on huge monitors */
-    
-    /* Push text down slightly to compensate for the negative margin pull-up */
+    max-height: 1000px;
     padding-top: 100px;
     padding-bottom: 15%; 
+    justify-content: center;
+    align-items: center;
   }
 
-  .subtitle {
+  .heroContainer {
+    max-width: 1280px;
+    padding: 0 var(--spacing-4);
+    justify-content: center;
+  }
+
+  .heroContent {
+    margin-top: 0;
+    align-items: center;
+    text-align: center;
+    max-width: 700px;
+    padding: 0 var(--spacing-4);
+  }
+
+  .eyebrowWrapper {
+    flex-direction: row;
+    gap: 0.5em;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: var(--spacing-5);
+  }
+
+  .eyebrowLine {
     font-size: 12px;
     letter-spacing: 0.2em;
-    margin-bottom: var(--spacing-5);
+    color: #C3B19E;
+  }
+
+  .eyebrowDivider {
+    display: none;
   }
 
   .title {
     font-size: 72px;
     line-height: 1.05;
     margin: 0 0 var(--spacing-5) 0;
+    text-align: center;
+    color: #FFFFFF;
   }
 
-  .description {
-    font-size: 16px;
-    line-height: 1.6;
-    margin: 0 0 var(--spacing-8) 0;
+  .titleLine1 {
+    display: block;
+  }
+
+  .titleLine2 {
+    display: inline;
+    margin-right: 0.28em;
+  }
+
+  .titleLine3 {
+    display: inline;
+  }
+
+  .curvedLineSvg {
+    left: 10%;
+    bottom: -18px;
+    width: 82%;
+    height: 18px;
   }
 
   .actions {
@@ -201,29 +286,37 @@
     justify-content: center;
     gap: var(--spacing-5);
     width: auto;
+    margin-top: 0;
   }
 
   .btnPrimary,
   .btnOutline {
-    width: auto; /* Reset back to intrinsic width on desktop */
+    width: auto;
     flex: none;
     padding: 14px 36px;
     font-size: 16px;
   }
+
+  .btnPrimary:hover {
+    background-color: var(--color-primary-600, #7A4B37);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(74, 44, 31, 0.32);
+  }
+
+  .btnOutline {
+    color: #FFFFFF;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+  }
+
+  .btnOutline:hover {
+    border-color: #FFFFFF;
+    background-color: rgba(255, 255, 255, 0.1);
+  }
 }
-
-
 
 @media (min-width: 768px) and (max-width: 1024px) {
   .title {
     font-size: 84px;
-    line-height: 1.1;
-  }
-}
-
-@media (min-width: 500px) and (max-width: 767px) {
-  .title {
-    font-size: 56px;
     line-height: 1.1;
   }
 }

@@ -248,6 +248,15 @@
   display: flex;
   flex-direction: column;
   flex: 1;
+  min-width: 0;
+}
+
+.stepHeaderRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
 }
 
 .stepTitle {
@@ -255,8 +264,41 @@
   font-size: 15px;
   font-weight: 700;
   color: #1F1D1C;
-  margin: 0 0 3px 0;
+  margin: 0;
   line-height: 1.25;
+}
+
+.chevronWrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #8C5B45;
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  flex-shrink: 0;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+.stepCollapsible {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition: grid-template-rows 0.28s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.2s ease, margin-top 0.2s ease;
+  margin-top: 0;
+}
+
+.stepCollapsibleOpen {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  margin-top: 6px;
+}
+
+.stepInner {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .stepDesc {
@@ -281,6 +323,42 @@
   font-weight: 500;
   color: #7A4B37;
   align-self: flex-start;
+}
+
+@media (max-width: 767px) {
+  .timelineCard {
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    padding: 12px 14px;
+    border-radius: 12px;
+    user-select: none;
+  }
+
+  .timelineCard.cardActive {
+    border-color: rgba(140, 91, 69, 0.28);
+    box-shadow: 0 4px 18px rgba(74, 44, 31, 0.08);
+  }
+}
+
+@media (min-width: 768px) {
+  .chevronWrap {
+    display: none;
+  }
+
+  .stepCollapsible {
+    display: block !important;
+    grid-template-rows: none !important;
+    opacity: 1 !important;
+    margin-top: 4px;
+  }
+
+  .stepInner {
+    overflow: visible;
+  }
+
+  .timelineCard {
+    cursor: default;
+  }
 }
 
 /* Stats Bar */
@@ -527,7 +605,7 @@
   background: var(--color-accent-teal);
   border-color: var(--color-accent-teal);
   color: #FFFFFF;
-  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.25);
+  box-shadow: 0 4px 12px rgba(74, 44, 31, 0.18);
 }
 
 .productChip.activeChip .chipIcon {
@@ -710,7 +788,7 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  background: rgba(13, 148, 136, 0.1);
+  background: rgba(140, 91, 69, 0.1);
   color: var(--color-accent-teal);
   font-family: var(--font-body);
   font-size: 11px;
@@ -741,13 +819,13 @@
   text-decoration: none;
   transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
   white-space: nowrap;
-  box-shadow: 0 4px 14px rgba(13, 148, 136, 0.25);
+  box-shadow: 0 4px 14px rgba(74, 44, 31, 0.2);
 }
 
 .getQuoteBtn:hover {
   background-color: var(--color-accent-teal-dark);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(13, 148, 136, 0.4);
+  box-shadow: 0 6px 20px rgba(74, 44, 31, 0.3);
 }
 
 /* --- BOTTOM TRUST BAR --- */
@@ -905,7 +983,7 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  background: rgba(13, 148, 136, 0.1);
+  background: rgba(140, 91, 69, 0.1);
   color: var(--color-accent-teal);
   font-family: var(--font-body);
   font-size: 11px;
@@ -936,13 +1014,13 @@
   text-decoration: none;
   transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
   white-space: nowrap;
-  box-shadow: 0 4px 14px rgba(13, 148, 136, 0.25);
+  box-shadow: 0 4px 14px rgba(74, 44, 31, 0.2);
 }
 
 .getQuoteBtn:hover {
   background-color: var(--color-accent-teal-dark);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(13, 148, 136, 0.4);
+  box-shadow: 0 6px 20px rgba(74, 44, 31, 0.3);
 }
 
 /* --- BOTTOM TRUST BAR --- */

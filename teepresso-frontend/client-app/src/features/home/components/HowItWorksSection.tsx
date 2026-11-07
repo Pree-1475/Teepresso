@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
-import { CheckCircle2, Star, Clock } from 'lucide-react';
+import { CheckCircle2, Star, Clock, ChevronDown } from 'lucide-react';
 import { useScrollReveal } from '@/common/hooks/useScrollReveal';
 import styles from './HowItWorksSection.module.css';
 import { InstantQuoteSection } from './InstantQuoteSection';
@@ -95,6 +95,11 @@ export function HowItWorksSection() {
   const { ref: headerRef, isVisible: isHeaderVisible } = useScrollReveal({ threshold: 0.5 });
   const ordersCounter = useCountUp(12438);
   const ratingCounter = useCountUp(49, 1200);
+  const [openStep, setOpenStep] = useState<number | null>(0);
+
+  const handleToggle = (idx: number) => {
+    setOpenStep((prev) => (prev === idx ? null : idx));
+  };
 
   return (
     <section className={styles.wrapper} id="instant-quote">
@@ -149,34 +154,62 @@ export function HowItWorksSection() {
             </div>
 
             <div className={styles.verticalTimeline}>
-              {steps.map((step, idx) => (
-                <div key={idx} className={styles.timelineStep}>
-                  <div className={styles.timelineNode}>
-                    {String(idx + 1).padStart(2, '0')}
-                  </div>
-                  
-                  <div className={styles.timelineCard}>
-                    <div className={styles.timelineIconWrapper}>
-                      <Image
-                        src={step.image}
-                        alt={step.title}
-                        width={36}
-                        height={36}
-                        style={{ objectFit: 'contain' }}
-                        unoptimized={true}
-                      />
+              {steps.map((step, idx) => {
+                const isOpen = openStep === idx;
+                return (
+                  <div key={idx} className={`${styles.timelineStep} ${isOpen ? styles.stepOpen : ''}`}>
+                    <div className={styles.timelineNode}>
+                      {String(idx + 1).padStart(2, '0')}
                     </div>
-                    <div className={styles.timelineText}>
-                      <h3 className={styles.stepTitle}>{step.title}</h3>
-                      <p className={styles.stepDesc}>{step.description}</p>
-                      <div className={styles.timePill}>
-                        <Clock size={11} />
-                        <span>{step.time}</span>
+                    
+                    <div 
+                      className={`${styles.timelineCard} ${isOpen ? styles.cardActive : ''}`}
+                      onClick={() => handleToggle(idx)}
+                      role="button"
+                      tabIndex={0}
+                      aria-expanded={isOpen}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          handleToggle(idx);
+                        }
+                      }}
+                    >
+                      <div className={styles.timelineIconWrapper}>
+                        <Image
+                          src={step.image}
+                          alt={step.title}
+                          width={36}
+                          height={36}
+                          style={{ objectFit: 'contain' }}
+                          unoptimized={true}
+                        />
+                      </div>
+                      <div className={styles.timelineText}>
+                        <div className={styles.stepHeaderRow}>
+                          <h3 className={styles.stepTitle}>{step.title}</h3>
+                          <span 
+                            className={`${styles.chevronWrap} ${isOpen ? styles.chevronOpen : ''}`} 
+                            aria-hidden="true"
+                          >
+                            <ChevronDown size={15} />
+                          </span>
+                        </div>
+
+                        <div className={`${styles.stepCollapsible} ${isOpen ? styles.stepCollapsibleOpen : ''}`}>
+                          <div className={styles.stepInner}>
+                            <p className={styles.stepDesc}>{step.description}</p>
+                            <div className={styles.timePill}>
+                              <Clock size={11} />
+                              <span>{step.time}</span>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             <div className={styles.statsBarContainer}>

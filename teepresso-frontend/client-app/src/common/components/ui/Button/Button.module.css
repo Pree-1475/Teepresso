@@ -17,16 +17,16 @@
 
 /* Variants */
 .primary {
-  background-color: var(--color-accent-teal);
+  background-color: var(--color-primary-500, #8C5B45);
   color: #FFFFFF;
-  box-shadow: 0 2px 4px rgba(13, 148, 136, 0.2);
+  box-shadow: 0 2px 4px rgba(74, 44, 31, 0.16);
 }
 .primary:hover:not(.disabled) {
-  background-color: var(--color-accent-teal-dark);
-  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3);
+  background-color: var(--color-primary-600, #7A4B37);
+  box-shadow: 0 4px 12px rgba(74, 44, 31, 0.25);
 }
 .primary:active:not(.disabled) {
-  background-color: #0F766E;
+  background-color: var(--color-primary-700, #623A2A);
   transform: translateY(1px);
 }
 

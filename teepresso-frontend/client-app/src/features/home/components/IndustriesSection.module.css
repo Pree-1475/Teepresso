@@ -149,9 +149,9 @@
 }
 
 .pill:hover {
-  border-color: var(--color-accent-teal);
-  color: var(--color-accent-teal);
-  box-shadow: 0 4px 14px rgba(13, 148, 136, 0.15);
+  border-color: var(--color-primary-500, #8C5B45);
+  color: var(--color-primary-500, #8C5B45);
+  box-shadow: 0 4px 14px rgba(74, 44, 31, 0.12);
 }
 
 @keyframes idleSwing {

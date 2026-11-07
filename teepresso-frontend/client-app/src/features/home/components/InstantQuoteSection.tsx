@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Check, ArrowRight } from 'lucide-react';
+import { Check, ArrowRight, Minus, Plus } from 'lucide-react';
 import styles from './InstantQuoteSection.module.css';
 
 interface ProductItem {
@@ -84,6 +84,14 @@ export function InstantQuoteSection({ embedded = false }: { embedded?: boolean }
     100,
     Math.max(0, ((quantity - 25) / (500 - 25)) * 100)
   );
+
+  const handleDecrease = () => {
+    setQuantity((prev) => Math.max(25, prev - 5));
+  };
+
+  const handleIncrease = () => {
+    setQuantity((prev) => Math.min(500, prev + 5));
+  };
 
   const content = (
     <div className={embedded ? '' : styles.centerContainer}>
@@ -186,19 +194,44 @@ export function InstantQuoteSection({ embedded = false }: { embedded?: boolean }
             </div>
 
             <div className={styles.sliderTrackWrapper}>
-              <input
-                type="range"
-                min="25"
-                max="500"
-                step="5"
-                value={quantity}
-                onChange={(e) => setQuantity(Number(e.target.value))}
-                className={styles.rangeSlider}
-                style={{
-                  background: `linear-gradient(to right, #8C5B45 ${sliderPercentage}%, #EADBCE ${sliderPercentage}%)`,
-                }}
-                aria-label="Order Quantity Slider"
-              />
+              <div className={styles.sliderRow}>
+                <button
+                  type="button"
+                  className={styles.stepBtn}
+                  onClick={handleDecrease}
+                  disabled={quantity <= 25}
+                  aria-label="Decrease quantity"
+                  title="Decrease quantity by 5"
+                >
+                  <Minus size={15} strokeWidth={2.5} />
+                </button>
+
+                <input
+                  type="range"
+                  min="25"
+                  max="500"
+                  step="5"
+                  value={quantity}
+                  onChange={(e) => setQuantity(Number(e.target.value))}
+                  className={styles.rangeSlider}
+                  style={{
+                    background: `linear-gradient(to right, #8C5B45 ${sliderPercentage}%, #EADBCE ${sliderPercentage}%)`,
+                  }}
+                  aria-label="Order Quantity Slider"
+                />
+
+                <button
+                  type="button"
+                  className={styles.stepBtn}
+                  onClick={handleIncrease}
+                  disabled={quantity >= 500}
+                  aria-label="Increase quantity"
+                  title="Increase quantity by 5"
+                >
+                  <Plus size={15} strokeWidth={2.5} />
+                </button>
+              </div>
+
               <div className={styles.sliderScale}>
                 <span>25</span>
                 <span>250</span>

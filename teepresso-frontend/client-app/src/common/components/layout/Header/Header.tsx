@@ -17,6 +17,7 @@ export function Header() {
 
   const pathname = usePathname();
   const isProductPage = pathname.startsWith('/product/');
+  const isHomePage = pathname === '/';
   const router = useRouter();
   const { user, isAuthenticated, logout } = useAuth();
   const { cart, setIsCartDrawerOpen } = useCart();
@@ -91,7 +92,7 @@ export function Header() {
   );
 
   return (
-    <header className={`${styles.header} ${isScrolled ? styles.scrolled : ''}`}>
+    <header className={`${styles.header} ${isScrolled ? styles.scrolled : ''} ${isHomePage && !isScrolled ? styles.onDarkHero : ''}`}>
       <div className={`container ${styles.container}`}>
         
         {/* Left Nav */}

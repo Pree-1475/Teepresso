@@ -44,15 +44,28 @@
 }
 
 .reviewsGrid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--spacing-6);
+  display: flex;
+  overflow-x: auto;
+  gap: 16px;
+  padding-bottom: 16px;
+  padding-top: 4px;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(140, 91, 69, 0.2) transparent;
 }
 
-@media (min-width: 768px) {
-  .reviewsGrid {
-    grid-template-columns: repeat(3, 1fr);
-  }
+.reviewsGrid::-webkit-scrollbar {
+  height: 4px;
+}
+
+.reviewsGrid::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.reviewsGrid::-webkit-scrollbar-thumb {
+  background-color: rgba(140, 91, 69, 0.2);
+  border-radius: 4px;
 }
 
 .reviewCard {
@@ -64,6 +77,33 @@
   flex-direction: column;
   box-shadow: 0 4px 12px rgba(0,0,0,0.02);
   transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease, opacity 0.6s ease;
+  flex: 0 0 82%;
+  max-width: 340px;
+  scroll-snap-align: start;
+}
+
+@media (max-width: 767px) {
+  .reviewCard {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .reviewsGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    overflow-x: visible;
+    gap: var(--spacing-6);
+    padding-bottom: 0;
+    padding-top: 0;
+  }
+
+  .reviewCard {
+    flex: initial;
+    max-width: none;
+    scroll-snap-align: none;
+  }
 }
 
 .cardHidden {
