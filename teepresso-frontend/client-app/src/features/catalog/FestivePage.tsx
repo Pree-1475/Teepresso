@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { Navigate } from 'react-router-dom';
+import { useStorefront } from '@/common/context/StorefrontContext';
 import { FestiveHeroNew } from '@/features/home/components/festive/FestiveHeroNew';
 import { FestiveKurtaCollection } from '@/features/home/components/festive/FestiveKurtaCollection';
 import { FestiveEssentialsCollection } from '@/features/home/components/festive/FestiveEssentialsCollection';
@@ -6,6 +8,12 @@ import { FestiveFeaturesBar } from '@/features/home/components/festive/FestiveFe
 import styles from './festive.module.css';
 
 export function FestivePage() {
+  const { storefrontMode } = useStorefront();
+
+  if (storefrontMode !== 'FESTIVE') {
+    return <Navigate to="/products" replace />;
+  }
+
   return (
     <div className={styles.pageContainer} style={{ position: 'relative', overflow: 'hidden' }}>
       

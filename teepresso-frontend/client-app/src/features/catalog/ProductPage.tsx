@@ -57,7 +57,7 @@ interface ProductItem {
 const defaultSizes: SizeQtyMap = { XS: 0, S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, '4XL': 0, '5XL': 0, '6XL': 0 };
 
 export function ProductPage() {
-  const { contactPhone } = useStorefront();
+  const { contactPhone, storefrontMode } = useStorefront();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { addToCart } = useCart();
@@ -144,6 +144,11 @@ export function ProductPage() {
         }
 
         if (prod && isMounted) {
+          if (storefrontMode === 'STANDARD' && (prod.category || '').toLowerCase().includes('kurta')) {
+            navigate('/products', { replace: true });
+            return;
+          }
+
           let parsedColors: string[] = [];
           if (Array.isArray(prod.colors)) parsedColors = prod.colors;
           else if (typeof prod.colors === 'string') {

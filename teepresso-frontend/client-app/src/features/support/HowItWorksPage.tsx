@@ -8,7 +8,7 @@ const steps = [
   {
     icon: ClipboardCheck,
     title: '1. Select & Configure',
-    desc: 'Choose your apparel style (t-shirts, hoodies, or kurtas), enter quantities, and specify colors.'
+    desc: 'Choose your apparel style (t-shirts, hoodies, or corporate polos), enter quantities, and specify colors.'
   },
   {
     icon: UploadCloud,

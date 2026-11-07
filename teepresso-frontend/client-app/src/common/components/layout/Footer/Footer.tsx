@@ -3,8 +3,10 @@
 import React from 'react';
 import Link from 'next/link';
 import styles from './Footer.module.css';
+import { useStorefront } from '@/common/context/StorefrontContext';
 
 export function Footer() {
+  const { storefrontMode } = useStorefront();
   const currentYear = new Date().getFullYear();
 
   return (
@@ -37,7 +39,9 @@ export function Footer() {
             <h4 className={styles.linkTitle}>Products & Services</h4>
             <ul className={styles.linkList}>
               <li><Link href="/products">Products Catalogue</Link></li>
-              <li><Link href="/custom-kurtas">✨ Custom Kurtas</Link></li>
+              {storefrontMode === 'FESTIVE' && (
+                <li><Link href="/festive">✨ Custom Kurtas</Link></li>
+              )}
               <li><Link href="/products">Bulk Order Configurator</Link></li>
               <li><Link href="/products">T-Shirts & Oversized Tees</Link></li>
               <li><Link href="/products">Polos & Corporate Merch</Link></li>

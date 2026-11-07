@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { Check, ArrowRight, Minus, Plus } from 'lucide-react';
 import styles from './InstantQuoteSection.module.css';
+import { useStorefront } from '@/common/context/StorefrontContext';
 
 interface ProductItem {
   id: string;
@@ -60,12 +61,17 @@ const checkmarks = [
 ];
 
 export function InstantQuoteSection({ embedded = false }: { embedded?: boolean }) {
+  const { storefrontMode } = useStorefront();
   const [selectedProductId, setSelectedProductId] = useState<string>('tshirt');
   const [selectedSize, setSelectedSize] = useState<string>('Mixed Sizes');
   const [quantity, setQuantity] = useState<number>(100);
 
+  const availableProducts = storefrontMode === 'STANDARD'
+    ? PRODUCTS.filter((p) => p.id !== 'kurta')
+    : PRODUCTS;
+
   const selectedProduct =
-    PRODUCTS.find((p) => p.id === selectedProductId) || PRODUCTS[0];
+    availableProducts.find((p) => p.id === selectedProductId) || availableProducts[0];
 
   // Dynamic tiered discount matching realistic volume manufacturing
   const getPricePerPiece = (base: number, qty: number): number => {
@@ -121,7 +127,7 @@ export function InstantQuoteSection({ embedded = false }: { embedded?: boolean }
         <div className={styles.topAreaGrid}>
           {/* Left: Product Selection List with Pill Shapes */}
           <div className={styles.productList} role="radiogroup" aria-label="Select apparel product">
-            {PRODUCTS.map((prod) => {
+            {availableProducts.map((prod) => {
               const isSelected = prod.id === selectedProduct.id;
               return (
                 <button

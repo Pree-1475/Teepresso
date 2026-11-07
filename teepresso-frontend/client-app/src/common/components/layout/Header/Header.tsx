@@ -7,10 +7,12 @@ import { useAuth } from '@/features/auth/context/AuthContext';
 import { useCart } from '@/features/cart/context/CartContext';
 import { Menu, X, ShoppingBag, User as UserIcon, LogOut, PackageCheck, Layers, Home, Sparkles, LogIn, Truck } from 'lucide-react';
 import styles from './Header.module.css';
+import { useStorefront } from '@/common/context/StorefrontContext';
 import { STOREFRONT_MODE } from '@/common/config/storefront';
 import { FestiveHeader } from './FestiveHeader';
 
 export function Header() {
+  const { storefrontMode } = useStorefront();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -104,9 +106,11 @@ export function Header() {
             <Link href="/products" className={`${styles.navLink} ${pathname === '/products' ? styles.activeLink : ''}`}>
               Products
             </Link>
-            <Link href="/festive" className={`${styles.navLink} ${pathname === '/festive' ? styles.activeLink : ''}`} style={{ color: 'var(--color-primary-600)', fontWeight: 600 }}>
-              Festive <span className={styles.newBadge}>New</span>
-            </Link>
+            {storefrontMode === 'FESTIVE' && (
+              <Link href="/festive" className={`${styles.navLink} ${pathname === '/festive' ? styles.activeLink : ''}`} style={{ color: 'var(--color-primary-600)', fontWeight: 600 }}>
+                Festive <span className={styles.newBadge}>New</span>
+              </Link>
+            )}
             <Link href="/fabric-guide" className={`${styles.navLink} ${pathname === '/fabric-guide' ? styles.activeLink : ''}`}>
               Fabric & Printing
             </Link>
@@ -204,11 +208,13 @@ export function Header() {
                 <ShoppingBag size={18} style={{ marginRight: '8px' }} /> Products
               </Link>
             </li>
-            <li>
-              <Link href="/festive" className={styles.mobileNavLink} onClick={() => setIsMobileMenuOpen(false)}>
-                <Sparkles size={18} style={{ marginRight: '8px' }} /> Festive Collection
-              </Link>
-            </li>
+            {storefrontMode === 'FESTIVE' && (
+              <li>
+                <Link href="/festive" className={styles.mobileNavLink} onClick={() => setIsMobileMenuOpen(false)}>
+                  <Sparkles size={18} style={{ marginRight: '8px' }} /> Festive Collection
+                </Link>
+              </li>
+            )}
             <li>
               <Link href="/my-orders" className={styles.mobileNavLink} onClick={() => setIsMobileMenuOpen(false)}>
                 <Truck size={18} style={{ marginRight: '8px' }} /> My Orders

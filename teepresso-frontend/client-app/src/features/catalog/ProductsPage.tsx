@@ -4,6 +4,7 @@ import { ArrowRight, CheckCircle2, ShieldCheck, Truck, Package } from 'lucide-re
 import { Button } from '@/common/components/ui/Button/Button';
 import styles from './products.module.css';
 import { API_BASE_URL } from '@/common/config/api';
+import { useStorefront } from '@/common/context/StorefrontContext';
 
 interface Product {
   id: string;
@@ -16,11 +17,18 @@ interface Product {
 }
 
 export function ProductsPage() {
+  const { storefrontMode } = useStorefront();
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<string[]>(['All']);
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (storefrontMode === 'STANDARD' && selectedCategory.toLowerCase().includes('kurta')) {
+      setSelectedCategory('All');
+    }
+  }, [storefrontMode, selectedCategory]);
 
   useEffect(() => {
     fetchLiveCatalog();
@@ -58,9 +66,17 @@ export function ProductsPage() {
     }
   };
 
+  const displayedCategories = storefrontMode === 'STANDARD'
+    ? categories.filter(c => c.toLowerCase() !== 'kurtas' && c.toLowerCase() !== 'kurta')
+    : categories;
+
+  const availableProducts = storefrontMode === 'STANDARD'
+    ? products.filter(p => (p.category || '').toLowerCase() !== 'kurtas' && (p.category || '').toLowerCase() !== 'kurta')
+    : products;
+
   const filteredProducts = selectedCategory === 'All'
-    ? products
-    : products.filter(p => p.category === selectedCategory);
+    ? availableProducts
+    : availableProducts.filter(p => p.category === selectedCategory);
 
   return (
     <div className={styles.pageContainer}>
@@ -89,7 +105,7 @@ export function ProductsPage() {
       <div className={styles.categoryNavWrapper}>
         <div className="container">
           <nav className={styles.categoryNav} aria-label="Product categories">
-            {categories.map(category => {
+            {displayedCategories.map(category => {
               const isActive = selectedCategory === category;
               const isKurta = category === 'Kurtas';
               return (

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { API_BASE_URL } from '@/common/config/api';
+import { useStorefront } from '@/common/context/StorefrontContext';
 import styles from './FeaturedProducts.module.css';
 
 interface Product {
@@ -16,6 +17,7 @@ interface Product {
 }
 
 export function FeaturedProducts() {
+  const { storefrontMode } = useStorefront();
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -33,18 +35,21 @@ export function FeaturedProducts() {
         const productsRes = await fetch(`${API_BASE_URL}/products`);
         const productsData = await productsRes.json();
         const allProducts: Product[] = Array.isArray(productsData.products) ? productsData.products : [];
+        const eligibleProducts = storefrontMode === 'STANDARD'
+          ? allProducts.filter(p => (p.category || '').toLowerCase() !== 'kurtas' && (p.category || '').toLowerCase() !== 'kurta')
+          : allProducts;
 
         // 3. Filter to featured products in their specified order
         let displayed: Product[] = [];
         if (featuredIds.length > 0) {
           displayed = featuredIds
-            .map(id => allProducts.find(p => p.id === id))
+            .map(id => eligibleProducts.find(p => p.id === id))
             .filter((p): p is Product => !!p);
         }
 
         // 4. Fallback if no products are marked as featured yet: show top 6 products
-        if (displayed.length === 0 && allProducts.length > 0) {
-          displayed = allProducts.slice(0, 6);
+        if (displayed.length === 0 && eligibleProducts.length > 0) {
+          displayed = eligibleProducts.slice(0, 6);
         }
 
         setFeaturedProducts(displayed);
