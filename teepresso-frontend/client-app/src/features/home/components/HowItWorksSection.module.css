@@ -16,32 +16,31 @@
 .gridContainer {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: 40px;
+  gap: 36px;
   padding: 10px 0;
 }
 
 @media (min-width: 1024px) {
-  .rightColumn {
-    order: 1;
-  }
-  .leftColumn {
-    order: 2;
-  }
   .gridContainer {
-    grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
-    gap: 52px;
-    align-items: stretch;
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+    gap: 56px;
+    align-items: start;
     padding: 15px 0;
   }
 }
 
 /* ============================================
-   LEFT COLUMN: TIMELINE & STATS
+   OVERVIEW & TIMELINE COLUMNS
    ============================================ */
-.leftColumn {
+.overviewColumn {
   display: flex;
   flex-direction: column;
-  order: 2;
+  gap: 28px;
+}
+
+.timelineColumn {
+  display: flex;
+  flex-direction: column;
 }
 
 /* Header */

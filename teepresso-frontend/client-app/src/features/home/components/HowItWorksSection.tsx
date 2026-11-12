@@ -5,7 +5,6 @@ import Image from 'next/image';
 import { CheckCircle2, Star, Clock, ChevronDown } from 'lucide-react';
 import { useScrollReveal } from '@/common/hooks/useScrollReveal';
 import styles from './HowItWorksSection.module.css';
-import { InstantQuoteSection } from './InstantQuoteSection';
 
 /* ──────────────────────────────────────────────
    DATA (Crisp & Concise)
@@ -102,24 +101,15 @@ export function HowItWorksSection() {
   };
 
   return (
-    <section className={styles.wrapper} id="instant-quote">
+    <section className={styles.wrapper} id="how-it-works">
       <div className="container">
         
         <div className={styles.gridContainer}>
           
           {/* ═══════════════════════════════════════════
-              LEFT COLUMN — INSTANT QUOTE CALCULATOR (LOCKED)
+              LEFT COLUMN — OVERVIEW & STATS
               ═══════════════════════════════════════════ */}
-          <div className={styles.rightColumn}>
-            <div className={styles.stickyCalculator}>
-              <InstantQuoteSection embedded={true} />
-            </div>
-          </div>
-
-          {/* ═══════════════════════════════════════════
-              RIGHT COLUMN — ORDER JOURNEY TIMELINE (SCROLLING)
-              ═══════════════════════════════════════════ */}
-          <div className={styles.leftColumn}>
+          <div className={styles.overviewColumn}>
             
             <div className={`${styles.header} ${isHeaderVisible ? styles.headerVisible : ''}`} ref={headerRef}>
               <div className={styles.journeyPill}>
@@ -138,7 +128,7 @@ export function HowItWorksSection() {
                 </div>
               </h2>
               <p className={styles.mainSubtitle}>
-                We make custom apparel easy, transparent and reliable.
+                We make custom apparel easy, transparent and reliable. From your initial idea to doorstep delivery, every step is crafted with precision.
               </p>
               <div className={styles.topBadgesRow}>
                 {trustBadges.map((b, i) => {
@@ -153,6 +143,37 @@ export function HowItWorksSection() {
               </div>
             </div>
 
+            <div className={styles.statsBarContainer}>
+              <div className={styles.statsBar} ref={ordersCounter.ref}>
+                <div className={styles.statItem}>
+                  <div className={styles.statValue}>
+                    {ordersCounter.value.toLocaleString('en-IN')}+
+                  </div>
+                  <div className={styles.statLabel}>Orders Delivered</div>
+                </div>
+
+                <div className={styles.statDivider} />
+
+                <div className={styles.statItem} ref={ratingCounter.ref}>
+                  <div className={styles.ratingStars}>
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} size={15} fill="#F59E0B" color="#F59E0B" />
+                    ))}
+                    <span className={styles.statValue}>
+                      {(ratingCounter.value / 10).toFixed(1)}/5
+                    </span>
+                  </div>
+                  <div className={styles.statLabel}>Customer Rating</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          {/* ═══════════════════════════════════════════
+              RIGHT COLUMN — ORDER JOURNEY TIMELINE
+              ═══════════════════════════════════════════ */}
+          <div className={styles.timelineColumn}>
             <div className={styles.verticalTimeline}>
               {steps.map((step, idx) => {
                 const isOpen = openStep === idx;
@@ -211,32 +232,6 @@ export function HowItWorksSection() {
                 );
               })}
             </div>
-
-            <div className={styles.statsBarContainer}>
-              <div className={styles.statsBar} ref={ordersCounter.ref}>
-                <div className={styles.statItem}>
-                  <div className={styles.statValue}>
-                    {ordersCounter.value.toLocaleString('en-IN')}+
-                  </div>
-                  <div className={styles.statLabel}>Orders Delivered</div>
-                </div>
-
-                <div className={styles.statDivider} />
-
-                <div className={styles.statItem} ref={ratingCounter.ref}>
-                  <div className={styles.ratingStars}>
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} size={15} fill="#F59E0B" color="#F59E0B" />
-                    ))}
-                    <span className={styles.statValue}>
-                      {(ratingCounter.value / 10).toFixed(1)}/5
-                    </span>
-                  </div>
-                  <div className={styles.statLabel}>Customer Rating</div>
-                </div>
-              </div>
-            </div>
-
           </div>
 
         </div>

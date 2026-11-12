@@ -53,8 +53,8 @@ export function HeroSection() {
             <Link href="/products" className={styles.btnPrimary}>
               Explore Gallery
             </Link>
-            <Link href="#instant-quote" className={styles.btnOutline}>
-              <span>Get a Quote</span>
+            <Link href="#combos" className={styles.btnOutline}>
+              <span>Explore Combos</span>
               <ArrowRight size={16} className={styles.btnArrow} />
             </Link>
           </div>
