@@ -1,6 +1,7 @@
 {
   "name": "teepresso-backend",
   "version": "0.1.0",
+  "type": "module",
   "private": true,
   "description": "Modular backend service for Teepresso API",
   "main": "dist/index.js",

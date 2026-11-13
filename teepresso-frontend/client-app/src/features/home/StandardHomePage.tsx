@@ -18,18 +18,14 @@ export function StandardHomePage() {
       <IndustriesSection />
       <div className="doubleStitchDivider" />
       <CombosSection />
-      <div className="doubleStitchDivider" />
       <TrustBar />
       <FeaturedProducts />
-      <div className="doubleStitchDivider" />
       <HowItWorksSection />
       <div className="doubleStitchDivider" />
       <TrustAndReviewsSection />
-      <div className="doubleStitchDivider" />
       <GallerySection />
       <div className="doubleStitchDivider" />
       <FAQSection />
-      <div className="doubleStitchDivider" />
       <CTASection />
     </div>
   );

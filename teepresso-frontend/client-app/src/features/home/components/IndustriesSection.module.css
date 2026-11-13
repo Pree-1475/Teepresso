@@ -1,25 +1,31 @@
 .section {
-  padding: 24px 0; /* Extremely tight padding */
-  background-color: #F8F5F2; /* Soft beige background */
+  padding: 40px 0 46px 0;
+  background-color: #F8F5F2; /* Soft warm beige */
   overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .section {
+    padding: 28px 0 32px 0;
+  }
 }
 
 .container {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-4); /* Just 16px between header and rope */
+  gap: var(--spacing-6);
 }
 
 @media (min-width: 1024px) {
   .container {
-    gap: var(--spacing-6); /* 24px on desktop */
+    gap: 32px;
   }
 }
 
 .header {
   flex: 1;
   max-width: 700px;
-  margin: 0 auto;
+  margin: 0 auto 12px auto;
   text-align: center;
   position: relative;
   z-index: 10;

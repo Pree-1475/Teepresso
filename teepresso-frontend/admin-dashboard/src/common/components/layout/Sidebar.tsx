@@ -15,6 +15,7 @@ import {
   ChevronUp,
   ClipboardList,
   Box,
+  Layers,
   Shield,
   Sliders,
   Warehouse
@@ -79,6 +80,7 @@ export function Sidebar({ onLogout }: SidebarProps) {
 
   const otherItems = [
     { label: 'Products', path: '/products', icon: Box },
+    { label: 'Combos', path: '/combos', icon: Layers },
     { label: 'Stock Overview', path: '/stock-overview', icon: Warehouse },
     { label: 'Customers', path: '/customers', icon: Users },
     { label: 'Offline POS', path: '/offline-orders', icon: ClipboardList },

@@ -188,6 +188,26 @@ export const initNeonDatabase = async () => {
       );
     `;
 
+    // 11. Combos Table
+    await sql`
+      CREATE TABLE IF NOT EXISTS combos (
+        id VARCHAR(100) PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        subtitle VARCHAR(255),
+        description TEXT,
+        "isPopular" BOOLEAN DEFAULT false,
+        "isActive" BOOLEAN DEFAULT true,
+        items JSONB NOT NULL DEFAULT '[]'::jsonb,
+        "originalPrice" INT NOT NULL DEFAULT 0,
+        "comboPrice" INT NOT NULL DEFAULT 0,
+        savings INT NOT NULL DEFAULT 0,
+        "sizePricing" JSONB DEFAULT '{}'::jsonb,
+        "displayOrder" INT DEFAULT 0,
+        "createdAt" TIMESTAMP DEFAULT NOW(),
+        "updatedAt" TIMESTAMP DEFAULT NOW()
+      );
+    `;
+
     console.log('✅ Neon PostgreSQL Database Schema Verified Cleanly!');
   } catch (error) {
     console.error('❌ Error initializing Neon PostgreSQL tables:', error);

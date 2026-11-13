@@ -14,6 +14,7 @@ import colorRoutes from './features/categories/routes/colorRoutes.js';
 import sizeRoutes from './features/categories/routes/sizeRoutes.js';
 import patternRoutes from './features/categories/routes/patternRoutes.js';
 import settingsRoutes from './features/settings/routes/settingsRoutes.js';
+import comboRoutes from './features/combos/routes/comboRoutes.js';
 
 const app = express();
 
@@ -50,13 +51,30 @@ app.use(`${config.apiPrefix}/colors`, colorRoutes);
 app.use(`${config.apiPrefix}/sizes`, sizeRoutes);
 app.use(`${config.apiPrefix}/patterns`, patternRoutes);
 app.use(`${config.apiPrefix}/settings`, settingsRoutes);
+app.use(`${config.apiPrefix}/combos`, comboRoutes);
 
 // 3. Start Server IMMEDIATELY on process.env.PORT
-const server = app.listen(config.port, () => {
-  console.log(`🚀 Teepresso Backend API listening on port ${config.port}`);
-  
-  // Asynchronously initialize database in background so port binding is instant!
-  setTimeout(() => {
-    initNeonDatabase().catch(err => console.error('Background DB initialization error:', err));
-  }, 100);
-});
+const startServer = (portToTry: number) => {
+  const srv = app.listen(portToTry, () => {
+    console.log(`🚀 Teepresso Backend API listening on port ${portToTry}`);
+    
+    // Asynchronously initialize database in background so port binding is instant!
+    setTimeout(() => {
+      initNeonDatabase().catch(err => console.error('Background DB initialization error:', err));
+    }, 100);
+  });
+
+  srv.on('error', (err: any) => {
+    if (err.code === 'EADDRINUSE') {
+      const nextPort = Number(portToTry) + 1;
+      console.warn(`⚠️ Port ${portToTry} is currently busy or reserved. Automatically trying port ${nextPort}...`);
+      startServer(nextPort);
+    } else {
+      console.error('Server error:', err);
+    }
+  });
+
+  return srv;
+};
+
+const server = startServer(Number(config.port));

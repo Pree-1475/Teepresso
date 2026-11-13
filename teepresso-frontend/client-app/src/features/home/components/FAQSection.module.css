@@ -1,13 +1,19 @@
 .section {
-  padding: var(--spacing-16) 0;
+  padding: 42px 0 48px 0;
   background-color: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
+}
+
+@media (max-width: 768px) {
+  .section {
+    padding: 28px 0 34px 0;
+  }
 }
 
 .wrapper {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-12);
+  gap: 28px;
 }
 
 @media (min-width: 1024px) {

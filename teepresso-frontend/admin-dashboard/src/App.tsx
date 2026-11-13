@@ -11,6 +11,7 @@ import { MockupsQueuePage } from '@/features/mockups/MockupsQueuePage';
 import { ProductsAdminPage } from '@/features/products/ProductsAdminPage';
 import { AddEditProductPage } from '@/features/products/AddEditProductPage';
 import { StockOverviewPage } from '@/features/products/StockOverviewPage';
+import { CombosAdminPage } from '@/features/combos/CombosAdminPage';
 import { CustomersAdminPage } from '@/features/customers/CustomersAdminPage';
 import { AnalyticsPage } from '@/features/analytics/AnalyticsPage';
 import { InventoryPage } from '@/features/inventory/InventoryPage';
@@ -37,6 +38,7 @@ function AnimatedRoutes() {
         <Route path="/products" element={<ProductsAdminPage />} />
         <Route path="/products/add" element={<AddEditProductPage />} />
         <Route path="/products/edit/:id" element={<AddEditProductPage />} />
+        <Route path="/combos" element={<CombosAdminPage />} />
         <Route path="/stock-overview" element={<StockOverviewPage />} />
         <Route path="/snippets" element={<SnippetsDashboardPage />} />
         <Route path="/snippets/categories" element={<CategoriesSnippetPage />} />
