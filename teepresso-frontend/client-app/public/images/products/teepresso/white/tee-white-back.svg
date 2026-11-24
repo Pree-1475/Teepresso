@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 560" fill="none">
+  <defs>
+    <filter id="softShadowBack" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="18" stdDeviation="16" flood-color="#482719" flood-opacity="0.08"/>
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000000" flood-opacity="0.05"/>
+    </filter>
+    <linearGradient id="backBodyLight" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.35"/>
+      <stop offset="50%" stop-color="#FFFFFF" stop-opacity="0.0"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.09"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Ground contact shadow -->
+  <ellipse cx="250" cy="510" rx="130" ry="14" fill="#3D261A" fill-opacity="0.12"/>
+  <ellipse cx="250" cy="508" rx="80" ry="8" fill="#3D261A" fill-opacity="0.08"/>
+
+  <g filter="url(#softShadowBack)">
+    <!-- Base Fabric Silhouettes -->
+    <path id="fabric-base-back" class="garment-color-target"
+      d="M138 152 
+         L76 178 L52 232 L72 244 L86 234 L114 246 
+         L102 444 C102 452 110 456 120 456 
+         L380 456 C390 456 398 452 398 444 
+         L386 246 L414 234 L428 244 L448 232 L424 178 
+         L362 152 
+         C332 144 300 136 250 136 
+         C200 136 168 144 138 152 Z" 
+      fill="#F8F6F4"/>
+
+    <!-- High back collar line -->
+    <path d="M192 148 C210 138 230 136 250 136 C270 136 290 138 308 148 C290 156 270 158 250 158 C230 158 210 156 192 148 Z" 
+      fill="#ECE8E4" stroke="#DCD6D0" stroke-width="1.2"/>
+
+    <!-- Horizontal back yoke seam across shoulders -->
+    <path d="M138 152 C180 178 220 184 250 184 C280 184 320 178 362 152" 
+      stroke="#DDD6CF" stroke-width="1.2" stroke-dasharray="3 1.5"/>
+
+    <!-- Shading & Fold Overlays -->
+    <path d="M114 246 L102 444 C102 452 110 456 120 456 L150 456 L140 320 L126 250 Z" 
+      fill="#000000" fill-opacity="0.04"/>
+    <path d="M386 246 L398 444 C398 452 390 456 380 456 L350 456 L360 320 L374 250 Z" 
+      fill="#000000" fill-opacity="0.05"/>
+
+    <path d="M138 152 L114 246 L102 444 C102 452 110 456 120 456 L380 456 C390 456 398 452 398 444 L386 246 L362 152 Z" 
+      fill="url(#backBodyLight)"/>
+
+    <!-- Center back spine drape line -->
+    <path d="M250 184 L250 452" stroke="#000000" stroke-opacity="0.04" stroke-width="2.5" fill="none"/>
+    <path d="M246 184 L246 452" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="4" fill="none"/>
+
+    <!-- Bottom Hem Double Stitch -->
+    <path d="M106 448 L394 448" stroke="#DDD6CF" stroke-width="1.2" stroke-dasharray="3 1.5"/>
+    <path d="M106 451 L394 451" stroke="#E8E2DC" stroke-width="1" stroke-dasharray="3 1.5"/>
+
+    <!-- Sleeve Hem Seams -->
+    <path d="M54 228 L74 240" stroke="#DDD6CF" stroke-width="1.2" stroke-dasharray="2.5 1"/>
+    <path d="M446 228 L426 240" stroke="#DDD6CF" stroke-width="1.2" stroke-dasharray="2.5 1"/>
+
+    <!-- Subtle Silhouette Edge Stroke -->
+    <path d="M138 152 
+             L76 178 L52 232 L72 244 L86 234 L114 246 
+             L102 444 C102 452 110 456 120 456 
+             L380 456 C390 456 398 452 398 444 
+             L386 246 L414 234 L428 244 L448 232 L424 178 
+             L362 152" 
+      stroke="#D6CEC6" stroke-width="1.2" stroke-linejoin="round" fill="none"/>
+  </g>
+</svg>

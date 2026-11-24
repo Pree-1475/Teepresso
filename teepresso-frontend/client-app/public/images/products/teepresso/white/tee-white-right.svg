@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 560" fill="none">
+  <defs>
+    <filter id="softShadowSideR" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="18" stdDeviation="16" flood-color="#482719" flood-opacity="0.08"/>
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000000" flood-opacity="0.05"/>
+    </filter>
+  </defs>
+
+  <ellipse cx="250" cy="510" rx="90" ry="12" fill="#3D261A" fill-opacity="0.12"/>
+
+  <g filter="url(#softShadowSideR)">
+    <!-- Right side profile base (mirrored) -->
+    <path id="fabric-base-right" class="garment-color-target"
+      d="M290 148 L362 174 L382 226 L362 238 L348 228 L312 234 L320 444 C320 452 312 456 302 456 L190 456 C180 456 172 452 172 444 L180 234 L164 218 L152 224 L140 216 L158 174 L200 152 C224 142 264 140 290 148 Z" 
+      fill="#F8F6F4"/>
+
+    <!-- Right sleeve full profile -->
+    <path d="M290 148 L362 174 L382 226 L362 238 L348 228 L312 234 Z" fill="#F0ECE8"/>
+    <path d="M358 176 L378 224 L364 232 L350 224 Z" fill="#FFFFFF" fill-opacity="0.25"/>
+
+    <!-- Side seam line -->
+    <path d="M246 234 L246 454" stroke="#DDD6CF" stroke-width="1.2" stroke-dasharray="3 1.5"/>
+
+    <!-- Collar side view -->
+    <path d="M276 146 C260 138 234 138 216 146 C224 154 248 156 264 154 Z" fill="#ECE8E4" stroke="#DCD6D0" stroke-width="1"/>
+
+    <!-- Bottom Hem -->
+    <path d="M174 448 L318 448" stroke="#DDD6CF" stroke-width="1.2" stroke-dasharray="3 1.5"/>
+    <path d="M174 451 L318 451" stroke="#E8E2DC" stroke-width="1" stroke-dasharray="3 1.5"/>
+
+    <!-- Outer stroke -->
+    <path d="M290 148 L362 174 L382 226 L362 238 L348 228 L312 234 L320 444 C320 452 312 456 302 456 L190 456 C180 456 172 452 172 444 L180 234" stroke="#D6CEC6" stroke-width="1.2" fill="none"/>
+  </g>
+</svg>

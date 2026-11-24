@@ -1,8 +1,17 @@
 import React from 'react';
+import { useLocation } from 'react-router-dom';
 import styles from './AnnouncementBar.module.css';
 import { useStorefront } from '@/common/context/StorefrontContext';
+
 export function AnnouncementBar() {
   const { storefrontMode } = useStorefront();
+  const location = useLocation();
+
+  // Reference A shows the clean editorial studio page without an announcement bar on product customization
+  if (location.pathname.startsWith('/product/')) {
+    return null;
+  }
+
   const content = storefrontMode === 'FESTIVE' ? (
     <>
       <span className={styles.diamond}>✦</span> FESTIVE MODE: Custom Kurtas for Every Crew. Bulk Orders • Special Pricing • On-time Delivery <span className={styles.diamond}>✦</span>

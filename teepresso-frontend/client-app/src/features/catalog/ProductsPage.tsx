@@ -153,11 +153,23 @@ export function ProductsPage() {
                     className={styles.productImg}
                     loading="lazy"
                   />
+                  <span className={styles.cardCta}>Customise <ArrowRight size={13} /></span>
                 </div>
 
                 <div className={styles.cardBody}>
+                  <span className={styles.productCategory}>{product.category}</span>
                   <h2 className={styles.productTitle}>{product.name}</h2>
-                  <span className={styles.productPriceText}>From ₹{product.startingPrice}</span>
+                  <div className={styles.cardMeta}>
+                    <span className={styles.productPriceText}>From <strong>₹{product.startingPrice}</strong></span>
+                    {Array.isArray(product.colors) && product.colors.length > 0 && (
+                      <span className={styles.cardColours} aria-label={`${product.colors.length} colours`}>
+                        {product.colors.slice(0, 5).map(hex => (
+                          <i key={hex} style={{ backgroundColor: hex }} />
+                        ))}
+                        {product.colors.length > 5 && <em>+{product.colors.length - 5}</em>}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </Link>
             ))}

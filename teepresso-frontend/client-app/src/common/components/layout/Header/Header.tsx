@@ -111,9 +111,6 @@ export function Header() {
                 Festive <span className={styles.newBadge}>New</span>
               </Link>
             )}
-            <Link href="/fabric-guide" className={`${styles.navLink} ${pathname === '/fabric-guide' ? styles.activeLink : ''}`}>
-              Fabric & Printing
-            </Link>
           </div>
 
           {/* Mobile Hamburger Menu (Only on Product Page) */}

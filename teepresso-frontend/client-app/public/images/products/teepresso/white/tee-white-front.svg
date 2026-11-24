@@ -1,0 +1,127 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 560" fill="none">
+  <defs>
+    <!-- Soft drop shadow -->
+    <filter id="softShadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="18" stdDeviation="16" flood-color="#482719" flood-opacity="0.08"/>
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000000" flood-opacity="0.05"/>
+    </filter>
+    <!-- Fabric gradient highlights -->
+    <linearGradient id="bodyLight" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.4"/>
+      <stop offset="45%" stop-color="#FFFFFF" stop-opacity="0.0"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.08"/>
+    </linearGradient>
+    <linearGradient id="sleeveLightL" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.12"/>
+    </linearGradient>
+    <linearGradient id="sleeveLightR" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.12"/>
+    </linearGradient>
+    <linearGradient id="neckDepth" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#000000" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.05"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Ground contact shadow -->
+  <ellipse cx="250" cy="510" rx="130" ry="14" fill="#3D261A" fill-opacity="0.12"/>
+  <ellipse cx="250" cy="508" rx="80" ry="8" fill="#3D261A" fill-opacity="0.08"/>
+
+  <!-- Garment Group with Filter -->
+  <g filter="url(#softShadow)">
+    <!-- Base Fabric Silhouettes -->
+    <!-- Torso and sleeves joined base -->
+    <path id="fabric-base" class="garment-color-target"
+      d="M138 152 
+         L76 178 L52 232 L72 244 L86 234 L114 246 
+         L102 444 C102 452 110 456 120 456 
+         L380 456 C390 456 398 452 398 444 
+         L386 246 L414 234 L428 244 L448 232 L424 178 
+         L362 152 
+         C332 150 310 128 250 128 
+         C190 128 168 150 138 152 Z" 
+      fill="#F8F6F4"/>
+
+    <!-- Inside back neck hole -->
+    <path d="M192 148 C210 132 230 128 250 128 C270 128 290 132 308 148 C288 158 268 162 250 162 C232 162 212 158 192 148 Z" 
+      fill="url(#neckDepth)"/>
+    
+    <!-- Shading & Fold Overlays -->
+    <!-- Natural side torso folds -->
+    <path d="M114 246 L102 444 C102 452 110 456 120 456 L150 456 L140 320 L126 250 Z" 
+      fill="#000000" fill-opacity="0.04"/>
+    <path d="M386 246 L398 444 C398 452 390 456 380 456 L350 456 L360 320 L374 250 Z" 
+      fill="#000000" fill-opacity="0.05"/>
+    
+    <!-- Left underarm fold -->
+    <path d="M114 246 C125 270 132 305 130 350 C128 390 120 425 116 448" 
+      stroke="#000000" stroke-opacity="0.08" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+    
+    <!-- Right underarm fold -->
+    <path d="M386 246 C375 270 368 305 370 350 C372 390 380 425 384 448" 
+      stroke="#000000" stroke-opacity="0.08" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+    
+    <!-- Sleeve folds and depth -->
+    <path d="M76 178 L52 232 L72 244 L86 234 L114 246 Z" fill="url(#sleeveLightL)"/>
+    <path d="M424 178 L448 232 L428 244 L414 234 L386 246 Z" fill="url(#sleeveLightR)"/>
+    
+    <path d="M74 210 C70 220 68 230 68 236" stroke="#000000" stroke-opacity="0.12" stroke-width="1.5" fill="none"/>
+    <path d="M426 210 C430 220 432 230 432 236" stroke="#000000" stroke-opacity="0.12" stroke-width="1.5" fill="none"/>
+
+    <!-- Body overall soft gradient lighting -->
+    <path d="M138 152 L114 246 L102 444 C102 452 110 456 120 456 L380 456 C390 456 398 452 398 444 L386 246 L362 152 Z" 
+      fill="url(#bodyLight)"/>
+
+    <!-- Subtle vertical cotton drape lines -->
+    <path d="M175 168 C165 240 160 340 168 450" stroke="#000000" stroke-opacity="0.03" stroke-width="6" fill="none"/>
+    <path d="M325 168 C335 240 340 340 332 450" stroke="#000000" stroke-opacity="0.035" stroke-width="6" fill="none"/>
+    <path d="M250 174 L250 454" stroke="#FFFFFF" stroke-opacity="0.25" stroke-width="14" fill="none"/>
+
+    <!-- Collar / Neckline Ribbing -->
+    <!-- Collar Outer band -->
+    <path d="M188 150 C206 128 228 122 250 122 C272 122 294 128 312 150 C294 170 272 176 250 176 C228 176 206 170 188 150 Z" 
+      fill="#ECE8E4" stroke="#DCD6D0" stroke-width="1.2"/>
+    <!-- Collar Inner cut -->
+    <path d="M196 150 C212 136 230 132 250 132 C270 132 288 136 304 150 C288 165 270 170 250 170 C230 170 212 165 196 150 Z" 
+      fill="#F5F2EF"/>
+
+    <!-- Fine Ribbing texture stitches on collar -->
+    <g stroke="#C8C2BA" stroke-width="0.8" opacity="0.65">
+      <line x1="216" y1="140" x2="219" y2="147"/>
+      <line x1="228" y1="135" x2="230" y2="143"/>
+      <line x1="240" y1="133" x2="241" y2="141"/>
+      <line x1="250" y1="132" x2="250" y2="140"/>
+      <line x1="260" y1="133" x2="259" y2="141"/>
+      <line x1="272" y1="135" x2="270" y2="143"/>
+      <line x1="284" y1="140" x2="281" y2="147"/>
+      <line x1="220" y1="160" x2="223" y2="167"/>
+      <line x1="234" y1="164" x2="235" y2="171"/>
+      <line x1="250" y1="166" x2="250" y2="174"/>
+      <line x1="266" y1="164" x2="265" y2="171"/>
+      <line x1="280" y1="160" x2="277" y2="167"/>
+    </g>
+
+    <!-- Dropped Shoulder Seams -->
+    <path d="M138 152 L188 150" stroke="#DDD6CF" stroke-width="1.4" stroke-dasharray="3 1.5"/>
+    <path d="M362 152 L312 150" stroke="#DDD6CF" stroke-width="1.4" stroke-dasharray="3 1.5"/>
+    
+    <!-- Sleeve Hem Seams -->
+    <path d="M54 228 L74 240" stroke="#DDD6CF" stroke-width="1.2" stroke-dasharray="2.5 1"/>
+    <path d="M446 228 L426 240" stroke="#DDD6CF" stroke-width="1.2" stroke-dasharray="2.5 1"/>
+
+    <!-- Bottom Hem Double Stitch -->
+    <path d="M106 448 L394 448" stroke="#DDD6CF" stroke-width="1.2" stroke-dasharray="3 1.5"/>
+    <path d="M106 451 L394 451" stroke="#E8E2DC" stroke-width="1" stroke-dasharray="3 1.5"/>
+
+    <!-- Subtle Silhouette Edge Stroke -->
+    <path d="M138 152 
+             L76 178 L52 232 L72 244 L86 234 L114 246 
+             L102 444 C102 452 110 456 120 456 
+             L380 456 C390 456 398 452 398 444 
+             L386 246 L414 234 L428 244 L448 232 L424 178 
+             L362 152" 
+      stroke="#D6CEC6" stroke-width="1.2" stroke-linejoin="round" fill="none"/>
+  </g>
+</svg>

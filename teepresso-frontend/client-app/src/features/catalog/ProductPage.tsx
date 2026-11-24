@@ -1,847 +1,1553 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useStorefront } from '@/common/context/StorefrontContext';
-import { useCart, SizeQtyMap, ArtworkData, MockupState } from '@/features/cart/context/CartContext';
+import { useCart, SizeQtyMap, ArtworkData } from '@/features/cart/context/CartContext';
 import styles from './ProductPage.module.css';
-import { ShoppingBag, ArrowLeft, UploadCloud, ShieldCheck, Box, HelpCircle, ChevronDown, ChevronUp, Bookmark, Sparkles, Check, ChevronLeft, ChevronRight, Mic } from 'lucide-react';
+import {
+  UploadCloud, Type, Smile, LayoutGrid, ChevronRight,
+  Search, RotateCcw, RotateCw, ZoomIn, ZoomOut,
+  Sparkles, Gem, Feather, Shirt, Mic, HelpCircle, ChevronDown,
+  ShoppingBag, Heart, Check, Plus, Minus, Info, Truck, Printer, Zap, RefreshCw,
+  Pencil, Scan, Square, Play, Pause, Trash2
+} from 'lucide-react';
 import { API_BASE_URL } from '@/common/config/api';
-import { MockupCanvasEditor } from './components/MockupCanvasEditor';
-import { VoiceNoteRecorder } from '@/features/checkout/components/VoiceNoteRecorder';
+import { PRODUCTS_CATALOG } from './data/productsData';
 
-interface ColorSnippet {
-  id: string;
-  name: string;
-  hex: string;
-}
-
-interface SizeSnippet {
-  id: string;
-  name: string;
-  category: 'Kids Sizes' | 'Adult Standard' | 'Adult Plus (Special)';
-}
-
-interface PatternSnippet {
-  id: string;
-  name: string;
-  image: string;
-  category?: string;
-}
-
-interface PriceTier {
-  minQty: number;
-  price: number;
-}
+/* ---- Types ---- */
+interface ColorSnippet { id: string; name: string; hex: string; }
+interface SizeSnippet { id: string; name: string; category: string; }
 
 interface ProductItem {
-  id: string;
-  name: string;
-  category: string;
-  shortDesc?: string;
-  startingPrice: number;
-  priceRange?: string;
-  image: string;
+  id: string; name: string; category: string; shortDesc?: string;
+  startingPrice: number; priceRange?: string; image: string;
   gallery?: string[];
-  colors?: string[];
-  sizes?: string[];
-  patterns?: string[];
-  tiers?: PriceTier[];
-  requiresSizes?: boolean;
-  requiresColors?: boolean;
-  requiresPatterns?: boolean;
-  requiresMockup?: boolean;
+  colors?: string[];          // hex list chosen by admin
+  sizes?: string[];           // size names chosen by admin
+  popularFor?: string;
+  tiers?: { minQty: number; price: number }[];
+  requiresSizes?: boolean; requiresColors?: boolean; requiresMockup?: boolean;
   applyVolumeDiscount?: boolean;
 }
 
-const defaultSizes: SizeQtyMap = { XS: 0, S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, '4XL': 0, '5XL': 0, '6XL': 0 };
+type GarmentView = 'front' | 'back' | 'left' | 'right';
+type Placement = 'centre_chest' | 'left_chest' | 'right_chest' | 'full_front' | 'back' | 'left_sleeve' | 'right_sleeve';
 
+interface PlacementRegion {
+  view: GarmentView;
+  xPct: number;  // center x as % of preview width
+  yPct: number;  // center y as % of preview height
+  wPct: number;  // width as % of preview width
+  hPct: number;  // height as % of preview height
+  label: string;
+}
+
+const PLACEMENT_REGIONS: Record<Placement, PlacementRegion> = {
+  centre_chest: { view: 'front', xPct: 50, yPct: 41, wPct: 30, hPct: 30, label: 'Centre Chest' },
+  left_chest:   { view: 'front', xPct: 62, yPct: 34, wPct: 18, hPct: 18, label: 'Left Chest' },
+  right_chest:  { view: 'front', xPct: 38, yPct: 34, wPct: 18, hPct: 18, label: 'Right Chest' },
+  full_front:   { view: 'front', xPct: 50, yPct: 48, wPct: 44, hPct: 44, label: 'Full Front' },
+  back:         { view: 'back',  xPct: 50, yPct: 44, wPct: 36, hPct: 36, label: 'Back' },
+  left_sleeve:  { view: 'left',  xPct: 50, yPct: 36, wPct: 18, hPct: 18, label: 'Left Sleeve' },
+  right_sleeve: { view: 'right', xPct: 50, yPct: 36, wPct: 18, hPct: 18, label: 'Right Sleeve' },
+};
+
+const VIEW_DEFAULT_PLACEMENT: Record<GarmentView, Placement> = {
+  front: 'centre_chest',
+  back: 'back',
+  left: 'left_sleeve',
+  right: 'right_sleeve',
+};
+
+/* ---- Garment PNGs for the 4 views (background-removed photography) ---- */
+const GARMENT_ASSETS: Record<GarmentView, string> = {
+  front: '/images/products/teepresso/white/tee-white-front.png',
+  back:  '/images/products/teepresso/white/tee-white-back.png',
+  left:  '/images/products/teepresso/white/tee-white-left.png',
+  right: '/images/products/teepresso/white/tee-white-right.png',
+};
+
+/* ---- View Thumbnails (Direct from reference screenshot) ---- */
+const VIEW_THUMBNAILS: Record<GarmentView, string> = {
+  front: '/images/products/teepresso/white/thumb-front.png',
+  back:  '/images/products/teepresso/white/thumb-back.png',
+  left:  '/images/products/teepresso/white/thumb-left.png',
+  right: '/images/products/teepresso/white/thumb-right.png',
+};
+
+/* ---- Sample Designs from Reference Screenshot ---- */
+interface UploadedItem {
+  id: string;
+  name: string;
+  previewUrl: string;
+  file: File | null;
+}
+
+const INITIAL_DESIGNS: UploadedItem[] = [
+  { id: 'sample-wave',  name: 'The Great Wave', previewUrl: '/images/ui/great-wave.png', file: null },
+  { id: 'sample-smile', name: 'Smiley Graphic', previewUrl: '/images/ui/smile.svg',      file: null },
+  { id: 'sample-star',  name: 'Star Graphic',   previewUrl: '/images/ui/star.svg',       file: null },
+];
+
+/* ---- 3 Size Categories (Exact specification from prompt & reference) ---- */
+interface SizeCategory { key: string; label: string; shortLabel: string; sizes: string[]; }
+// Offline fallback only — normally categories & sizes come from GET /sizes
+const FALLBACK_SIZE_CATEGORIES: SizeCategory[] = ['Kids Sizes', 'Adult Standard', 'Adult Plus (Special)'].map(label => ({
+  key: label, label, shortLabel: shortCategoryLabel(label), sizes: ['S', 'M', 'L', 'XL', 'XXL'],
+}));
+function shortCategoryLabel(label: string) {
+  return label.replace(/\(.*?\)/g, '').replace(/\bSizes?\b/i, '').trim() || label;
+}
+
+/* ---- Product Accordions ---- */
+const STATIC_ACCORDIONS = [
+  {
+    id: 'care',
+    title: 'Care Instructions',
+    content: 'Machine wash cold inside-out with like colors. Do not iron directly on print. Tumble dry on low heat or hang dry in shade.'
+  },
+  {
+    id: 'shipping',
+    title: 'Shipping & Returns',
+    content: 'Standard dispatch in 3-5 business days. Free shipping across India. Quality guarantee: free reprint if any print defect occurs.'
+  },
+];
+
+/* ============================================================
+   MAIN PRODUCT CUSTOMIZATION STUDIO COMPONENT
+   ============================================================ */
 export function ProductPage() {
-  const { contactPhone, storefrontMode } = useStorefront();
+  const { contactPhone } = useStorefront();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { addToCart } = useCart();
-  
+
+  /* — Product data — */
   const [product, setProduct] = useState<ProductItem | null>(null);
-  const [activeColor, setActiveColor] = useState<string>('Default');
-  const [activePattern, setActivePattern] = useState<string>('Standard');
-  const [selectedImage, setSelectedImage] = useState<string>('');
-  const [matrixSizes, setMatrixSizes] = useState<Record<string, SizeQtyMap>>({});
-  const [quantity, setQuantity] = useState<number>(0);
-
-  // Live Database Snippets
-  const [allColors, setAllColors] = useState<ColorSnippet[]>([]);
-  const [allSizes, setAllSizes] = useState<SizeSnippet[]>([]);
-  const [allPatterns, setAllPatterns] = useState<PatternSnippet[]>([]);
-
-  const [designMode, setDesignMode] = useState<'none' | 'has_design' | 'need_help'>('none');
-  const [instructions, setInstructions] = useState('');
-  const [voiceNote, setVoiceNote] = useState<string | null>(null);
-  const [voiceNoteDuration, setVoiceNoteDuration] = useState<number>(0);
-  
-  const [artwork, setArtwork] = useState<ArtworkData>({
-    file: null,
-    previewUrl: '',
-    mode: 'none',
-    instructions: '',
-    placements: {}
-  });
-
-  const [mockup, setMockup] = useState<MockupState>({
-    activeView: 'front',
-    activePlacementId: 'front',
-    frontTransform: { x: 0, y: 0, scale: 1, rotation: 0 },
-    backTransform: { x: 0, y: 0, scale: 1, rotation: 0 },
-    designerAssistance: false,
-  });
-
-  const [isMockupOpen, setIsMockupOpen] = useState(false);
-  const [isArtworkPopoverOpen, setIsArtworkPopoverOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  /* — Live database metadata snippets — */
+  const [allColors, setAllColors] = useState<ColorSnippet[]>([]);
+  const [allSizes, setAllSizes] = useState<SizeSnippet[]>([]);
 
-  // Parallel Unified Fetch (0 Hardcoding, 100% DB Dynamic)
+  /* — Studio Customization State (Source of Truth) — */
+  const [workflowTab, setWorkflowTab] = useState<'design' | 'product'>(
+    () => (new URLSearchParams(window.location.search).get('tab') === 'design' ? 'design' : 'product')
+  );
+  const [activeView, setActiveView] = useState<GarmentView>('front');
+  const [activeColour, setActiveColour] = useState<string>('#FFFFFF');
+  const [activeColourName, setActiveColourName] = useState<string>('White');
+  const [zoomLevel, setZoomLevel] = useState<number>(100);
+
+  /* — Uploads & Artwork State — */
+  const [uploadedDesigns, setUploadedDesigns] = useState<UploadedItem[]>(INITIAL_DESIGNS);
+  const [activeDesignId, setActiveDesignId] = useState<string>('sample-wave');
+  const [selectedPlacement, setSelectedPlacement] = useState<Placement>('centre_chest');
+
+  const [artwork, setArtwork] = useState<ArtworkData>({
+    file: null,
+    previewUrl: '/images/ui/great-wave.png',
+    mode: 'has_design',
+    instructions: '',
+    placements: {
+      centre_chest: {
+        placementId: 'centre_chest',
+        file: null,
+        previewUrl: '/images/ui/great-wave.png',
+        x: 0,
+        y: 0,
+        scale: 1,
+        rotation: 0,
+      }
+    }
+  });
+
+  /* — Size & Quantity Configuration — */
+  // Unset = open: every size category is expanded when the page loads
+  const [openSizeCategories, setOpenSizeCategories] = useState<Record<string, boolean>>({});
+  // Quantity per size, keyed `${categoryName}:${size}` so Kids M and Adult M stay separate
+  const [sizeQty, setSizeQty] = useState<Record<string, number>>({});
+  const seededDefaultRef = useRef(false);
+
+  /* — Voice Note State — */
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordingSeconds, setRecordingSeconds] = useState(0);
+  const [voiceAudioUrl, setVoiceAudioUrl] = useState<string | null>(null);
+  const [isPlayingAudio, setIsPlayingAudio] = useState(false);
+  const [voiceNoteBase64, setVoiceNoteBase64] = useState<string | null>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const audioTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const audioElementRef = useRef<HTMLAudioElement | null>(null);
+
+  /* — UI States — */
+  const [openAccordions, setOpenAccordions] = useState<Record<string, boolean>>({});
+  const [saveSuccess, setSaveSuccess] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const canvasRef = useRef<HTMLDivElement>(null);
+
+  /* ---- Data Loading: DB fetch with Catalog fallback ---- */
   useEffect(() => {
     if (!id) return;
     let isMounted = true;
 
-    const loadAllProductData = async () => {
+    const loadData = async () => {
       setLoading(true);
       setError(null);
 
       try {
-        const [prodRes, colRes, sizeRes, patRes] = await Promise.all([
+        const [prodRes, colRes, sizeRes] = await Promise.all([
           fetch(`${API_BASE_URL}/products/${id}`).then(r => r.json()).catch(() => null),
           fetch(`${API_BASE_URL}/colors`).then(r => r.json()).catch(() => null),
           fetch(`${API_BASE_URL}/sizes`).then(r => r.json()).catch(() => null),
-          fetch(`${API_BASE_URL}/patterns`).then(r => r.json()).catch(() => null)
         ]);
 
         if (!isMounted) return;
 
-        // Populate database snippets
         if (colRes?.success && Array.isArray(colRes.colors)) setAllColors(colRes.colors);
         if (sizeRes?.success && Array.isArray(sizeRes.sizes)) setAllSizes(sizeRes.sizes);
-        if (patRes?.success && Array.isArray(patRes.patterns)) setAllPatterns(patRes.patterns);
 
         let prod: any = null;
         if (prodRes?.success && prodRes?.product) {
           prod = prodRes.product;
         } else {
-          // Fallback fetch catalog
-          const catRes = await fetch(`${API_BASE_URL}/products`);
-          const catData = await catRes.json();
-          if (catData?.success && Array.isArray(catData.products) && catData.products.length > 0) {
-            const targetId = id.toLowerCase().trim();
-            prod = catData.products.find((p: any) => {
-              const pId = (p.id || '').toLowerCase();
-              const pName = (p.name || '').toLowerCase().replace(/[^a-z0-9]/g, '-');
-              return pId === targetId || pName.includes(targetId) || targetId.includes(pId);
-            }) || catData.products[0];
-          }
+          // Catalog match
+          const local = PRODUCTS_CATALOG.find(p => p.id === id) || PRODUCTS_CATALOG[0];
+          prod = { ...local };
         }
 
-        if (prod && isMounted) {
-          if (storefrontMode === 'STANDARD' && (prod.category || '').toLowerCase().includes('kurta')) {
-            navigate('/products', { replace: true });
-            return;
-          }
-
-          let parsedColors: string[] = [];
-          if (Array.isArray(prod.colors)) parsedColors = prod.colors;
-          else if (typeof prod.colors === 'string') {
-            try { parsedColors = JSON.parse(prod.colors); } catch(e) {}
-          }
-
-          let parsedPatterns: string[] = [];
-          if (Array.isArray(prod.patterns)) parsedPatterns = prod.patterns;
-          else if (typeof prod.patterns === 'string') {
-            try { parsedPatterns = JSON.parse(prod.patterns); } catch(e) {}
-          }
-
-          let parsedSizes: string[] = [];
-          if (Array.isArray(prod.sizes)) parsedSizes = prod.sizes;
-          else if (typeof prod.sizes === 'string') {
-            try { parsedSizes = JSON.parse(prod.sizes); } catch(e) {}
-          }
-
-          const safeProduct: ProductItem = {
-            ...prod,
-            colors: parsedColors,
-            patterns: parsedPatterns,
-            sizes: parsedSizes,
-            startingPrice: Number(prod.startingPrice || 0)
-          };
-
-          setProduct(safeProduct);
-          setSelectedImage(safeProduct.image || '');
-
-          if (parsedColors.length > 0) setActiveColor(parsedColors[0]);
-          if (parsedPatterns.length > 0) setActivePattern(parsedPatterns[0]);
-        } else if (isMounted) {
-          setError('Requested product could not be loaded.');
+        if (prod && isMounted) setProduct(prod);
+        else if (isMounted) setError('Product not found');
+      } catch {
+        if (isMounted) {
+          const local = PRODUCTS_CATALOG.find(p => p.id === id) || PRODUCTS_CATALOG[0];
+          setProduct({ ...local });
         }
-      } catch (err) {
-        console.error('Failed to load dynamic product data:', err);
-        if (isMounted) setError('Network error loading product specifications.');
       } finally {
         if (isMounted) setLoading(false);
       }
     };
 
-    loadAllProductData();
+    loadData();
     return () => { isMounted = false; };
   }, [id]);
 
-  const currentMatrixKey = `${activeColor || 'Default'}_${activePattern || 'Standard'}`;
-  const currentSizes = (matrixSizes && matrixSizes[currentMatrixKey]) ? matrixSizes[currentMatrixKey] : { ...defaultSizes };
+  /* ---- Computed Available Swatches ---- */
+  // Only the colours the admin enabled for THIS product (product.colors = hex list)
+  const swatches = useMemo(() => {
+    const productHexes = (product?.colors || []).filter(Boolean);
+    if (productHexes.length > 0) {
+      return productHexes.map(hex => {
+        const named = allColors.find(c => c.hex.toLowerCase() === hex.toLowerCase());
+        return { name: named?.name || hex.toUpperCase(), hex };
+      });
+    }
+    return [] as { name: string; hex: string }[];
+  }, [allColors, product]);
 
-  const updateSize = (sz: string, delta: number) => {
-    setMatrixSizes(prev => {
-      const currentMap = prev[currentMatrixKey] || { ...defaultSizes };
-      const currentVal = currentMap[sz] || 0;
-      const newVal = Math.max(0, currentVal + delta);
+  // Default to the product's first colour once loaded
+  useEffect(() => {
+    if (swatches.length === 0) {
+      if (product) { setActiveColour('#FFFFFF'); setActiveColourName('Standard'); }
+      return;
+    }
+    setActiveColour(swatches[0].hex);
+    setActiveColourName(swatches[0].name);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product?.id, swatches.length === 0]);
+
+  /* ---- Product photography (admin-uploaded: main image + gallery) ---- */
+  const productPhotos = useMemo(
+    () => [product?.image, ...(product?.gallery || [])].filter((u): u is string => !!u),
+    [product]
+  );
+  const usePhotos = productPhotos.length > 0;
+  const [activePhotoIdx, setActivePhotoIdx] = useState(0);
+  useEffect(() => { setActivePhotoIdx(0); }, [product?.id]);
+
+  /* ---- Size categories from backend (grouped by category, admin order) ---- */
+  // Only the sizes the admin enabled for THIS product (product.sizes = size names)
+  const productSizeNames: string[] | null = product?.sizes && product.sizes.length > 0 ? product.sizes : null;
+
+  const sizeCategories = useMemo<SizeCategory[]>(() => {
+    const enabled = (name: string) => !productSizeNames || productSizeNames.includes(name);
+    let cats: SizeCategory[];
+    if (allSizes.length === 0) {
+      cats = FALLBACK_SIZE_CATEGORIES.map(c => ({ ...c, sizes: c.sizes.filter(enabled) }));
+    } else {
+      const map = new Map<string, string[]>();
+      allSizes.forEach(sz => {
+        if (!enabled(sz.name)) return;
+        const cat = sz.category || 'Adult Standard';
+        if (!map.has(cat)) map.set(cat, []);
+        map.get(cat)!.push(sz.name);
+      });
+      cats = Array.from(map, ([label, sizes]) => ({ key: label, label, shortLabel: shortCategoryLabel(label), sizes }));
+    }
+    return cats.filter(c => c.sizes.length > 0);
+  }, [allSizes, productSizeNames]);
+
+  const defaultOpenKey = (sizeCategories.find(c => /adult/i.test(c.label)) || sizeCategories[0])?.key;
+
+  // Seed one default piece (Adult, L) once sizes have loaded
+  useEffect(() => {
+    if (seededDefaultRef.current || loading) return;
+    const cat = sizeCategories.find(c => c.key === defaultOpenKey);
+    if (!cat) return;
+    seededDefaultRef.current = true;
+    const size = cat.sizes.includes('L') ? 'L' : cat.sizes[0];
+    if (size) setSizeQty(prev => (Object.keys(prev).length ? prev : { [`${cat.key}:${size}`]: 1 }));
+  }, [sizeCategories, defaultOpenKey, loading]);
+
+  /* ---- Active Placement & Artwork ---- */
+  const activePlacementData = artwork.placements[selectedPlacement];
+  const activeRegion = PLACEMENT_REGIONS[selectedPlacement];
+
+  /* ---- View and Placement Selection Sync ---- */
+  const handleSelectView = useCallback((viewKey: GarmentView) => {
+    setActiveView(viewKey);
+    const currentPlacementView = PLACEMENT_REGIONS[selectedPlacement]?.view;
+    if (currentPlacementView !== viewKey) {
+      setSelectedPlacement(VIEW_DEFAULT_PLACEMENT[viewKey]);
+    }
+  }, [selectedPlacement]);
+
+  const handleSelectPlacement = useCallback((placementKey: Placement) => {
+    setSelectedPlacement(placementKey);
+    const targetView = PLACEMENT_REGIONS[placementKey].view;
+    if (activeView !== targetView) {
+      setActiveView(targetView);
+    }
+  }, [activeView]);
+
+  /* ---- Artwork interaction: move / scale / rotate (unified pointer events) ---- */
+  const artLayerRef = useRef<HTMLDivElement>(null);
+  const [imgAspect, setImgAspect] = useState<Record<string, number>>({});
+
+  const updateActivePlacement = useCallback((patch: Partial<{ x: number; y: number; scale: number; rotation: number }>) => {
+    const key = selectedPlacement;
+    setArtwork(prev => {
+      const cur = prev.placements[key];
+      if (!cur) return prev;
+      return { ...prev, placements: { ...prev.placements, [key]: { ...cur, ...patch } } };
+    });
+  }, [selectedPlacement]);
+
+  const startArtworkInteraction = (mode: 'move' | 'scale' | 'rotate') => (e: React.PointerEvent) => {
+    const cur = activePlacementData;
+    const layer = artLayerRef.current;
+    const frame = (e.currentTarget as HTMLElement).closest('[data-art-frame]') as HTMLElement | null;
+    if (!cur || !layer || !frame) return;
+    e.preventDefault();
+    e.stopPropagation();
+
+    const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
+    const layerRect = layer.getBoundingClientRect();
+    const fr = frame.getBoundingClientRect();
+    const cx = fr.left + fr.width / 2;
+    const cy = fr.top + fr.height / 2;
+    const startX = e.clientX;
+    const startY = e.clientY;
+    const startDist = Math.hypot(startX - cx, startY - cy) || 1;
+    const startAngle = Math.atan2(startY - cy, startX - cx);
+    const init = { x: cur.x, y: cur.y, scale: cur.scale || 1, rotation: cur.rotation || 0 };
+
+    const onMove = (ev: PointerEvent) => {
+      if (mode === 'move') {
+        updateActivePlacement({
+          x: clamp(init.x + ((ev.clientX - startX) / layerRect.width) * 100, -28, 28),
+          y: clamp(init.y + ((ev.clientY - startY) / layerRect.height) * 100, -28, 28),
+        });
+      } else if (mode === 'scale') {
+        const d = Math.hypot(ev.clientX - cx, ev.clientY - cy);
+        updateActivePlacement({ scale: clamp(Number((init.scale * (d / startDist)).toFixed(2)), 0.3, 2.5) });
+      } else {
+        let deg = init.rotation + ((Math.atan2(ev.clientY - cy, ev.clientX - cx) - startAngle) * 180) / Math.PI;
+        deg = ((deg % 360) + 360) % 360;
+        const snap = Math.round(deg / 15) * 15;
+        if (Math.abs(deg - snap) < 3) deg = snap % 360; // snap to 15° steps
+        updateActivePlacement({ rotation: Math.round(deg) });
+      }
+    };
+    const onUp = () => {
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+      window.removeEventListener('pointercancel', onUp);
+    };
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
+    window.addEventListener('pointercancel', onUp);
+  };
+
+  /* Frame size (in % of the placement box) that matches the image's real aspect ratio */
+  const getFrameSize = (url: string, region: PlacementRegion = activeRegion) => {
+    const imgA = imgAspect[url] || 1;
+    const boxA = region.wPct / region.hPct;
+    return imgA >= boxA
+      ? { w: 100, h: (boxA / imgA) * 100 }
+      : { w: (imgA / boxA) * 100, h: 100 };
+  };
+
+  /* ---- Scale and Rotate Adjusters ---- */
+  const handleAdjustScale = (delta: number) => {
+    setArtwork(prev => {
+      const cur = prev.placements[selectedPlacement];
+      if (!cur) return prev;
+      const newScale = Math.max(0.3, Math.min(2.5, Number(((cur.scale || 1) + delta).toFixed(2))));
       return {
         ...prev,
-        [currentMatrixKey]: {
-          ...currentMap,
-          [sz]: newVal
+        placements: {
+          ...prev.placements,
+          [selectedPlacement]: {
+            ...cur,
+            scale: newScale
+          }
         }
       };
     });
   };
 
-  const setSizeDirect = (sz: string, val: number) => {
-    setMatrixSizes(prev => {
-      const currentMap = prev[currentMatrixKey] || { ...defaultSizes };
-      const newVal = Math.max(0, isNaN(val) ? 0 : val);
+  const handleResetScale = () => {
+    setArtwork(prev => {
+      const cur = prev.placements[selectedPlacement];
+      if (!cur) return prev;
       return {
         ...prev,
-        [currentMatrixKey]: {
-          ...currentMap,
-          [sz]: newVal
+        placements: {
+          ...prev.placements,
+          [selectedPlacement]: {
+            ...cur,
+            scale: 1
+          }
         }
       };
     });
   };
 
-  const totalQty = product?.requiresSizes
-    ? Object.values(matrixSizes || {}).reduce((tot, map) => {
-        if (!map || typeof map !== 'object') return tot;
-        return tot + Object.values(map).reduce((s, v) => s + (v || 0), 0);
-      }, 0)
-    : (quantity || 0);
-
-  const getEffectivePrice = (qty: number) => {
-    const base = Number(product?.startingPrice || 0);
-    if (!product) return 0;
-    
-    // Use live database volume pricing tiers if configured on the product
-    if (Array.isArray(product.tiers) && product.tiers.length > 0) {
-      const sortedTiers = [...product.tiers].sort((a, b) => b.minQty - a.minQty);
-      const matchedTier = sortedTiers.find(t => qty >= t.minQty);
-      if (matchedTier) return Number(matchedTier.price);
-    }
-
-    if (product.applyVolumeDiscount) {
-      if (qty >= 150) return Math.round(base * 0.8);
-      if (qty >= 75) return Math.round(base * 0.9);
-    }
-    return base;
-  };
-
-  const calculateTotal = () => {
-    const unitPrice = getEffectivePrice(totalQty);
-    return totalQty * unitPrice;
-  };
-
-  const handleAddToCart = () => {
-    if (!product || totalQty <= 0) return;
-    const unitPrice = getEffectivePrice(totalQty);
-
-    const colorVariantsList: any[] = [];
-
-    if (product.requiresSizes && Object.keys(matrixSizes).length > 0) {
-      Object.entries(matrixSizes).forEach(([matrixKey, sizesMap]) => {
-        if (!sizesMap || typeof sizesMap !== 'object') return;
-        const mapTotal = Object.values(sizesMap).reduce((s, v) => s + (v || 0), 0);
-        if (mapTotal > 0) {
-          const parts = matrixKey.split('_');
-          const colName = parts[0] || activeColor || 'Default';
-          const patName = parts[1] || activePattern || 'Standard';
-
-          const colSnippet = allColors.find(c => c.name.toLowerCase() === colName.toLowerCase());
-          const hexVal = colSnippet?.hex || (colName.startsWith('#') ? colName : '#1a1a1a');
-
-          colorVariantsList.push({
-            id: `cv_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
-            color: colSnippet?.name || colName,
-            colorHex: hexVal,
-            pattern: patName !== 'Standard' ? patName : undefined,
-            sizes: sizesMap
-          });
+  const handleRotate = () => {
+    setArtwork(prev => {
+      const cur = prev.placements[selectedPlacement];
+      if (!cur) return prev;
+      const newRot = ((cur.rotation || 0) + 15) % 360;
+      return {
+        ...prev,
+        placements: {
+          ...prev.placements,
+          [selectedPlacement]: {
+            ...cur,
+            rotation: newRot
+          }
         }
-      });
-    }
-
-    if (colorVariantsList.length === 0) {
-      const colSnippet = allColors.find(c => c.name.toLowerCase() === activeColor.toLowerCase());
-      const hexVal = colSnippet?.hex || (activeColor.startsWith('#') ? activeColor : '#1a1a1a');
-
-      colorVariantsList.push({
-        id: `cv_${Date.now()}`,
-        color: colSnippet?.name || activeColor || 'Default',
-        colorHex: hexVal,
-        pattern: activePattern !== 'Standard' ? activePattern : undefined,
-        sizes: currentSizes
-      });
-    }
-
-    addToCart({
-      productId: product.id,
-      name: product.name,
-      category: product.category || 'Apparel',
-      pricePerUnit: unitPrice,
-      requiresSizes: !!product.requiresSizes,
-      requiresColors: !!product.requiresColors,
-      requiresMockup: !!product.requiresMockup,
-      applyVolumeDiscount: !!product.applyVolumeDiscount,
-      colorVariants: colorVariantsList,
-      artwork: {
-        file: artwork.file || null,
-        previewUrl: artwork.previewUrl || '',
-        mode: designMode,
-        instructions,
-        placements: artwork.placements || {},
-        voiceNote: voiceNote || null,
-        voiceNoteDuration: voiceNote ? voiceNoteDuration : null,
-      },
-      voiceNote: voiceNote || null,
-      voiceNoteDuration: voiceNote ? voiceNoteDuration : null,
+      };
     });
-
-    // Automatically opens CartDrawer in CartContext (No unwanted page redirection!)
   };
 
-  const handleGlobalFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
+  /* ---- Remove Artwork from Current Placement ---- */
+  const handleRemoveArtwork = () => {
+    setArtwork(prev => {
+      const newPlacements = { ...prev.placements };
+      delete newPlacements[selectedPlacement];
+      return {
+        ...prev,
+        placements: newPlacements
+      };
+    });
+  };
+
+  /* ---- Place Active Design on Current Placement ---- */
+  const handlePlaceCurrentDesign = () => {
+    const currentDesign = uploadedDesigns.find(d => d.id === activeDesignId) || uploadedDesigns[0];
+    if (!currentDesign) return;
+
+    setArtwork(prev => ({
+      ...prev,
+      file: currentDesign.file,
+      previewUrl: currentDesign.previewUrl,
+      mode: 'has_design',
+      placements: {
+        ...prev.placements,
+        [selectedPlacement]: {
+          placementId: selectedPlacement,
+          file: currentDesign.file,
+          previewUrl: currentDesign.previewUrl,
+          x: 0,
+          y: 0,
+          scale: 1,
+          rotation: 0
+        }
+      }
+    }));
+  };
+
+  /* ---- Upload Files Handling ---- */
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+
+    files.forEach(file => {
       const reader = new FileReader();
       reader.onloadend = () => {
         const previewUrl = reader.result as string;
-      setArtwork(prev => ({
+        const newDesign: UploadedItem = {
+          id: `design-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+          name: file.name,
+          previewUrl,
+          file
+        };
+
+        setUploadedDesigns(prev => [newDesign, ...prev]);
+        setActiveDesignId(newDesign.id);
+
+        setArtwork(prev => ({
+          ...prev,
+          file,
+          previewUrl,
+          mode: 'has_design',
+          placements: {
+            ...prev.placements,
+            [selectedPlacement]: {
+              placementId: selectedPlacement,
+              file,
+              previewUrl,
+              x: 0,
+              y: 0,
+              scale: 1,
+              rotation: 0,
+            }
+          }
+        }));
+      };
+      reader.readAsDataURL(file);
+    });
+
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  /* ---- Select from My Designs ---- */
+  const handleSelectDesign = (design: UploadedItem) => {
+    setActiveDesignId(design.id);
+    setArtwork(prev => {
+      const existing = prev.placements[selectedPlacement];
+      return {
         ...prev,
-        file,
-        previewUrl,
+        file: design.file,
+        previewUrl: design.previewUrl,
         mode: 'has_design',
         placements: {
           ...prev.placements,
-          front: {
-            placementId: 'front',
-            file,
-            previewUrl,
+          [selectedPlacement]: {
+            placementId: selectedPlacement,
+            file: design.file,
+            previewUrl: design.previewUrl,
+            x: existing?.x ?? 0,
+            y: existing?.y ?? 0,
+            scale: existing?.scale ?? 1,
+            rotation: existing?.rotation ?? 0,
+          }
+        }
+      };
+    });
+  };
+
+  /* ---- Colour Swatch Selection ---- */
+  const handleColourClick = (c: typeof swatches[0]) => {
+    setActiveColour(c.hex);
+    setActiveColourName(c.name);
+  };
+
+  /* ---- Zoom In / Out ---- */
+  const handleZoom = (delta: number) => {
+    setZoomLevel(prev => Math.max(70, Math.min(160, prev + delta)));
+  };
+
+  /* ---- Reset Transformations (Undo/Redo) ---- */
+  const handleResetTransform = () => {
+    setArtwork(prev => {
+      const current = prev.placements[selectedPlacement];
+      if (!current) return prev;
+      return {
+        ...prev,
+        placements: {
+          ...prev.placements,
+          [selectedPlacement]: {
+            ...current,
             x: 0,
             y: 0,
             scale: 1,
             rotation: 0
           }
         }
-      }));
-      setDesignMode('has_design');
-      setIsMockupOpen(true);
       };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  // Dynamically group sizes from database
-  const getGroupedSizesFromDb = () => {
-    if (allSizes.length === 0) {
-      return {
-        'Adult Standard': ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
-        'Adult Plus (Special)': ['3XL', '4XL', '5XL']
-      };
-    }
-
-    const groups: Record<string, string[]> = {};
-    allSizes.forEach(s => {
-      const cat = s.category || 'Adult Standard';
-      if (!groups[cat]) groups[cat] = [];
-      // If product restricts sizes, filter
-      if (!product?.sizes || product.sizes.length === 0 || product.sizes.includes(s.name)) {
-        groups[cat].push(s.name);
-      }
     });
-    return groups;
   };
 
-  const phoneStr = String(contactPhone || '919390771123').replace(/[^0-9]/g, '');
-  const formattedWaPhone = phoneStr.length === 10 ? `91${phoneStr}` : (phoneStr || '919390771123');
-  const waHelpUrl = `https://wa.me/${formattedWaPhone}?text=${encodeURIComponent(`Hi Teepresso Team! I need help with design for ${product?.name || 'custom apparel'}`)}`;
+  /* ---- Voice Note Recording Logic ---- */
+  const startRecording = async () => {
+    if (!navigator.mediaDevices?.getUserMedia) {
+      alert('Microphone access is not supported in this browser.');
+      return;
+    }
 
-  if (loading) {
-    return (
-      <div className={styles.pageWrapper} style={{ padding: '40px 0', minHeight: '80vh' }}>
-        <div className="container" style={{ maxWidth: '1100px', margin: '0 auto' }}>
-          <div style={{ width: '200px', height: '24px', backgroundColor: '#e5e7eb', borderRadius: '4px', marginBottom: '32px', animation: 'pulse 1.5s infinite' }}></div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '32px' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div style={{ width: '100%', height: '380px', backgroundColor: '#f3f4f6', borderRadius: '12px', animation: 'pulse 1.5s infinite' }}></div>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-              <div style={{ width: '100%', height: '120px', backgroundColor: '#f3f4f6', borderRadius: '8px' }}></div>
-              <div style={{ width: '100%', height: '220px', backgroundColor: '#f3f4f6', borderRadius: '8px' }}></div>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-              <div style={{ width: '100%', height: '180px', backgroundColor: '#f3f4f6', borderRadius: '8px' }}></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      audioChunksRef.current = [];
 
-  if (error || !product) {
-    return (
-      <div className={styles.pageWrapper} style={{ padding: '80px 0', textAlign: 'center' }}>
-        <div className="container" style={{ maxWidth: '600px', margin: '0 auto', backgroundColor: '#ffffff', border: '1px solid #e5e7eb', padding: '40px', borderRadius: '12px' }}>
-          <ShoppingBag size={48} color="#9ca3af" style={{ margin: '0 auto 16px auto' }} />
-          <h2 style={{ fontSize: '1.5rem', marginBottom: '8px', color: '#111827' }}>Product Unavailable</h2>
-          <p style={{ color: '#6b7280', marginBottom: '24px' }}>
-            {error || 'The requested product specs could not be loaded.'}
-          </p>
-          <button onClick={() => navigate('/products')} className="btn-primary" style={{ padding: '10px 20px', borderRadius: '6px', cursor: 'pointer' }}>
-            Return to Products Catalog
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data && event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+
+      mediaRecorder.onstop = () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        const url = URL.createObjectURL(audioBlob);
+        setVoiceAudioUrl(url);
+
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setVoiceNoteBase64(reader.result as string);
+        };
+        reader.readAsDataURL(audioBlob);
+
+        stream.getTracks().forEach(track => track.stop());
+      };
+
+      mediaRecorder.start();
+      setIsRecording(true);
+      setRecordingSeconds(0);
+
+      audioTimerRef.current = setInterval(() => {
+        setRecordingSeconds(s => s + 1);
+      }, 1000);
+    } catch {
+      alert('Microphone access was denied. Please allow microphone permissions in browser settings.');
+    }
+  };
+
+  const stopRecording = () => {
+    if (audioTimerRef.current) clearInterval(audioTimerRef.current);
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+      mediaRecorderRef.current.stop();
+    }
+    setIsRecording(false);
+  };
+
+  const deleteRecording = () => {
+    if (audioElementRef.current) audioElementRef.current.pause();
+    if (voiceAudioUrl) URL.revokeObjectURL(voiceAudioUrl);
+    setVoiceAudioUrl(null);
+    setVoiceNoteBase64(null);
+    setIsPlayingAudio(false);
+    setRecordingSeconds(0);
+  };
+
+  const toggleAudioPlayback = () => {
+    if (!audioElementRef.current) return;
+    if (isPlayingAudio) {
+      audioElementRef.current.pause();
+      setIsPlayingAudio(false);
+    } else {
+      audioElementRef.current.play()
+        .then(() => setIsPlayingAudio(true))
+        .catch(() => setIsPlayingAudio(false));
+    }
+  };
+
+  /* ---- Accordion Toggle ---- */
+  const toggleAccordion = (accId: string) => {
+    setOpenAccordions(prev => ({ ...prev, [accId]: !prev[accId] }));
+  };
+
+  /* ---- Size Category Toggle ---- */
+  const toggleSizeCategory = (catKey: string) => {
+    setOpenSizeCategories(prev => ({ ...prev, [catKey]: !(prev[catKey] ?? true) }));
+  };
+
+  /* ---- Add To Cart Action ---- */
+  const setQtyFor = (key: string, next: number) => {
+    setSizeQty(prev => {
+      const copy = { ...prev };
+      const v = Math.max(0, Math.min(9999, Math.floor(next) || 0));
+      if (v === 0) delete copy[key]; else copy[key] = v;
+      return copy;
+    });
+  };
+
+  /* Ordered list of selected sizes, e.g. [{ key:'kids:S', label:'Kids S', qty:5 }] */
+  const orderLines = useMemo(() => {
+    const lines: { key: string; label: string; qty: number }[] = [];
+    sizeCategories.forEach(cat => {
+      cat.sizes.forEach(sz => {
+        const key = `${cat.key}:${sz}`;
+        const qty = sizeQty[key] || 0;
+        if (qty > 0) lines.push({ key, label: `${cat.shortLabel} ${sz}`, qty });
+      });
+    });
+    return lines;
+  }, [sizeQty, sizeCategories]);
+
+  const categoryCount = (catKey: string) =>
+    (sizeCategories.find(c => c.key === catKey)?.sizes ?? [])
+      .reduce((sum, sz) => sum + (sizeQty[`${catKey}:${sz}`] || 0), 0);
+
+  const handleAddToCart = () => {
+    if (!product || totalPieces === 0) return;
+
+    const sizesMap: SizeQtyMap = {};
+    orderLines.forEach(l => { sizesMap[l.label] = l.qty; });
+    const quantity = totalPieces;
+
+    addToCart({
+      productId: product.id,
+      name: product.name,
+      category: product.category,
+      pricePerUnit: unitPrice, // tier price for this quantity
+      requiresSizes: product.requiresSizes ?? true,
+      requiresColors: product.requiresColors ?? true,
+      requiresMockup: product.requiresMockup ?? true,
+      applyVolumeDiscount: false, // tiers already applied in unitPrice
+      colorVariants: [{
+        id: `variant-${activeColour}`,
+        color: activeColourName,
+        colorHex: activeColour,
+        sizes: sizesMap,
+        quantity,
+      }],
+      artwork: {
+        ...artwork,
+        voiceNote: voiceNoteBase64,
+        voiceNoteDuration: recordingSeconds
+      },
+      voiceNote: voiceNoteBase64,
+      voiceNoteDuration: recordingSeconds
+    });
+  };
+
+  /* ---- Save Design Action ---- */
+  const handleSaveDesign = () => {
+    const payload = {
+      productId: product?.id,
+      colour: activeColour,
+      colourName: activeColourName,
+      view: activeView,
+      placement: selectedPlacement,
+      artwork,
+      sizes: Object.fromEntries(orderLines.map(l => [l.label, l.qty])),
+      quantity: totalPieces,
+      savedAt: new Date().toISOString(),
+    };
+
+    try {
+      const stored = JSON.parse(localStorage.getItem('teepresso_saved_designs') || '[]');
+      stored.unshift(payload);
+      localStorage.setItem('teepresso_saved_designs', JSON.stringify(stored.slice(0, 20)));
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 2400);
+    } catch {
+      // fallback
+    }
+  };
+
+  /* ---- WhatsApp Contact Us ---- */
+  const handleContactUs = () => {
+    const phone = contactPhone || '919390771123';
+    window.open(`https://wa.me/${phone.replace(/\D/g, '')}?text=Hi+Teepresso%2C+I+need+help+customizing+my+T-shirt.`, '_blank');
+  };
+
+  const productPrice = product?.startingPrice || 499;
+  const popularForTags = (product?.popularFor || '').split(',').map(t => t.trim()).filter(Boolean);
+  const totalPieces = orderLines.reduce((sum, l) => sum + l.qty, 0);
+  // Admin-defined quantity tiers: price per piece is the highest tier whose minQty is reached
+  const sortedTiers = useMemo(
+    () => [...(product?.tiers || [])].map(t => ({ minQty: Number(t.minQty), price: Number(t.price) })).sort((a, b) => a.minQty - b.minQty),
+    [product]
+  );
+  const unitPrice = sortedTiers.length === 0
+    ? productPrice
+    : ([...sortedTiers].reverse().find(t => totalPieces >= t.minQty)?.price ?? sortedTiers[0].price);
+  const nextTier = sortedTiers.find(t => t.minQty > totalPieces && t.price < unitPrice);
+  const accordions = [
+    ...(sortedTiers.length > 1 ? [{ id: 'bulk', title: 'Bulk Pricing', content: '' }] : []),
+    ...STATIC_ACCORDIONS,
+  ];
+  const estimatedTotal = totalPieces * unitPrice;
+  const fmt = (n: number) => `₹${n.toLocaleString('en-IN')}`;
+
+  return (
+    <div className={styles.studioPage}>
+      {/* Hidden File Upload Input */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileUpload}
+        accept="image/png, image/jpeg, image/webp, image/svg+xml"
+        multiple
+        style={{ display: 'none' }}
+        aria-label="Upload custom artwork"
+      />
+
+      {/* Hidden Audio Element for Voice Preview */}
+      {voiceAudioUrl && (
+        <audio
+          ref={audioElementRef}
+          src={voiceAudioUrl}
+          onEnded={() => setIsPlayingAudio(false)}
+        />
+      )}
+
+      {/* ── Mode switch: Product / Design ── */}
+      <div className={styles.workflowContainer}>
+        <div className={styles.workflowPill} role="tablist" aria-label="Product or design view">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={workflowTab === 'product'}
+            className={`${styles.tabItem} ${workflowTab === 'product' ? styles.tabItemActive : ''}`}
+            onClick={() => setWorkflowTab('product')}
+          >
+            <Shirt size={14} />
+            <span>Product</span>
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={workflowTab === 'design'}
+            className={`${styles.tabItem} ${workflowTab === 'design' ? styles.tabItemActive : ''}`}
+            onClick={() => setWorkflowTab('design')}
+          >
+            <Pencil size={14} />
+            <span>Design</span>
           </button>
         </div>
       </div>
-    );
-  }
 
-  const groupedSizes = getGroupedSizesFromDb();
-
-  return (
-    <div className={styles.pageWrapper}>
-      
-      {/* Top Stepper */}
-      <div className={styles.stepperContainer}>
-        <div className={styles.step}>
-          <div className={styles.stepNumActive}>1</div>
-          <span className={styles.stepTextActive}>Configure Specs</span>
-        </div>
-        <div className={styles.stepLine}></div>
-        <div className={styles.step}>
-          <div className={styles.stepNum}>2</div>
-          <span className={styles.stepText}>Size & Quantity</span>
-        </div>
-        <div className={styles.stepLine}></div>
-        <div className={styles.step}>
-          <div className={styles.stepNum}>3</div>
-          <span className={styles.stepText}>Upload Design</span>
-        </div>
-        <div className={styles.stepLine}></div>
-        <div className={styles.step}>
-          <div className={styles.stepNum}>4</div>
-          <span className={styles.stepText}>Add to Cart</span>
-        </div>
-      </div>
-
-      <div className={`${styles.mainGrid} ${product.requiresMockup === false ? styles.mainGridNoMockup : ''}`}>
-        
-        {/* Left Column: Product Image & Overview */}
-        <div className={styles.leftCol}>
-          <div className={styles.gallery}>
-            <div className={styles.mainImageWrapper}>
-              <img src={selectedImage || product.image || '/images/mockups/tshirt-blank.svg'} className={styles.mainImage} alt={product.name} />
-            </div>
-            {Array.isArray(product.gallery) && product.gallery.length > 0 && (
-              <div style={{ display: 'flex', alignItems: 'center', marginTop: '12px', gap: '8px', position: 'relative' }}>
-                <button 
-                  onClick={() => {
-                    const container = document.getElementById('product-gallery-scroll');
-                    if (container) container.scrollBy({ left: -100, behavior: 'smooth' });
-                  }}
-                  style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0, boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}
+      {workflowTab === 'product' ? (
+      /* ══════════ PRODUCT: photos + details ══════════ */
+      <main className={styles.productLayout}>
+        <section className={styles.gallery} aria-label="Product photos">
+          {productPhotos.length > 1 && (
+            <div className={styles.galleryThumbs} role="tablist" aria-label="Select product photo">
+              {productPhotos.map((src, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  role="tab"
+                  aria-selected={activePhotoIdx === i}
+                  aria-label={`${product?.name} photo ${i + 1}`}
+                  className={`${styles.galleryThumb} ${activePhotoIdx === i ? styles.galleryThumbActive : ''}`}
+                  onClick={() => setActivePhotoIdx(i)}
                 >
-                  <ChevronLeft size={16} />
+                  <img src={src} alt="" />
                 </button>
-                <div 
-                  id="product-gallery-scroll"
-                  style={{ display: 'flex', gap: '8px', overflowX: 'auto', scrollBehavior: 'smooth', flex: 1, padding: '4px 0', scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-                >
-                  <style>{`#product-gallery-scroll::-webkit-scrollbar { display: none; }`}</style>
-                  {[product.image, ...product.gallery].filter(Boolean).map((imgUrl, idx) => (
-                    <img
-                      key={idx}
-                      src={imgUrl}
-                      alt={`View ${idx}`}
-                      onClick={() => setSelectedImage(imgUrl)}
-                      style={{
-                        width: '60px',
-                        height: '60px',
-                        objectFit: 'cover',
-                        borderRadius: '6px',
-                        border: (selectedImage || product.image) === imgUrl ? '2px solid var(--color-primary-600)' : '1px solid #e5e7eb',
-                        cursor: 'pointer',
-                        flexShrink: 0
-                      }}
-                    />
-                  ))}
-                </div>
-                <button 
-                  onClick={() => {
-                    const container = document.getElementById('product-gallery-scroll');
-                    if (container) container.scrollBy({ left: 100, behavior: 'smooth' });
-                  }}
-                  style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0, boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}
-                >
-                  <ChevronRight size={16} />
-                </button>
-              </div>
-            )}
-          </div>
-          
-          <div className={styles.productCard}>
-            <div className={styles.productDetails}>
-              <h1 className={styles.title}>{product.name}</h1>
-              <div className={styles.priceRow}>
-                <span className={styles.price}>₹{product.startingPrice}</span>
-                <span className={styles.priceSuffix}>/ piece</span>
-                <span className={styles.taxBadge}>Inclusive of all taxes</span>
-              </div>
-              {product.shortDesc && <p className={styles.desc}>{product.shortDesc}</p>}
-              
-              <div className={styles.features}>
-                <div className={styles.feature}><Box size={16} /> Premium Fabric</div>
-                <div className={styles.feature}><ShieldCheck size={16} /> Soft & Breathable</div>
-                <div className={styles.feature}><ShieldCheck size={16} /> 100% Quality Guaranteed</div>
-                <div className={styles.feature}><Box size={16} /> Bulk Discounts Available</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Middle Column: Configurator (Dynamic Patterns, Colors & Sizes) */}
-        <div className={styles.middleCol}>
-          
-          {/* DYNAMIC PATTERNS SELECTOR */}
-          {(product.requiresPatterns || (product.patterns && product.patterns.length > 0)) && (
-            <div className={styles.panel} style={{ marginBottom: '16px' }}>
-              <h3 className={styles.panelTitle} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Sparkles size={16} color="#d97706" /> 1. Choose Pattern / Craft
-              </h3>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '10px' }}>
-                {(product.patterns && product.patterns.length > 0 ? product.patterns : allPatterns.map(p => p.name)).map(patName => {
-                  const patObj = allPatterns.find(p => p.name === patName);
-                  const isSelected = activePattern === patName;
-
-                  return (
-                    <div
-                      key={patName}
-                      onClick={() => setActivePattern(patName)}
-                      style={{
-                        border: isSelected ? '2px solid #d97706' : '1px solid #e5e7eb',
-                        backgroundColor: isSelected ? 'rgba(245, 158, 11, 0.08)' : '#ffffff',
-                        borderRadius: '8px',
-                        padding: '10px',
-                        cursor: 'pointer',
-                        textAlign: 'center',
-                        transition: 'all 0.15s ease',
-                        position: 'relative'
-                      }}
-                    >
-                      {patObj?.image ? (
-                        <img src={patObj.image} alt={patName} style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '6px', marginBottom: '6px' }} />
-                      ) : (
-                        <div style={{ width: '40px', height: '40px', borderRadius: '6px', backgroundColor: '#f3f4f6', margin: '0 auto 6px auto', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          <Sparkles size={16} color="#d97706" />
-                        </div>
-                      )}
-                      <span style={{ fontSize: '11px', fontWeight: 600, color: isSelected ? '#b45309' : '#374151', display: 'block', lineHeight: 1.2 }}>
-                        {patName}
-                      </span>
-                      {isSelected && (
-                        <span style={{ position: 'absolute', top: '4px', right: '4px', backgroundColor: '#d97706', color: '#fff', borderRadius: '50%', width: '14px', height: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '9px' }}>
-                          ✓
-                        </span>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
+              ))}
             </div>
           )}
-
-          {/* DYNAMIC COLORS SELECTOR (Compact) */}
-          {(product.requiresColors || (product.colors && product.colors.length > 0)) && (
-            <div className={`${styles.panel} ${styles.colorPanel}`}>
-              <div className={styles.colorHeaderRow}>
-                <h3 className={styles.panelTitle} style={{ marginBottom: 0, fontSize: '0.95rem' }}>
-                  {(product.requiresPatterns || (product.patterns && product.patterns.length > 0)) ? '2. Choose Colour' : '1. Choose Colour'}
-                </h3>
-                <span className={styles.selectedColorPill}>
-                  {allColors.find(c => c.name.toLowerCase() === activeColor.toLowerCase() || c.hex.toLowerCase() === activeColor.toLowerCase())?.name || activeColor}
-                </span>
-              </div>
-              <div className={styles.colorGrid}>
-                {(product.colors && product.colors.length > 0 ? product.colors : allColors.map(c => c.name)).map(colName => {
-                  const colSnippet = allColors.find(c => c.name.toLowerCase() === colName.toLowerCase() || c.hex.toLowerCase() === colName.toLowerCase());
-                  const hexVal = colSnippet?.hex || (colName.startsWith('#') ? colName : '#e0e0e0');
-                  const isSelected = activeColor === colName;
-
-                  return (
-                    <button
-                      type="button"
-                      key={colName}
-                      className={styles.colorItem}
-                      onClick={() => setActiveColor(colName)}
-                      title={colSnippet?.name || colName}
-                      aria-label={colSnippet?.name || colName}
-                    >
-                      <span
-                        className={`${styles.colorCircle} ${isSelected ? styles.colorCircleActive : ''}`}
-                        style={{ backgroundColor: hexVal }}
-                      >
-                        {isSelected && <Check size={12} strokeWidth={3} color={hexVal.toLowerCase() === '#ffffff' || hexVal.toLowerCase() === '#fff' || hexVal.toLowerCase() === '#f8f8f8' ? '#000' : '#fff'} />}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
-          {/* DYNAMIC SIZES SELECTOR */}
-          <div className={styles.panel}>
-            <h3 className={styles.panelTitle}>
-              {(product.requiresPatterns && product.requiresColors) ? '3. Choose Size & Quantity' : (product.requiresColors || product.requiresPatterns) ? '2. Choose Size & Quantity' : '1. Choose Size & Quantity'}
-            </h3>
-            
-            {product.requiresSizes !== false ? (
-              <div className={styles.sizeCategories}>
-                {Object.entries(groupedSizes).map(([category, categorySizes]) => {
-                  const categoryTotal = categorySizes.reduce((sum, sz) => sum + (currentSizes[sz] || 0), 0);
-                  return (
-                    <details key={category} className={styles.sizeCategoryDetails} open={category === 'Adult Standard'}>
-                      <summary className={styles.sizeCategorySummary}>
-                        <span>{category}</span>
-                        {categoryTotal > 0 && <span className={styles.categoryBadge}>{categoryTotal} added</span>}
-                      </summary>
-                      <div className={styles.tableWrapper}>
-                        <table className={styles.sizeTable}>
-                          <thead>
-                            <tr>
-                              <th>Size</th>
-                              <th>Quantity</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {categorySizes.map(sz => {
-                              const qty = currentSizes[sz] || 0;
-                              return (
-                                <tr key={sz}>
-                                  <td className={styles.szName}>{sz}</td>
-                                  <td>
-                                    <div className={styles.tableStepper}>
-                                      <button onClick={() => updateSize(sz, -1)}>-</button>
-                                      <input type="number" value={qty || ''} onChange={e => setSizeDirect(sz, parseInt(e.target.value))} placeholder="0"/>
-                                      <button onClick={() => updateSize(sz, 1)}>+</button>
-                                    </div>
-                                  </td>
-                                </tr>
-                              );
-                            })}
-                          </tbody>
-                        </table>
-                      </div>
-                    </details>
-                  );
-                })}
-              </div>
+          <div className={styles.galleryMain}>
+            {usePhotos ? (
+              <img src={productPhotos[activePhotoIdx]} alt={`${product?.name} photo ${activePhotoIdx + 1}`} />
             ) : (
-               <div className={styles.tableStepper} style={{ width: '150px', marginBottom: '20px' }}>
-                  <button onClick={() => setQuantity(Math.max(0, quantity - 1))}>-</button>
-                  <input type="number" value={quantity || ''} onChange={e => setQuantity(Math.max(0, parseInt(e.target.value)))} placeholder="0"/>
-                  <button onClick={() => setQuantity(quantity + 1)}>+</button>
-               </div>
+              <div className={styles.galleryEmpty}>No photo available</div>
+            )}
+          </div>
+        </section>
+
+        <section className={styles.details} aria-label="Product details">
+          <nav className={styles.breadcrumb} aria-label="Breadcrumb">
+            <Link to="/products">Products</Link>
+            <span aria-hidden="true">/</span>
+            <span>{product?.name}</span>
+          </nav>
+          {/* Heading */}
+          <div className={styles.productHeadingArea}>
+            <h1 className={styles.productTitle}>{product?.name}</h1>
+            {product?.shortDesc && <p className={styles.productSubtitle}>{product.shortDesc}</p>}
+          </div>
+
+          {/* Popular-for tags (admin-set) */}
+          {popularForTags.length > 0 && (
+            <div className={styles.popularForRow}>
+              <span className={styles.popularForLabel}>Popular for</span>
+              {popularForTags.map(t => <span key={t} className={styles.popularForTag}>{t}</span>)}
+            </div>
+          )}
+
+          {/* Price Header */}
+          <div className={styles.priceSection}>
+            <p className={styles.priceLabel}>Your Custom {product?.name}</p>
+            <div className={styles.priceRow}>
+              <span className={styles.priceVal}>{fmt(unitPrice)}</span>
+              <span className={styles.perPiece}>per piece</span>
+              <span title="Includes fabric, printing & GST" className={styles.priceInfoIcon}>
+                <Info size={14} />
+              </span>
+            </div>
+            <p className={styles.priceSubnote}>
+              {nextTier
+                ? `Buy ${nextTier.minQty}+ for ${fmt(nextTier.price)}/pc`
+                : 'All customisations included'}
+            </p>
+          </div>
+
+          {/* Customise CTA */}
+          <button type="button" className={styles.customiseBtn} onClick={() => setWorkflowTab('design')}>
+            <Pencil size={16} />
+            <span>Customise your design</span>
+          </button>
+
+          {swatches.length > 0 && product?.requiresColors !== false && (
+          <div className={styles.colourSection}>
+            <p className={styles.sectionHeading}>Colour — <span className={styles.colourNameText}>{activeColourName}</span></p>
+            <div className={styles.swatchesRow} role="group" aria-label="Select garment colour">
+              {swatches.map(c => {
+                const isSelected = activeColour.toLowerCase() === c.hex.toLowerCase();
+                return (
+                  <button
+                    key={c.hex}
+                    type="button"
+                    className={`${styles.colourSwatch} ${isSelected ? styles.colourSwatchActive : ''}`}
+                    style={{ backgroundColor: c.hex }}
+                    onClick={() => handleColourClick(c)}
+                    title={c.name}
+                    aria-label={`Select ${c.name} colour`}
+                    aria-pressed={isSelected}
+                  />
+                );
+              })}
+              <button
+                type="button"
+                className={styles.swatchPlusBtn}
+                onClick={handleContactUs}
+                title="Custom Pantone / Dye Request"
+                aria-label="Request custom colour"
+              >
+                +
+              </button>
+            </div>
+          </div>
+          )}
+
+          {/* 3 Size Categories (Kids, Adult Standard, Adult Plus) */}
+          <div className={styles.sizeCategoriesGroup} role="group" aria-label="Size selection categories">
+            {sizeCategories.map(category => {
+              const isOpen = openSizeCategories[category.key] ?? true;
+              return (
+                <div key={category.key} className={styles.sizeCategoryBox}>
+                  <button
+                    type="button"
+                    className={styles.sizeCategoryHeader}
+                    onClick={() => toggleSizeCategory(category.key)}
+                    aria-expanded={isOpen}
+                  >
+                    <span>
+                      {category.label}
+                      {categoryCount(category.key) > 0 && (
+                        <span className={styles.sizeCategoryCount}>{categoryCount(category.key)} selected</span>
+                      )}
+                    </span>
+                    <ChevronDown
+                      size={14}
+                      className={`${styles.accordionChevron} ${isOpen ? styles.accordionChevronOpen : ''}`}
+                    />
+                  </button>
+
+                  {isOpen && (
+                    <div className={styles.sizeQtyList}>
+                      {category.sizes.map(sizeStr => {
+                        const key = `${category.key}:${sizeStr}`;
+                        const qty = sizeQty[key] || 0;
+                        return (
+                          <div key={key} className={`${styles.sizeQtyRow} ${qty > 0 ? styles.sizeQtyRowActive : ''}`}>
+                            <span className={styles.sizeQtyLabel}>{sizeStr}</span>
+                            <div className={styles.sizeQtyStepper} role="group" aria-label={`${category.label} ${sizeStr} quantity`}>
+                              <button type="button" className={styles.qtyBtn} onClick={() => setQtyFor(key, qty - 1)} disabled={qty === 0} aria-label={`Decrease ${category.label} ${sizeStr}`}>
+                                <Minus size={12} />
+                              </button>
+                              <input
+                                type="number"
+                                min={0}
+                                inputMode="numeric"
+                                className={styles.sizeQtyInput}
+                                value={qty}
+                                onChange={e => setQtyFor(key, parseInt(e.target.value, 10))}
+                                aria-label={`${category.label} ${sizeStr} quantity`}
+                              />
+                              <button type="button" className={styles.qtyBtn} onClick={() => setQtyFor(key, qty + 1)} aria-label={`Increase ${category.label} ${sizeStr}`}>
+                                <Plus size={12} />
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Order Summary */}
+          <div className={styles.orderSummary} aria-live="polite">
+            <p className={styles.sectionHeading}>Your order</p>
+            {orderLines.length === 0 ? (
+              <p className={styles.orderEmpty}>Choose a quantity for at least one size.</p>
+            ) : (
+              <>
+                <ul className={styles.orderList}>
+                  {orderLines.map(l => (
+                    <li key={l.key} className={styles.orderLine}>
+                      <span>{l.label} × {l.qty}</span>
+                      <button type="button" className={styles.orderRemove} onClick={() => setQtyFor(l.key, 0)} aria-label={`Remove ${l.label}`}>×</button>
+                    </li>
+                  ))}
+                </ul>
+                <div className={styles.orderTotalRow}>
+                  <span>{totalPieces} {totalPieces === 1 ? 'piece' : 'pieces'} · {fmt(unitPrice)}/pc</span>
+                  <strong>{fmt(estimatedTotal)}</strong>
+                </div>
+              </>
             )}
           </div>
 
-          {product.requiresMockup === false && (
-            <div style={{ marginBottom: '16px' }}>
-              <VoiceNoteRecorder
-                onVoiceNoteChange={(dataUrl, duration) => {
-                  setVoiceNote(dataUrl);
-                  setVoiceNoteDuration(duration);
-                }}
-              />
+
+          {/* Instructions for our team */}
+          <div className={styles.notesSection}>
+            <p className={styles.sectionHeading}>Notes for our team</p>
+          {/* Voice Note Section (Warm Peach/Tan Card) */}
+          <div className={styles.voiceNoteCard}>
+            <div className={styles.voiceNoteLeft}>
+              <Mic size={18} className={styles.voiceNoteMicIcon} />
+              <div>
+                <p className={styles.voiceNoteTitle}>Add a Voice Note</p>
+                <p className={styles.voiceNoteDesc}>
+                  {isRecording
+                    ? `Recording: ${Math.floor(recordingSeconds / 60)}:${(recordingSeconds % 60).toString().padStart(2, '0')}`
+                    : voiceAudioUrl
+                    ? 'Voice instructions recorded. Click to preview or replace.'
+                    : 'Record your instructions or customization requirements.'}
+                </p>
+              </div>
             </div>
-          )}
-        </div>
 
-        {/* Right Column: Design & Mockup Preview */}
-        {product.requiresMockup !== false && (
-        <div className={styles.rightCol}>
-              <div className={styles.panel} style={{ marginBottom: '16px' }}>
-                <h3 className={styles.panelTitle}>Add Your Design / Artwork</h3>
-                
-                <div className={styles.uploadArea} onClick={() => fileInputRef.current?.click()}>
-                  <UploadCloud size={24} color="#6b7280" />
-                  <div className={styles.uploadTextContainer}>
-                    <h4>Upload custom artwork</h4>
-                    <span className={styles.formats}>PNG, JPG, SVG, PDF (Max 20MB)</span>
-                  </div>
-                  <button className={styles.browseBtn} onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}>Browse</button>
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleGlobalFileUpload}
-                    accept="image/png, image/jpeg, image/svg+xml, application/pdf"
-                    style={{ display: 'none' }}
-                  />
-                </div>
+            {/* Dynamic Mic / Play / Stop Button */}
+            {!isRecording && !voiceAudioUrl && (
+              <button
+                type="button"
+                className={styles.voiceMicActionBtn}
+                onClick={startRecording}
+                title="Start Recording Voice Note"
+                aria-label="Start recording voice note"
+              >
+                <Mic size={17} />
+              </button>
+            )}
 
-                <div className={styles.helpArea}>
-                  <div className={styles.helpContent}>
-                    <div className={styles.helpHeader}>
-                      <HelpCircle size={16} color="#b45309" />
-                      <h4>Need help with design?</h4>
-                    </div>
-                    <a 
-                      href={waHelpUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={styles.talkBtn}
-                      style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
-                    >
-                      Contact Us
-                    </a>
-                  </div>
-                </div>
+            {isRecording && (
+              <button
+                type="button"
+                className={`${styles.voiceMicActionBtn} ${styles.voiceRecordingActive}`}
+                onClick={stopRecording}
+                title="Stop Recording"
+                aria-label="Stop recording"
+              >
+                <Square size={13} fill="#FFFFFF" />
+              </button>
+            )}
+
+            {voiceAudioUrl && (
+              <div style={{ display: 'flex', gap: '6px' }}>
+                <button
+                  type="button"
+                  className={styles.voiceMicActionBtn}
+                  onClick={toggleAudioPlayback}
+                  title={isPlayingAudio ? 'Pause' : 'Play'}
+                  aria-label="Play recording"
+                >
+                  {isPlayingAudio ? <Pause size={15} /> : <Play size={15} fill="#FFFFFF" />}
+                </button>
+                <button
+                  type="button"
+                  className={styles.voiceMicActionBtn}
+                  style={{ background: '#77716D' }}
+                  onClick={deleteRecording}
+                  title="Delete Recording"
+                  aria-label="Delete recording"
+                >
+                  <Trash2 size={14} />
+                </button>
               </div>
+            )}
+          </div>
 
-              {/* Optional Voice Note Recorder for Customization */}
-              <div style={{ marginBottom: '16px' }}>
-                <VoiceNoteRecorder
-                  onVoiceNoteChange={(dataUrl, duration) => {
-                    setVoiceNote(dataUrl);
-                    setVoiceNoteDuration(duration);
-                  }}
-                />
-              </div>
+          {/* Design Assistance Card */}
+          <div className={styles.helpRow}>
+            <div className={styles.helpLeft}>
+              <HelpCircle size={18} className={styles.helpIcon} />
+              <p className={styles.helpTitle}>Need help with design?</p>
+            </div>
+            <button
+              type="button"
+              className={styles.contactBtn}
+              onClick={handleContactUs}
+            >
+              Contact Us
+            </button>
+          </div>
 
-              <div className={styles.panel}>
-                <div className={styles.accordionHeader} onClick={() => setIsMockupOpen(!isMockupOpen)}>
-                  <h3 className={styles.panelTitle} style={{marginBottom: 0}}>Preview & Position Design</h3>
-                  {isMockupOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-                </div>
-                
-                {!isMockupOpen && <p className={styles.accordionHint}>Appears after you upload a design</p>}
-                
-                {isMockupOpen && (
-                  <div className={styles.accordionContent}>
-                    <MockupCanvasEditor 
-                      productId={product.id}
-                      artwork={artwork}
-                      mockup={mockup}
-                      setArtwork={setArtwork}
-                      setMockup={setMockup}
-                      onPopoverStateChange={setIsArtworkPopoverOpen}
+          </div>
+
+          {/* Accordion Stack */}
+          <div className={styles.accordionList} role="list">
+            {accordions.map(acc => {
+              const isOpen = !!openAccordions[acc.id];
+              return (
+                <div key={acc.id} className={styles.accordionItem} role="listitem">
+                  <button
+                    type="button"
+                    className={styles.accordionTrigger}
+                    onClick={() => toggleAccordion(acc.id)}
+                    aria-expanded={isOpen}
+                  >
+                    <span>{acc.title}</span>
+                    <ChevronDown
+                      size={15}
+                      className={`${styles.accordionChevron} ${isOpen ? styles.accordionChevronOpen : ''}`}
                     />
+                  </button>
+                  <div className={`${styles.accordionContent} ${isOpen ? styles.accordionContentOpen : ''}`}>
+                    {acc.id === 'bulk' ? (
+                      <table className={styles.tierTable}>
+                        <tbody>
+                          {sortedTiers.map(t => (
+                            <tr key={t.minQty}><td>{t.minQty}+ pcs</td><td>{fmt(t.price)} / pc</td></tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    ) : (
+                      <p className={styles.accordionBody}>{acc.content}</p>
+                    )}
                   </div>
-                )}
-              </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      </main>
+      ) : (
+      /* ══════════ DESIGN: mockup studio ══════════ */
+      <main className={styles.designGrid}>
+        <aside className={styles.designSidebar} aria-label="Design tools & uploads">
+          {/* Primary Upload Button */}
+          <button
+            type="button"
+            className={styles.uploadBtn}
+            onClick={() => fileInputRef.current?.click()}
+            aria-label="Upload artwork"
+          >
+            <UploadCloud size={20} />
+            <span>Upload</span>
+          </button>
+
+          <div className={styles.sidebarDivider} />
+
+          {/* My Designs Section */}
+          <div className={styles.myDesignsHeader}>
+            <span className={styles.myDesignsTitle}>My Designs</span>
+            <ChevronRight size={13} color="var(--tp-text-secondary)" />
+          </div>
+
+          <div className={styles.myDesignsList}>
+            {uploadedDesigns.map(design => {
+              const isActive = activeDesignId === design.id;
+              return (
+                <button
+                  key={design.id}
+                  type="button"
+                  className={`${styles.designThumbnailItem} ${isActive ? styles.designThumbnailActive : ''}`}
+                  onClick={() => handleSelectDesign(design)}
+                  aria-label={`Select ${design.name}`}
+                >
+                  <img src={design.previewUrl} alt={design.name} className={styles.thumbImg} />
+                  {isActive && (
+                    <div className={styles.activeCheckmarkBadge} aria-hidden="true">
+                      <Check size={10} strokeWidth={3} />
                     </div>
-        )}
+                  )}
+                </button>
+              );
+            })}
 
-      </div>
+            {/* Add More Button */}
+            <button
+              type="button"
+              className={styles.addMoreBtn}
+              onClick={() => fileInputRef.current?.click()}
+              aria-label="Add more design files"
+            >
+              <Plus size={13} />
+              <span>Add More</span>
+            </button>
 
-      {/* Bottom Sticky Action Bar */}
-      {totalQty > 0 && (
-        <div className={styles.bottomBar}>
-          <div className={styles.bottomContainer}>
-            <div className={styles.bottomStats}>
-              <ShoppingBag size={24} color="#666" />
-              <div className={styles.bCol}>
-                <span className={styles.bLabel}>Total Pieces</span>
-                <span className={styles.bVal}>{totalQty}</span>
-              </div>
-              <div className={styles.bDivider}></div>
-              <div className={styles.bCol}>
-                <span className={styles.bLabel}>Estimated Price</span>
-                <div className={styles.bPriceRow}>
-                  <span className={styles.bPrice}>₹{calculateTotal().toLocaleString('en-IN')}</span>
-                  <span className={styles.bTax}>(Inclusive of all taxes)</span>
+            {/* Resize Artwork Stepper in Sidebar */}
+            {activePlacementData?.previewUrl && (
+              <div className={styles.sidebarResizeSection}>
+                <span className={styles.sidebarResizeLabel}>Resize</span>
+                <div className={styles.sidebarResizeStepper}>
+                  <button
+                    type="button"
+                    onClick={() => handleAdjustScale(-0.1)}
+                    title="Decrease artwork size"
+                    aria-label="Decrease artwork size"
+                  >
+                    <Minus size={11} />
+                  </button>
+                  <span
+                    className={styles.sidebarResizeVal}
+                    title="Click to reset to 100%"
+                    onClick={handleResetScale}
+                  >
+                    {Math.round((activePlacementData.scale || 1) * 100)}%
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => handleAdjustScale(0.1)}
+                    title="Increase artwork size"
+                    aria-label="Increase artwork size"
+                  >
+                    <Plus size={11} />
+                  </button>
                 </div>
               </div>
-            </div>
-            <div className={styles.bottomActions}>
-              {voiceNote && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', backgroundColor: '#F0FDF4', border: '1px solid #DCFCE7', padding: '6px 12px', borderRadius: '9999px', fontSize: '12px', color: '#15803D', fontWeight: 600 }}>
-                  <Mic size={14} /> Voice note included
+            )}
+
+            {/* Remove Artwork from Current Placement Button */}
+            {activePlacementData?.previewUrl && (
+              <button
+                type="button"
+                className={styles.removeArtworkBtn}
+                onClick={handleRemoveArtwork}
+                title={`Remove design from ${activeRegion.label}`}
+                aria-label={`Remove design from ${activeRegion.label}`}
+              >
+                <Trash2 size={13} />
+                <span>Remove from {activeRegion.label}</span>
+              </button>
+            )}
+          </div>
+        </aside>
+
+        <section className={styles.garmentPreviewPanel} aria-label="Garment studio preview">
+          {/* Top Bar (Search Zoom on left, Undo/Redo on right) */}
+          <div className={styles.previewTopBar}>
+            <button
+              type="button"
+              className={styles.iconCircleBtn}
+              onClick={() => handleZoom(10)}
+              title="Inspect Garment"
+              aria-label="Zoom in garment"
+            >
+              <Search size={15} />
+            </button>
+
+            {/* Placement Switcher Pill (Front positions, or indicator for sleeves/back) */}
+            <div className={styles.placementPillsRow}>
+              {activeView === 'front' ? (
+                (['centre_chest', 'left_chest', 'right_chest', 'full_front'] as Placement[]).map(pKey => (
+                  <button
+                    key={pKey}
+                    type="button"
+                    className={`${styles.placementPillBtn} ${selectedPlacement === pKey ? styles.placementPillBtnActive : ''}`}
+                    onClick={() => handleSelectPlacement(pKey)}
+                  >
+                    {PLACEMENT_REGIONS[pKey].label}
+                    {artwork.placements[pKey]?.previewUrl && <span className={styles.pillDot} aria-label="Design placed" />}
+                  </button>
+                ))
+              ) : (
+                <div className={styles.placementCurrentBadge}>
+                  <span>{activeRegion.label}</span>
                 </div>
               )}
-              <button className={styles.saveBtn} onClick={() => navigate('/products')}>
-                <Bookmark size={18} /> Continue Shopping
+            </div>
+
+            <div className={styles.undoRedoPill}>
+              <button
+                type="button"
+                className={styles.undoRedoBtn}
+                onClick={handleResetTransform}
+                title="Reset placement position & scale"
+                aria-label="Reset placement position and scale"
+              >
+                <RotateCcw size={14} />
               </button>
-              <button className={styles.cartBtn} onClick={handleAddToCart}>
-                <ShoppingBag size={18} /> Add to Cart • ₹{calculateTotal().toLocaleString('en-IN')}
+              <div className={styles.undoRedoDivider} />
+              <button
+                type="button"
+                className={styles.undoRedoBtn}
+                onClick={handleResetTransform}
+                title="Reset placement position & scale"
+                aria-label="Reset placement position and scale"
+              >
+                <RotateCw size={14} />
               </button>
             </div>
           </div>
-        </div>
+
+          {/* Canvas Area */}
+          <div className={styles.canvasArea} ref={canvasRef}>
+            <div className={styles.canvasInner} style={{ transform: `scale(${zoomLevel / 100})` }}>
+              {/* Default garment image for the active view (no recolouring) */}
+              <img
+                src={GARMENT_ASSETS[activeView]}
+                alt={`Garment ${activeView} view`}
+                className={styles.garmentBaseSvg}
+                draggable={false}
+              />
+
+              {/* Dashed Printable Area Guide Box across all views */}
+              {activeRegion.view === activeView && (
+                <div
+                  className={styles.printableGuideBox}
+                  style={{
+                    left: `${activeRegion.xPct - activeRegion.wPct / 2}%`,
+                    top: `${activeRegion.yPct - activeRegion.hPct / 2}%`,
+                    width: `${activeRegion.wPct}%`,
+                    height: `${activeRegion.hPct}%`,
+                  }}
+                  aria-hidden="true"
+                >
+                  {/* Empty State Prompt: 1-click add design to this view */}
+                  {!activePlacementData?.previewUrl && (
+                    <button
+                      type="button"
+                      className={styles.emptyPlacementPrompt}
+                      onClick={handlePlaceCurrentDesign}
+                      title={`Place artwork on ${activeRegion.label}`}
+                    >
+                      <Plus size={15} />
+                      <span>Place on {activeRegion.label}</span>
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {/* Every placed design on this view is visible; the selected one is editable */}
+              {(Object.keys(PLACEMENT_REGIONS) as Placement[]).map(pKey => {
+                const region = PLACEMENT_REGIONS[pKey];
+                const art = artwork.placements[pKey];
+                if (region.view !== activeView || !art?.previewUrl) return null;
+                const isSelected = pKey === selectedPlacement;
+                const frame = getFrameSize(art.previewUrl, region);
+                const sc = art.scale || 1;
+                return (
+                  <div
+                    key={pKey}
+                    ref={isSelected ? artLayerRef : undefined}
+                    className={styles.artLayer}
+                    style={{
+                      left: `${region.xPct - region.wPct / 2}%`,
+                      top: `${region.yPct - region.hPct / 2}%`,
+                      width: `${region.wPct}%`,
+                      height: `${region.hPct}%`,
+                      zIndex: isSelected ? 16 : 15,
+                    }}
+                  >
+                    <div
+                      data-art-frame
+                      className={`${styles.artFrame} ${isSelected ? '' : styles.artFrameIdle}`}
+                      style={{
+                        left: `${50 + art.x}%`,
+                        top: `${50 + art.y}%`,
+                        width: `${frame.w * sc}%`,
+                        height: `${frame.h * sc}%`,
+                        transform: `translate(-50%, -50%) rotate(${art.rotation}deg)`,
+                      }}
+                      onPointerDown={isSelected
+                        ? startArtworkInteraction('move')
+                        : (e => { e.preventDefault(); setSelectedPlacement(pKey); })}
+                      role="img"
+                      aria-label={`Placed artwork on ${region.label}`}
+                      title={isSelected ? undefined : `Select ${region.label} design`}
+                    >
+                      <img
+                        src={art.previewUrl}
+                        alt="Custom artwork design"
+                        draggable={false}
+                        onLoad={e => {
+                          const el = e.currentTarget;
+                          if (el.naturalWidth && el.naturalHeight) {
+                            setImgAspect(prev => prev[art.previewUrl] ? prev : { ...prev, [art.previewUrl]: el.naturalWidth / el.naturalHeight });
+                          }
+                        }}
+                      />
+                      {isSelected && (
+                        <>
+                          <span className={styles.artRotateStem} aria-hidden="true" />
+                          <div
+                            className={styles.artRotateHandle}
+                            onPointerDown={startArtworkInteraction('rotate')}
+                            title="Drag to rotate"
+                            aria-label="Rotate artwork"
+                          >
+                            <RotateCw size={12} />
+                          </div>
+                          {(['TL', 'TR', 'BL', 'BR'] as const).map(corner => (
+                            <div
+                              key={corner}
+                              className={`${styles.artHandle} ${styles['artHandle' + corner]}`}
+                              onPointerDown={startArtworkInteraction('scale')}
+                              title="Drag to resize"
+                              aria-label="Resize artwork"
+                            />
+                          ))}
+                        </>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Artwork controls */}
+          {activeRegion.view === activeView && activePlacementData?.previewUrl && (
+            <div className={styles.artToolbar} role="group" aria-label="Artwork size and rotation">
+              <button type="button" className={styles.artToolbarBtn} onClick={() => handleAdjustScale(-0.05)} aria-label="Decrease artwork size">
+                <Minus size={14} />
+              </button>
+              <input
+                type="range"
+                min={30}
+                max={250}
+                step={1}
+                value={Math.round((activePlacementData.scale || 1) * 100)}
+                onChange={e => updateActivePlacement({ scale: Number(e.target.value) / 100 })}
+                className={styles.artSlider}
+                aria-label="Artwork size"
+              />
+              <button type="button" className={styles.artToolbarBtn} onClick={() => handleAdjustScale(0.05)} aria-label="Increase artwork size">
+                <Plus size={14} />
+              </button>
+              <span className={styles.artToolbarVal}>{Math.round((activePlacementData.scale || 1) * 100)}%</span>
+              <span className={styles.artToolbarDivider} />
+              <button type="button" className={styles.artToolbarBtn} onClick={handleRotate} title="Rotate 15°" aria-label="Rotate 15 degrees">
+                <RotateCw size={14} />
+              </button>
+              <button type="button" className={styles.artToolbarBtn} onClick={() => updateActivePlacement({ x: 0, y: 0, scale: 1, rotation: 0 })} title="Reset size, position and rotation" aria-label="Reset artwork">
+                <RotateCcw size={14} />
+              </button>
+              <button type="button" className={`${styles.artToolbarBtn} ${styles.artToolbarDelete}`} onClick={handleRemoveArtwork} title="Remove artwork" aria-label="Remove artwork">
+                <Trash2 size={14} />
+              </button>
+            </div>
+          )}
+
+          {/* Bottom Bar: 4 View Thumbnails & Zoom Capsule */}
+          <div className={styles.previewBottomBar}>
+            {/* 4 View Thumbnails (Front, Back, Left, Right) */}
+            <div className={styles.viewThumbsRow} role="tablist" aria-label="Select garment view">
+              {(['front', 'back', 'left', 'right'] as GarmentView[]).map(viewKey => (
+                <button
+                  key={viewKey}
+                  type="button"
+                  role="tab"
+                  aria-selected={activeView === viewKey}
+                  aria-label={`${viewKey} garment view`}
+                  className={`${styles.viewThumbBtn} ${activeView === viewKey ? styles.viewThumbBtnActive : ''}`}
+                  onClick={() => handleSelectView(viewKey)}
+                >
+                  <img src={VIEW_THUMBNAILS[viewKey]} alt={`${viewKey} view`} className={styles.viewThumbImg} />
+                </button>
+              ))}
+            </div>
+
+            {/* Zoom Capsule Control */}
+            <div className={styles.zoomPill} role="group" aria-label="Zoom controls">
+              <button
+                type="button"
+                className={styles.zoomActionBtn}
+                onClick={() => handleZoom(-10)}
+                aria-label="Zoom out"
+              >
+                <ZoomOut size={13} />
+              </button>
+              <span className={styles.zoomValueText}>{zoomLevel}%</span>
+              <button
+                type="button"
+                className={styles.zoomActionBtn}
+                onClick={() => handleZoom(10)}
+                aria-label="Zoom in"
+              >
+                <ZoomIn size={13} />
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <aside className={styles.designRight} aria-label="Design options">
+          <div className={styles.designRightHead}>
+            <p className={styles.designRightTitle}>{product?.name}</p>
+            <button type="button" className={styles.linkBtn} onClick={() => setWorkflowTab('product')}>
+              ← Back to product
+            </button>
+          </div>
+          <p className={styles.designHint}>
+            Drag your artwork to move it, use the corner handles to resize and the top handle to rotate.
+            Add voice notes and sizes on the Product tab.
+          </p>
+          {/* Colour Swatches Selector */}
+
+          {/* Purchase Action Buttons */}
+          <div className={styles.purchaseActions}>
+            <button
+              type="button"
+              className={styles.saveDesignBtn}
+              onClick={handleSaveDesign}
+            >
+              <Heart size={15} color={saveSuccess ? '#C0392B' : 'var(--tp-text-primary)'} fill={saveSuccess ? '#C0392B' : 'none'} />
+              <span>{saveSuccess ? 'Design Saved!' : 'Save Design'}</span>
+            </button>
+          </div>
+        </aside>
+      </main>
       )}
 
+      {/* ── Sticky Order Bar ── */}
+      <div className={styles.orderBar} role="region" aria-label="Order summary">
+        <div className={styles.orderBarStats}>
+          <ShoppingBag size={22} className={styles.orderBarIcon} />
+          <div>
+            <span className={styles.orderBarLabel}>Total Pieces</span>
+            <strong className={styles.orderBarValue}>{totalPieces}</strong>
+          </div>
+          <div className={styles.orderBarDivider} />
+          <div>
+            <span className={styles.orderBarLabel}>Price per piece</span>
+            <strong className={styles.orderBarValue}>{fmt(unitPrice)}</strong>
+          </div>
+          <div className={styles.orderBarDivider} />
+          <div>
+            <span className={styles.orderBarLabel}>Estimated Price</span>
+            <strong className={styles.orderBarValue}>{fmt(estimatedTotal)}</strong>
+            <span className={styles.orderBarNote}> (Inclusive of all taxes)</span>
+          </div>
+        </div>
+        <div className={styles.orderBarActions}>
+          <button type="button" className={styles.continueBtn} onClick={() => navigate('/products')}>
+            Continue Shopping
+          </button>
+          <button type="button" className={styles.orderBarAddBtn} onClick={handleAddToCart} disabled={totalPieces === 0}>
+            <ShoppingBag size={16} />
+            <span>{totalPieces === 0 ? 'Add to Cart' : `Add to Cart • ${fmt(estimatedTotal)}`}</span>
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
 
-class ProductErrorBoundary extends React.Component<
-  { children: React.ReactNode },
-  { hasError: boolean; error: Error | null; errorInfo: React.ErrorInfo | null }
-> {
-  constructor(props: { children: React.ReactNode }) {
-    super(props);
-    this.state = { hasError: false, error: null, errorInfo: null };
-  }
-
-  static getDerivedStateFromError(error: Error) {
-    return { hasError: true, error };
-  }
-
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('ProductPage ErrorBoundary caught error:', error, errorInfo);
-    this.setState({ errorInfo });
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return (
-        <div style={{ padding: '60px 20px', textAlign: 'center', backgroundColor: '#fff', minHeight: '80vh' }}>
-          <div style={{ maxWidth: '600px', margin: '0 auto', border: '1px solid #fee2e2', padding: '32px', borderRadius: '12px', backgroundColor: '#fef2f2' }}>
-            <h2 style={{ color: '#991b1b', marginBottom: '12px' }}>Product Configuration Warning</h2>
-            <p style={{ color: '#7f1d1d', fontSize: '14px', marginBottom: '20px' }}>
-              {this.state.error?.message || 'A temporary rendering error occurred.'}
-            </p>
-            <button onClick={() => window.location.reload()} className="btn-primary" style={{ padding: '10px 20px', borderRadius: '6px', cursor: 'pointer' }}>
-              Reload Page
-            </button>
-          </div>
-        </div>
-      );
-    }
-    return this.props.children;
-  }
-}
-
-export function ProductPageWithErrorBoundary() {
-  return (
-    <ProductErrorBoundary>
-      <ProductPage />
-    </ProductErrorBoundary>
-  );
-}
-
-export default ProductPageWithErrorBoundary;
+export default ProductPage;

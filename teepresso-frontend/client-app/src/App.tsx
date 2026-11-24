@@ -15,7 +15,6 @@ import FestivePage from '@/features/catalog/FestivePage';
 import CheckoutPage from '@/features/checkout/CheckoutPage';
 import IndustriesPage from '@/features/catalog/IndustriesPage';
 import HowItWorksPage from '@/features/support/HowItWorksPage';
-import FabricGuidePage from '@/features/catalog/FabricGuidePage';
 import FAQPage from '@/features/support/FAQPage';
 import MyOrdersPage from '@/features/tracking/MyOrdersPage';
 import ApproveMockupPage from '@/features/tracking/ApproveMockupPage';
@@ -43,7 +42,6 @@ export function App() {
               <Route path="/checkout" element={<CheckoutPage />} />
               <Route path="/industries" element={<IndustriesPage />} />
               <Route path="/how-it-works" element={<HowItWorksPage />} />
-              <Route path="/fabric-guide" element={<FabricGuidePage />} />
               <Route path="/faq" element={<FAQPage />} />
               <Route path="/my-orders" element={<MyOrdersPage />} />
               <Route path="/approve-mockup" element={<ApproveMockupPage />} />

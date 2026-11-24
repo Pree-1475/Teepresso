@@ -52,7 +52,6 @@ export function Footer() {
           <div className={styles.linkGroup}>
             <h4 className={styles.linkTitle}>Quick Navigation</h4>
             <ul className={styles.linkList}>
-              <li><Link href="/fabric-guide">Fabric & Printing Guide</Link></li>
               <li><Link href="/how-it-works">How It Works</Link></li>
               <li><Link href="/faq">FAQ & Assistance</Link></li>
               <li><Link href="/track-order">Track Order</Link></li>
