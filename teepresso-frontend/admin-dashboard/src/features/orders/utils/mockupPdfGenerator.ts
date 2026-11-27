@@ -171,8 +171,14 @@ export async function renderGarmentSideToDataUrl(
 export interface PdfOrderMeta {
   orderId: string;
   customerName: string;
+  email?: string;
   phone?: string;
+  orgName?: string;
+  orgType?: string;
   orderDate?: string;
+  estimatedDelivery?: string;
+  totalAmount?: number;
+  paymentStatus?: string;
   productName: string;
   color?: string;
   colorHex?: string;
@@ -184,7 +190,7 @@ export interface PdfOrderMeta {
 
 /**
  * Generates and downloads a production-ready A4 PDF showing all 4 sides
- * of the garment with the customer's placed artwork + order specifications.
+ * of the garment with the customer's placed artwork + full customer & order details.
  */
 export async function generateOrderMockupPdf(meta: PdfOrderMeta): Promise<void> {
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
@@ -192,31 +198,57 @@ export async function generateOrderMockupPdf(meta: PdfOrderMeta): Promise<void> 
 
   // Header Banner
   doc.setFillColor(72, 39, 25); // #482719 Espresso
-  doc.rect(0, 0, pageW, 24, 'F');
+  doc.rect(0, 0, pageW, 22, 'F');
   doc.setTextColor(255, 255, 255);
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(15);
-  doc.text('TEEPRESSO — PRODUCTION MOCKUP SHEET', 14, 11);
+  doc.setFontSize(14);
+  doc.text('TEEPRESSO — PRODUCTION MOCKUP SHEET', 14, 10);
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(9.5);
-  doc.text(`Order ID: ${meta.orderId}   |   Date: ${meta.orderDate || '-'}`, 14, 18);
+  doc.setFontSize(9);
+  doc.text(
+    `Order ID: ${meta.orderId}   |   Placed: ${meta.orderDate || '-'}   |   Est. Delivery: ${meta.estimatedDelivery || '-'}`,
+    14,
+    17
+  );
 
-  // Order Metadata Box
+  // Two-Column Customer & Order Details Box
   doc.setFillColor(250, 247, 243);
   doc.setDrawColor(230, 223, 215);
-  doc.roundedRect(14, 29, pageW - 28, 24, 2, 2, 'FD');
+  doc.roundedRect(14, 26, pageW - 28, 30, 2, 2, 'FD');
+
+  // Vertical divider inside metadata box
+  doc.setDrawColor(225, 217, 208);
+  doc.line(pageW / 2 + 2, 29, pageW / 2 + 2, 53);
+
+  // Left Column: Customer Details
+  doc.setTextColor(72, 39, 25);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(8.5);
+  doc.text('CUSTOMER DETAILS', 18, 31.5);
 
   doc.setTextColor(40, 30, 25);
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(9.5);
-  doc.text(`Customer: ${meta.customerName}`, 18, 36);
-  doc.text(`Product: ${meta.productName}`, 18, 42);
-  doc.text(`Color: ${meta.color || 'White'}   |   Size: ${meta.size || 'Standard'}   |   Qty: ${meta.totalPieces || 1} pcs`, 18, 48);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8.5);
+  doc.text(`Name: ${meta.customerName || 'N/A'}`, 18, 37);
+  doc.text(`Phone: ${meta.phone || 'N/A'}`, 18, 42);
+  doc.text(`Email: ${meta.email || 'N/A'}`, 18, 47);
+  doc.text(`Org: ${meta.orgName || 'Individual'} (${meta.orgType || 'Online'})`, 18, 52);
 
-  if (meta.phone) {
-    doc.setFont('helvetica', 'normal');
-    doc.text(`Phone: ${meta.phone}`, pageW - 68, 36);
-  }
+  // Right Column: Order Specifications
+  const rightX = pageW / 2 + 6;
+  doc.setTextColor(72, 39, 25);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(8.5);
+  doc.text('ORDER SPECIFICATIONS', rightX, 31.5);
+
+  doc.setTextColor(40, 30, 25);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8.5);
+  doc.text(`Product: ${meta.productName}`, rightX, 37, { maxWidth: 85 });
+  doc.text(`Color: ${meta.color || 'White'}   |   Size: ${meta.size || 'Standard'}`, rightX, 42);
+  doc.text(`Quantity: ${meta.totalPieces || 1} pcs`, rightX, 47);
+  const amountStr = meta.totalAmount != null ? `Rs. ${Number(meta.totalAmount).toLocaleString('en-IN')}` : '-';
+  doc.text(`Amount: ${amountStr}   |   Payment: ${meta.paymentStatus || 'Pending'}`, rightX, 52);
 
   // Render all 4 views in parallel
   const renderedViews = await Promise.all(
@@ -247,12 +279,12 @@ export async function generateOrderMockupPdf(meta: PdfOrderMeta): Promise<void> 
   );
 
   // 2x2 Grid Layout
-  const cardW = 86;
-  const cardH = 86;
+  const cardW = 84;
+  const cardH = 84;
   const startX = 14;
-  const startY = 59;
-  const gapX = 10;
-  const gapY = 18;
+  const startY = 61;
+  const gapX = 14;
+  const gapY = 17;
 
   renderedViews.forEach((rv, idx) => {
     const col = idx % 2;
