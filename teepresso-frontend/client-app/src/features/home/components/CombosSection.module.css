@@ -145,6 +145,25 @@
 }
 
 /* ──────────────────────────────────────────────
+   SIDE-BY-SIDE GRID (COMBOS + RARE 4XL/5XL CARD)
+   ────────────────────────────────────────────── */
+.combosWithRareGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.9fr) minmax(265px, 0.78fr);
+  gap: 22px;
+  align-items: stretch;
+  max-width: 1260px;
+  margin: 0 auto;
+}
+
+@media (max-width: 1024px) {
+  .combosWithRareGrid {
+    grid-template-columns: 1fr;
+    max-width: 960px;
+  }
+}
+
+/* ──────────────────────────────────────────────
    SPOTLIGHT CARD
    ────────────────────────────────────────────── */
 .spotlightCard {
@@ -152,12 +171,152 @@
   background: #FFFFFF;
   border: 1px solid rgba(140, 91, 69, 0.14);
   border-radius: 24px;
-  padding: 38px 44px;
+  padding: 36px 40px;
   box-shadow:
     0 12px 36px rgba(74, 44, 31, 0.05),
     0 2px 6px rgba(0, 0, 0, 0.02);
-  max-width: 960px;
-  margin: 0 auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* ──────────────────────────────────────────────
+   CLEAN 4XL & 5XL RARE SIZES CARD
+   ────────────────────────────────────────────── */
+.rareSizesCard {
+  background: #FFFFFF;
+  border: 1px solid rgba(140, 91, 69, 0.16);
+  border-radius: 24px;
+  padding: 26px 22px;
+  box-shadow:
+    0 12px 36px rgba(74, 44, 31, 0.05),
+    0 2px 6px rgba(0, 0, 0, 0.02);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.rareEyebrow {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #8C5B45;
+  background: #FAF3EE;
+  border: 1px solid rgba(140, 91, 69, 0.2);
+  padding: 4px 10px;
+  border-radius: 9999px;
+}
+
+.rareTitle {
+  font-family: var(--font-heading, 'Playfair Display', serif);
+  font-size: 23px;
+  font-weight: 700;
+  color: #2D1A13;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.rareDesc {
+  font-size: 12.5px;
+  color: #6E6864;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.rarePreviewBox {
+  position: relative;
+  width: 100%;
+  height: 132px;
+  background: #FAF6F0;
+  border-radius: 16px;
+  border: 1px solid rgba(140, 91, 69, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  margin: 2px 0;
+}
+
+.rareGarmentThumb {
+  height: 86%;
+  width: auto;
+  object-fit: contain;
+  position: relative;
+  z-index: 2;
+  filter: drop-shadow(0 6px 12px rgba(74, 44, 31, 0.1));
+}
+
+.rareWatermark {
+  position: absolute;
+  font-family: var(--font-heading, 'Playfair Display', serif);
+  font-size: 54px;
+  font-weight: 800;
+  color: rgba(140, 91, 69, 0.12);
+  user-select: none;
+  z-index: 1;
+}
+
+.rareSizePills {
+  display: flex;
+  gap: 6px;
+  width: 100%;
+}
+
+.rareSizeBtn {
+  flex: 1;
+  padding: 7px 6px;
+  border-radius: 9999px;
+  border: 1px solid rgba(140, 91, 69, 0.22);
+  background: #FAF6F0;
+  color: #482719;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.rareSizeBtn:hover {
+  border-color: #482719;
+}
+
+.rareSizeBtnActive {
+  background: #482719;
+  border-color: #482719;
+  color: #FFFFFF;
+}
+
+.rareSpecLine {
+  font-size: 11.5px;
+  color: #6E6864;
+  margin: 0;
+}
+
+.rareCtaBtn {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 11px 16px;
+  border-radius: 9999px;
+  border: none;
+  background: #2D1A13;
+  color: #FFFFFF;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 180ms ease;
+  margin-top: 2px;
+}
+
+.rareCtaBtn:hover {
+  background: #482719;
+  transform: translateY(-1px);
 }
 
 @media (max-width: 820px) {

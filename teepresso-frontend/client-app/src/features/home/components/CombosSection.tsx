@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Check } from 'lucide-react';
 import styles from './CombosSection.module.css';
 import { API_BASE_URL } from '@/common/config/api';
@@ -156,6 +157,8 @@ export function CombosSection() {
   }, []);
 
   // Selected combo
+  const navigate = useNavigate();
+  const [rareSize, setRareSize] = useState<'4XL' | '5XL'>('4XL');
   const selectedCombo = combos.find((c) => c.id === selectedComboId) || combos[0];
 
   if (!selectedCombo) {
@@ -244,8 +247,9 @@ export function CombosSection() {
           </div>
         </div>
 
-        {/* The Balanced Spotlight Card */}
-        <div className={styles.spotlightCard}>
+        {/* Combos Spotlight Card + Clean 4XL & 5XL Card Beside It */}
+        <div className={styles.combosWithRareGrid}>
+          <div className={styles.spotlightCard}>
           <div className={styles.contentGrid}>
             
             {/* Left: Offer, Concise Description, Perks, Sizes, Price & CTA */}
@@ -361,6 +365,55 @@ export function CombosSection() {
             </div>
 
           </div>
+          </div>
+
+          {/* Clean & Simple 4XL & 5XL Rare Sizes Card Beside Combos */}
+          <aside className={styles.rareSizesCard} aria-label="Rare 4XL and 5XL sizes">
+            <span className={styles.rareEyebrow}>RARE SIZES • IN STOCK</span>
+            <h3 className={styles.rareTitle}>4XL &amp; 5XL Tees</h3>
+            <p className={styles.rareDesc}>
+              Hard-to-find extended sizes in 240 GSM combed cotton — available with no minimum order.
+            </p>
+
+            <div className={styles.rarePreviewBox}>
+              <img
+                src="/images/products/teepresso/white/tee-white-front.png"
+                alt="4XL and 5XL Custom T-Shirt"
+                className={styles.rareGarmentThumb}
+              />
+              <span className={styles.rareWatermark}>{rareSize}</span>
+            </div>
+
+            <div className={styles.rareSizePills} role="group" aria-label="Select rare size">
+              <button
+                type="button"
+                onClick={() => setRareSize('4XL')}
+                className={`${styles.rareSizeBtn} ${rareSize === '4XL' ? styles.rareSizeBtnActive : ''}`}
+              >
+                4XL · 50&quot; Chest
+              </button>
+              <button
+                type="button"
+                onClick={() => setRareSize('5XL')}
+                className={`${styles.rareSizeBtn} ${rareSize === '5XL' ? styles.rareSizeBtnActive : ''}`}
+              >
+                5XL · 54&quot; Chest
+              </button>
+            </div>
+
+            <p className={styles.rareSpecLine}>
+              {rareSize === '4XL' ? 'Length 31.5" • Relaxed Tailored Fit' : 'Length 32.5" • Generous Studio Fit'}
+            </p>
+
+            <button
+              type="button"
+              onClick={() => navigate('/product/prod_tee_001')}
+              className={styles.rareCtaBtn}
+            >
+              <span>Customize {rareSize}</span>
+              <ArrowRight size={15} />
+            </button>
+          </aside>
         </div>
 
       </div>
