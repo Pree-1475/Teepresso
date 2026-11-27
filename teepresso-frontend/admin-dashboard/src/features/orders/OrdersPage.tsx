@@ -7,21 +7,31 @@ const getUser = () => {
     return { role: 'admin' };
   }
 };
-import { Search, Filter, Download, ShieldAlert, X, CheckCircle, Clock, Save, Truck, CreditCard, Package, Mic } from 'lucide-react';
+import { Search, Filter, Download, ShieldAlert, X, CheckCircle, Clock, Save, Truck, CreditCard, Package, Mic, FileText, Image as ImageIcon } from 'lucide-react';
 import styles from './OrdersPage.module.css';
 import { API_BASE_URL } from '@/common/config/api';
+import {
+  GARMENT_VIEWS,
+  PLACEMENT_REGIONS,
+  getFabricFilter,
+  generateOrderMockupPdf,
+  downloadRawArtwork,
+} from './utils/mockupPdfGenerator';
 
 interface OrderItem {
   id?: string;
   name?: string;
   productName?: string;
   color?: string;
+  colorHex?: string;
   pattern?: string;
   size?: string;
   quantity?: number;
   qty?: number;
+  totalPieces?: number;
   unitPrice?: number;
   totalPrice?: number;
+  placements?: Record<string, any>;
 }
 
 interface Order {
@@ -74,6 +84,31 @@ export function OrdersPage() {
   const [updating, setUpdating] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+
+  const handleDownloadMockupPdf = async (order: Order, item: OrderItem) => {
+    setIsGeneratingPdf(true);
+    try {
+      await generateOrderMockupPdf({
+        orderId: order.orderId || order.id,
+        customerName: order.customerName,
+        phone: order.phone,
+        orderDate: order.orderDate,
+        productName: item.productName || item.name || order.productName,
+        color: item.color,
+        colorHex: item.colorHex,
+        size: item.size,
+        totalPieces: item.totalPieces || item.quantity || item.qty || order.totalPieces,
+        notes: order.notes,
+        placements: item.placements || {},
+      });
+    } catch (err) {
+      console.error('Failed to generate mockup PDF:', err);
+      alert('Failed to generate PDF mockup. Check console for details.');
+    } finally {
+      setIsGeneratingPdf(false);
+    }
+  };
 
   useEffect(() => {
     fetchOrders();
@@ -478,7 +513,7 @@ export function OrdersPage() {
                         <td style={{ padding: '8px 12px' }}>{item.color || 'Default'}</td>
                         <td style={{ padding: '8px 12px' }}>{item.pattern || 'Standard'}</td>
                         <td style={{ padding: '8px 12px', fontWeight: 700 }}>{item.size || 'M'}</td>
-                        <td style={{ padding: '8px 12px' }}>{item.quantity || item.qty || 1} Pcs</td>
+                        <td style={{ padding: '8px 12px' }}>{item.totalPieces || item.quantity || item.qty || 1} Pcs</td>
                         <td style={{ padding: '8px 12px', fontWeight: 600 }}>₹{Number(item.totalPrice || item.unitPrice || 0).toLocaleString('en-IN')}</td>
                       </tr>
                     ))}
@@ -486,6 +521,187 @@ export function OrdersPage() {
                 </table>
               )}
             </div>
+
+            {/* Custom Design Mockups (All 4 Sides) + PDF Export + Raw Artwork Downloads */}
+            {parsedItems(selectedOrder.items).map((item, itemIdx) => {
+              const placements = item.placements || {};
+              const placedEntries = Object.entries(placements).filter(([, p]: [string, any]) => p && p.previewUrl);
+              if (placedEntries.length === 0) return null;
+
+              const fabricFilter = getFabricFilter(item.color, item.colorHex);
+
+              return (
+                <div
+                  key={`mockup-${itemIdx}`}
+                  style={{
+                    backgroundColor: '#FAF7F3',
+                    border: '1px solid rgba(72, 39, 25, 0.16)',
+                    borderRadius: '10px',
+                    padding: '16px',
+                    marginBottom: '24px'
+                  }}
+                >
+                  {/* Header + Download PDF Button */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '10px' }}>
+                    <div>
+                      <h4 style={{ margin: 0, fontSize: '14px', fontWeight: 700, color: '#482719' }}>
+                        Custom T-Shirt Mockups (All 4 Sides) — {item.productName || item.name || selectedOrder.productName}
+                      </h4>
+                      <span style={{ fontSize: '11.5px', color: '#6E655F' }}>
+                        Color: {item.color || 'White'} • {placedEntries.length} placement{placedEntries.length > 1 ? 's' : ''} applied
+                      </span>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => handleDownloadMockupPdf(selectedOrder, item)}
+                      disabled={isGeneratingPdf}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        backgroundColor: '#482719',
+                        color: '#FFFFFF',
+                        border: 'none',
+                        borderRadius: '6px',
+                        padding: '8px 14px',
+                        fontSize: '12px',
+                        fontWeight: 600,
+                        cursor: isGeneratingPdf ? 'wait' : 'pointer',
+                        opacity: isGeneratingPdf ? 0.7 : 1,
+                      }}
+                    >
+                      <FileText size={14} />
+                      <span>{isGeneratingPdf ? 'Generating PDF...' : 'Download All Sides (PDF)'}</span>
+                    </button>
+                  </div>
+
+                  {/* 4-Side Visual Preview Grid */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(155px, 1fr))', gap: '12px', marginBottom: '16px' }}>
+                    {GARMENT_VIEWS.map((viewInfo) => {
+                      const viewPlacements = placedEntries.filter(([k]) => PLACEMENT_REGIONS[k]?.view === viewInfo.key);
+                      return (
+                        <div
+                          key={viewInfo.key}
+                          style={{
+                            backgroundColor: '#FFFFFF',
+                            border: '1px solid #E5DFD7',
+                            borderRadius: '8px',
+                            padding: '8px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                          }}
+                        >
+                          <div style={{ position: 'relative', width: '100%', aspectRatio: '1 / 1', backgroundColor: '#F7F4F0', borderRadius: '6px', overflow: 'hidden' }}>
+                            <img
+                              src={viewInfo.asset}
+                              alt={viewInfo.label}
+                              style={{ width: '100%', height: '100%', objectFit: 'contain', filter: fabricFilter, display: 'block' }}
+                            />
+                            {viewPlacements.map(([pKey, pData]: [string, any]) => {
+                              const region = PLACEMENT_REGIONS[pKey];
+                              if (!region) return null;
+                              return (
+                                <div
+                                  key={pKey}
+                                  style={{
+                                    position: 'absolute',
+                                    left: `${region.xPct - region.wPct / 2}%`,
+                                    top: `${region.yPct - region.hPct / 2}%`,
+                                    width: `${region.wPct}%`,
+                                    height: `${region.hPct}%`,
+                                    transform: `translate(${Number(pData.x) || 0}%, ${Number(pData.y) || 0}%) scale(${Number(pData.scale) || 1}) rotate(${Number(pData.rotation) || 0}deg)`,
+                                    pointerEvents: 'none',
+                                  }}
+                                >
+                                  <img
+                                    src={pData.previewUrl}
+                                    alt={region.label}
+                                    style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
+                                  />
+                                </div>
+                              );
+                            })}
+                          </div>
+                          <span style={{ marginTop: '6px', fontSize: '11.5px', fontWeight: 700, color: '#482719' }}>
+                            {viewInfo.label}
+                          </span>
+                          <span style={{ fontSize: '10.5px', color: '#77716D' }}>
+                            {viewPlacements.length > 0
+                              ? viewPlacements.map(([k]) => PLACEMENT_REGIONS[k]?.label || k).join(', ')
+                              : 'No artwork'}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Raw Customer Artwork Downloads */}
+                  <div style={{ borderTop: '1px solid rgba(72, 39, 25, 0.12)', paddingTop: '12px' }}>
+                    <h5 style={{ margin: '0 0 8px 0', fontSize: '12.5px', fontWeight: 700, color: '#482719', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <ImageIcon size={14} />
+                      <span>Original Uploaded Artwork Files ({placedEntries.length})</span>
+                    </h5>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+                      {placedEntries.map(([pKey, pData]: [string, any]) => {
+                        const label = PLACEMENT_REGIONS[pKey]?.label || pKey;
+                        const scalePct = Math.round((Number(pData.scale) || 1) * 100);
+                        const rotDeg = Math.round(Number(pData.rotation) || 0);
+                        return (
+                          <div
+                            key={`raw-${pKey}`}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '10px',
+                              backgroundColor: '#FFFFFF',
+                              border: '1px solid #E5DFD7',
+                              borderRadius: '8px',
+                              padding: '8px 10px',
+                              minWidth: '230px',
+                            }}
+                          >
+                            <img
+                              src={pData.previewUrl}
+                              alt={label}
+                              style={{ width: '44px', height: '44px', objectFit: 'contain', backgroundColor: '#F7F4F0', borderRadius: '4px', border: '1px solid #EFEAE4' }}
+                            />
+                            <div style={{ flex: 1 }}>
+                              <div style={{ fontSize: '12px', fontWeight: 700, color: '#2F2622' }}>{label}</div>
+                              <div style={{ fontSize: '10.5px', color: '#77716D' }}>
+                                Scale: {scalePct}%{rotDeg ? ` • Rot: ${rotDeg}°` : ''}
+                              </div>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => downloadRawArtwork(pData.previewUrl, `${selectedOrder.orderId || selectedOrder.id}_${pKey}`)}
+                              style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                                backgroundColor: '#FAF7F3',
+                                border: '1px solid rgba(72, 39, 25, 0.25)',
+                                borderRadius: '5px',
+                                padding: '5px 9px',
+                                fontSize: '11px',
+                                fontWeight: 600,
+                                color: '#482719',
+                                cursor: 'pointer',
+                              }}
+                              title={`Download raw image for ${label}`}
+                            >
+                              <Download size={12} />
+                              <span>Download</span>
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
 
             {/* Customer Voice Note Player */}
             {selectedOrder && getOrderVoiceNote(selectedOrder) && (() => {

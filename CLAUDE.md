@@ -29,7 +29,7 @@
 │   │   │   ├── App.tsx                         # Router & global context providers
 │   │   │   ├── common/
 │   │   │   │   ├── components/layout/          # Header, Footer, AnnouncementBar
-│   │   │   │   ├── config/api.ts               # API_BASE_URL (http://localhost:5000/api)
+│   │   │   │   ├── config/api.ts               # API_BASE_URL (http://localhost:5001/api/v1)
 │   │   │   │   ├── context/StorefrontContext   # Storefront phone, settings
 │   │   │   │   └── styles/globals.css          # Global CSS variables & reset
 │   │   │   └── features/
@@ -58,7 +58,7 @@
     │   ├── config/storageService.ts # Google Cloud Storage integration
     │   ├── features/products/   # Product routes & controllers
     │   ├── features/orders/     # Order creation & checkout APIs
-    │   └── index.ts             # Express entry point (Port 5000)
+    │   └── index.ts             # Express entry point (Port 5001)
     └── package.json
 ```
 
@@ -97,7 +97,7 @@ npm run preview           # Preview dist bundle on port 5173
 
 # Backend API
 cd teepresso-backend
-npm run dev               # Start Express API with tsc-watch on port 5000
+npm run dev               # Start Express API with tsc-watch on port 5001
 npm run build             # Compile TypeScript to dist/
 npm start                 # Run compiled dist/index.js
 
