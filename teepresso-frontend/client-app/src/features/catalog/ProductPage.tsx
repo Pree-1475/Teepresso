@@ -94,7 +94,10 @@ const INITIAL_DESIGNS: UploadedItem[] = [
 interface SizeCategory { key: string; label: string; shortLabel: string; sizes: string[]; }
 // Offline fallback only — normally categories & sizes come from GET /sizes
 const FALLBACK_SIZE_CATEGORIES: SizeCategory[] = ['Kids Sizes', 'Adult Standard', 'Adult Plus (Special)'].map(label => ({
-  key: label, label, shortLabel: shortCategoryLabel(label), sizes: ['S', 'M', 'L', 'XL', 'XXL'],
+  key: label,
+  label,
+  shortLabel: shortCategoryLabel(label),
+  sizes: label === 'Adult Plus (Special)' ? ['XXL', '3XL', '4XL', '5XL'] : ['S', 'M', 'L', 'XL', 'XXL'],
 }));
 function shortCategoryLabel(label: string) {
   return label.replace(/\(.*?\)/g, '').replace(/\bSizes?\b/i, '').trim() || label;

@@ -1,0 +1,455 @@
+/* =========================================================================
+   ExtendedSizesSection.module.css
+   Creative Editorial Showcase for Rare 4XL & 5XL Sizes
+   ========================================================================= */
+
+.section {
+  position: relative;
+  width: 100%;
+  padding: 18px 0 54px 0;
+  background-color: var(--color-background, #FAF6F0);
+}
+
+.wrapperCard {
+  position: relative;
+  background: linear-gradient(135deg, #2D1A13 0%, #482719 58%, #361C12 100%);
+  border-radius: 28px;
+  padding: 42px 44px;
+  color: #FAF6F0;
+  overflow: hidden;
+  box-shadow: 0 22px 48px rgba(45, 26, 19, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+@media (max-width: 900px) {
+  .wrapperCard {
+    padding: 28px 22px;
+    border-radius: 22px;
+  }
+}
+
+.bgGlow {
+  position: absolute;
+  top: -120px;
+  right: -80px;
+  width: 420px;
+  height: 420px;
+  background: radial-gradient(circle, rgba(214, 158, 118, 0.18) 0%, rgba(214, 158, 118, 0) 70%);
+  pointer-events: none;
+}
+
+.grid {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 36px;
+  align-items: center;
+}
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+}
+
+/* ── Left Content Column ── */
+.contentCol {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.eyebrowPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(246, 232, 222, 0.14);
+  border: 1px solid rgba(246, 232, 222, 0.28);
+  color: #F6E8DE;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  border-radius: 9999px;
+}
+
+.title {
+  font-family: var(--font-heading, 'Playfair Display', serif);
+  font-size: 38px;
+  font-weight: 700;
+  line-height: 1.15;
+  margin: 0;
+  color: #FFFFFF;
+  letter-spacing: -0.02em;
+}
+
+.highlight {
+  color: #F4C7A1;
+  font-style: italic;
+}
+
+@media (max-width: 640px) {
+  .title {
+    font-size: 28px;
+  }
+}
+
+.subtitle {
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: rgba(250, 246, 240, 0.82);
+  margin: 0;
+  max-width: 540px;
+}
+
+/* ── Interactive Size Spectrum ── */
+.spectrumBlock {
+  width: 100%;
+  max-width: 520px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.spectrumLabels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.spectrumStd {
+  color: rgba(250, 246, 240, 0.55);
+}
+
+.spectrumRare {
+  color: #F4C7A1;
+}
+
+.spectrumRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.22);
+  padding: 6px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.sizeChip {
+  flex: 1;
+  min-width: 40px;
+  text-align: center;
+  padding: 7px 6px;
+  border-radius: 9px;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(250, 246, 240, 0.52);
+  background: transparent;
+  border: 1px solid transparent;
+  user-select: none;
+}
+
+.sizeChipExtended {
+  color: #FFFFFF;
+  background: rgba(244, 199, 161, 0.16);
+  border: 1px solid rgba(244, 199, 161, 0.45);
+  cursor: pointer;
+  font-weight: 700;
+  transition: all 180ms ease;
+}
+
+.sizeChipExtended:hover {
+  background: rgba(244, 199, 161, 0.28);
+  transform: translateY(-1px);
+}
+
+.sizeChipActive {
+  background: #F4C7A1 !important;
+  color: #2D1A13 !important;
+  border-color: #F4C7A1 !important;
+  box-shadow: 0 4px 12px rgba(244, 199, 161, 0.35);
+}
+
+/* ── Dynamic Measurement Card ── */
+.specCard {
+  width: 100%;
+  max-width: 520px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 16px;
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.specHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.specTitleGroup {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.specIcon {
+  color: #F4C7A1;
+}
+
+.specTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+
+.specBadge {
+  font-size: 10.5px;
+  font-weight: 700;
+  background: rgba(39, 174, 96, 0.22);
+  color: #A9DFBF;
+  border: 1px solid rgba(169, 223, 191, 0.35);
+  padding: 3px 10px;
+  border-radius: 9999px;
+}
+
+.specMetricsGrid {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  padding: 10px 14px;
+}
+
+.metricBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+
+.metricVal {
+  font-size: 17px;
+  font-weight: 700;
+  color: #F4C7A1;
+  font-variant-numeric: tabular-nums;
+}
+
+.metricLabel {
+  font-size: 11px;
+  color: rgba(250, 246, 240, 0.65);
+}
+
+.metricDivider {
+  width: 1px;
+  height: 26px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.specFitNote {
+  margin: 0;
+  font-size: 12px;
+  color: rgba(250, 246, 240, 0.78);
+}
+
+/* ── Perks & CTA ── */
+.perksRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.perkItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  color: rgba(250, 246, 240, 0.9);
+}
+
+.perkIcon {
+  color: #A9DFBF;
+  flex-shrink: 0;
+}
+
+.ctaRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.primaryCta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #F4C7A1;
+  color: #2D1A13;
+  border: none;
+  border-radius: 9999px;
+  padding: 12px 24px;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 180ms ease;
+  box-shadow: 0 6px 20px rgba(244, 199, 161, 0.28);
+}
+
+.primaryCta:hover {
+  background: #F9D8BC;
+  transform: translateY(-2px);
+}
+
+.secondaryCta {
+  display: inline-flex;
+  align-items: center;
+  background: transparent;
+  color: #FAF6F0;
+  border: 1px solid rgba(250, 246, 240, 0.32);
+  border-radius: 9999px;
+  padding: 12px 22px;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 180ms ease;
+}
+
+.secondaryCta:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #FAF6F0;
+}
+
+/* ── Right Visual Showcase Card ── */
+.visualCol {
+  display: flex;
+  justify-content: center;
+}
+
+.studioShowcaseCard {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  background: #FAF6F0;
+  border-radius: 22px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+}
+
+.sizeWatermark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -52%);
+  font-family: var(--font-heading, 'Playfair Display', serif);
+  font-size: 112px;
+  font-weight: 800;
+  color: rgba(72, 39, 25, 0.07);
+  pointer-events: none;
+  user-select: none;
+  letter-spacing: -0.04em;
+}
+
+.floatingSpecTag {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: #FFFFFF;
+  border: 1px solid #EFEAE4;
+  border-radius: 9999px;
+  padding: 5px 14px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #482719;
+  box-shadow: 0 3px 10px rgba(72, 39, 25, 0.08);
+}
+
+.dotPulse {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #27AE60;
+}
+
+.garmentStage {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  aspect-ratio: 1 / 0.92;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 4px 0;
+}
+
+.garmentImg {
+  width: 88%;
+  height: 88%;
+  object-fit: contain;
+  filter: drop-shadow(0 12px 20px rgba(72, 39, 25, 0.14));
+  transition: filter 200ms ease, transform 220ms ease;
+}
+
+.studioShowcaseCard:hover .garmentImg {
+  transform: scale(1.03);
+}
+
+.swatchBar {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #FFFFFF;
+  border: 1px solid #EFEAE4;
+  border-radius: 9999px;
+  padding: 6px 14px;
+}
+
+.swatchLabel {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #482719;
+}
+
+.swatchDots {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.swatchDot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid #D6CCC2;
+  cursor: pointer;
+  transition: transform 140ms ease;
+}
+
+.swatchDot:hover {
+  transform: scale(1.15);
+}
+
+.swatchDotActive {
+  border: 2px solid #482719;
+  box-shadow: 0 0 0 2px #FAF6F0, 0 0 0 3.5px #482719;
+}
