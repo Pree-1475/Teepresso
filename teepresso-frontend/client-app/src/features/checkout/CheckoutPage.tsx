@@ -2,14 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useCart } from '@/features/cart/context/CartContext';
 import { useAuth } from '@/features/auth/context/AuthContext';
-import { CheckCircle, ShieldCheck, ArrowLeft, Mic } from 'lucide-react';
+import { CheckCircle, ShieldCheck, ArrowLeft, Mic, Lock, X, LogIn, UserPlus } from 'lucide-react';
 import styles from './CheckoutPage.module.css';
 import { API_BASE_URL } from '@/common/config/api';
 
 export function CheckoutPage() {
   const navigate = useNavigate();
   const { cart, clearCart } = useCart();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, setUserSession } = useAuth();
 
   const [customerInfo, setCustomerInfo] = useState({
     name: '',
@@ -31,6 +31,16 @@ export function CheckoutPage() {
   const [orderComplete, setOrderComplete] = useState(false);
   const [confirmedOrderId, setConfirmedOrderId] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  // Login / Register Modal Gate State (when guest clicks Confirm & Submit Order)
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
+  const [authName, setAuthName] = useState('');
+  const [authPhone, setAuthPhone] = useState('');
+  const [authEmail, setAuthEmail] = useState('');
+  const [authPassword, setAuthPassword] = useState('');
+  const [authLoading, setAuthLoading] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
 
   useEffect(() => {
     if (isAuthenticated && user) {
@@ -60,10 +70,13 @@ export function CheckoutPage() {
   const orderVoiceNote = itemWithVoice?.voiceNote || itemWithVoice?.artwork?.voiceNote || null;
   const orderVoiceNoteDuration = itemWithVoice?.voiceNoteDuration || itemWithVoice?.artwork?.voiceNoteDuration || null;
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const submitOrder = async (overrideUser?: { name: string; email: string; phone: string }) => {
     setIsSubmitting(true);
     setErrorMessage(null);
+
+    const activeName = (overrideUser?.name || customerInfo.name).trim();
+    const activeEmail = (overrideUser?.email || customerInfo.email).trim();
+    const activePhone = (overrideUser?.phone || customerInfo.phone).trim();
 
     // Format all multi-item cart entries cleanly for database JSONB storage
     const formattedItems = cart.items.map(item => ({
@@ -91,9 +104,9 @@ export function CheckoutPage() {
       : `Online Order placed via Storefront Checkout. ${isUrgent ? '[URGENT PROCESSING REQUESTED]' : ''}`;
 
     const payload = {
-      customerName: customerInfo.name.trim(),
-      email: customerInfo.email.trim(),
-      phone: customerInfo.phone.trim(),
+      customerName: activeName,
+      email: activeEmail,
+      phone: activePhone,
       orgName: customerInfo.organization.trim() || 'Individual',
       orgType: 'Individual',
       productName: cart.items.length === 1 ? cart.items[0].name : `${cart.items[0].name} (+${cart.items.length - 1} more items)`,
@@ -128,6 +141,58 @@ export function CheckoutPage() {
       setErrorMessage('Network error while placing order. Please try again.');
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!isAuthenticated) {
+      setAuthName(customerInfo.name);
+      setAuthPhone(customerInfo.phone);
+      setAuthEmail(customerInfo.email);
+      setAuthError(null);
+      setShowAuthModal(true);
+      return;
+    }
+    await submitOrder();
+  };
+
+  const handleAuthSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAuthLoading(true);
+    setAuthError(null);
+
+    try {
+      const endpoint = authMode === 'login' ? `${API_BASE_URL}/auth/login` : `${API_BASE_URL}/auth/register`;
+      const bodyPayload = authMode === 'login'
+        ? { emailOrPhone: authEmail.trim(), password: authPassword }
+        : { name: authName.trim(), email: authEmail.trim(), phone: authPhone.trim(), password: authPassword };
+
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(bodyPayload)
+      });
+      const data = await res.json();
+
+      if (data.success && data.user) {
+        const loggedUser = {
+          id: data.user.id,
+          name: data.user.name || authName || customerInfo.name || 'Customer',
+          email: data.user.email || authEmail || customerInfo.email,
+          phone: data.user.phone || authPhone || customerInfo.phone || '',
+          role: data.user.role || 'customer'
+        };
+        setUserSession(loggedUser);
+        setShowAuthModal(false);
+        await submitOrder(loggedUser);
+      } else {
+        setAuthError(data.message || (authMode === 'login' ? 'Invalid email/phone or password' : 'Registration failed'));
+      }
+    } catch {
+      setAuthError('Network error connecting to authentication service.');
+    } finally {
+      setAuthLoading(false);
     }
   };
 
@@ -342,6 +407,196 @@ export function CheckoutPage() {
 
         </form>
       </div>
+
+      {/* Sign In / Register Modal Gate on Order Confirmation */}
+      {showAuthModal && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(25, 16, 12, 0.55)',
+            backdropFilter: 'blur(4px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 9999,
+            padding: '16px'
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: '16px',
+              width: '100%',
+              maxWidth: '420px',
+              padding: '24px',
+              boxShadow: '0 20px 50px rgba(0,0,0,0.2)',
+              border: '1px solid #EFEAE4',
+              position: 'relative'
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => setShowAuthModal(false)}
+              aria-label="Close login modal"
+              style={{
+                position: 'absolute',
+                top: '16px',
+                right: '16px',
+                background: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                color: '#77716D'
+              }}
+            >
+              <X size={20} />
+            </button>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+              <div style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: '#F6E8DE', color: '#482719', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Lock size={18} />
+              </div>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: '#482719' }}>
+                  Sign In to Place Order
+                </h3>
+                <p style={{ margin: 0, fontSize: '12.5px', color: '#6E655F' }}>
+                  Please log in or create an account to confirm your custom order.
+                </p>
+              </div>
+            </div>
+
+            {/* Auth Mode Toggle */}
+            <div style={{ display: 'flex', gap: '6px', backgroundColor: '#FCF8F4', padding: '4px', borderRadius: '9999px', border: '1px solid #EFEAE4', margin: '16px 0' }}>
+              <button
+                type="button"
+                onClick={() => { setAuthMode('login'); setAuthError(null); }}
+                style={{
+                  flex: 1,
+                  padding: '8px',
+                  borderRadius: '9999px',
+                  border: 'none',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  backgroundColor: authMode === 'login' ? '#482719' : 'transparent',
+                  color: authMode === 'login' ? '#FFFFFF' : '#6E655F'
+                }}
+              >
+                Sign In
+              </button>
+              <button
+                type="button"
+                onClick={() => { setAuthMode('register'); setAuthError(null); }}
+                style={{
+                  flex: 1,
+                  padding: '8px',
+                  borderRadius: '9999px',
+                  border: 'none',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  backgroundColor: authMode === 'register' ? '#482719' : 'transparent',
+                  color: authMode === 'register' ? '#FFFFFF' : '#6E655F'
+                }}
+              >
+                Create Account
+              </button>
+            </div>
+
+            {authError && (
+              <div style={{ backgroundColor: '#FEE2E2', color: '#B91C1C', padding: '10px 12px', borderRadius: '8px', fontSize: '12.5px', fontWeight: 600, marginBottom: '12px' }}>
+                {authError}
+              </div>
+            )}
+
+            <form onSubmit={handleAuthSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {authMode === 'register' && (
+                <>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#482719', marginBottom: '4px' }}>Full Name *</label>
+                    <input
+                      type="text"
+                      required
+                      value={authName}
+                      onChange={e => setAuthName(e.target.value)}
+                      placeholder="Your full name"
+                      style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #D6CCC2', fontSize: '13.5px', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#482719', marginBottom: '4px' }}>Phone Number *</label>
+                    <input
+                      type="tel"
+                      required
+                      value={authPhone}
+                      onChange={e => setAuthPhone(e.target.value)}
+                      placeholder="10-digit mobile number"
+                      style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #D6CCC2', fontSize: '13.5px', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                </>
+              )}
+
+              <div>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#482719', marginBottom: '4px' }}>
+                  {authMode === 'login' ? 'Email or Phone Number *' : 'Email Address *'}
+                </label>
+                <input
+                  type={authMode === 'login' ? 'text' : 'email'}
+                  required
+                  value={authEmail}
+                  onChange={e => setAuthEmail(e.target.value)}
+                  placeholder={authMode === 'login' ? 'you@example.com or 9876543210' : 'you@example.com'}
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #D6CCC2', fontSize: '13.5px', boxSizing: 'border-box' }}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#482719', marginBottom: '4px' }}>Password *</label>
+                <input
+                  type="password"
+                  required
+                  value={authPassword}
+                  onChange={e => setAuthPassword(e.target.value)}
+                  placeholder="••••••••"
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #D6CCC2', fontSize: '13.5px', boxSizing: 'border-box' }}
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={authLoading}
+                style={{
+                  marginTop: '6px',
+                  width: '100%',
+                  padding: '12px',
+                  borderRadius: '9999px',
+                  border: 'none',
+                  backgroundColor: '#482719',
+                  color: '#FFFFFF',
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  cursor: authLoading ? 'wait' : 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px'
+                }}
+              >
+                {authMode === 'login' ? <LogIn size={16} /> : <UserPlus size={16} />}
+                <span>
+                  {authLoading
+                    ? 'Authenticating...'
+                    : authMode === 'login'
+                      ? 'Sign In & Place Order'
+                      : 'Create Account & Place Order'}
+                </span>
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
